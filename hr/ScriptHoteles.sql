@@ -70,3 +70,22 @@ INSERT INTO room_type(typ_name,typ_bed_number,typ_base_price) VALUES('doble',2,2
 INSERT INTO room_type(typ_name,typ_bed_number,typ_base_price) VALUES('simple',1,120);
 INSERT INTO room_type(typ_name,typ_bed_number,typ_base_price) VALUES('suite',1,350);
 
+
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'101',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'102',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'103',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'104',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'105',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'106',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'107',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'108',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'109',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'110',2);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'201',1);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'202',1);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'203',1);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1001',3);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1002',3);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1003',3);
+INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1004',3);
+
