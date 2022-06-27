@@ -43,7 +43,7 @@ public class HotelService implements IHotelService {
 				if ((Integer.parseInt(entry.getValue().toString()) < 1)
 						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
 					res.setCode(EntityResult.OPERATION_WRONG);
-					res.setMessage("ERROR - ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+					res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
 					return res;
 				}
 			}
@@ -53,7 +53,7 @@ public class HotelService implements IHotelService {
 			return this.daoHelper.insert(this.hotelDao, attrMap);
 		} catch (DuplicateKeyException e) {
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(e.getMessage());
+			res.setMessage("DUPLICATED HOTEL NAME");
 			return res;
 		}
 	}
@@ -69,7 +69,7 @@ public class HotelService implements IHotelService {
 				if ((Integer.parseInt(entry.getValue().toString()) < 1)
 						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
 					res.setCode(EntityResult.OPERATION_WRONG);
-					res.setMessage("ERROR - ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+					res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
 					return res;
 				}
 			}
@@ -79,7 +79,7 @@ public class HotelService implements IHotelService {
 			return this.daoHelper.update(this.hotelDao, attrMap, keyMap);
 		} catch (DuplicateKeyException e) {
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(e.getMessage());
+			res.setMessage("DUPLICATED HOTEL NAME");
 			return res;
 		}
 

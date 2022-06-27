@@ -4,19 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ontimize.hr.api.core.service.IHotelService;
+import com.ontimize.hr.api.core.service.IRoomTypeService;
 import com.ontimize.jee.server.rest.ORestController;
 
 @RestController
-@RequestMapping("/hotels")
-public class HotelRestController extends ORestController<IHotelService> {
-	
+@RequestMapping("/roomtypes")
+public class RoomTypeRestController extends ORestController<IRoomTypeService>{
 	@Autowired
-	private IHotelService hotelService;
+	private IRoomTypeService roomTypeService;
 	
 	@Override
-	public IHotelService getService() {
-		return this.hotelService;
+	public IRoomTypeService getService() {
+		return this.roomTypeService;
 	}
-
 }
