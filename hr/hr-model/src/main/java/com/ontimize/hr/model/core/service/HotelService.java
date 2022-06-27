@@ -1,18 +1,18 @@
 package com.ontimize.hr.model.core.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IHotelService;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.jee.common.dto.EntityResult;
+import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
@@ -34,32 +34,55 @@ public class HotelService implements IHotelService {
 	}
 
 	@Override
-	public EntityResult hotelInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		// para pasar datos vacios
-		Map<String, Object> dataVacio = new HashMap<String, Object>();
-		EntityResult vacio, bien;
+	public EntityResult hotelInsert(Map<String, Object> attrMap) {
+
+		EntityResult res = new EntityResultMapImpl();
 
 		for (Entry<String, Object> entry : attrMap.entrySet()) {
 			if (entry.getKey().equals(HotelDao.ATTR_STARS)) {
 				if ((Integer.parseInt(entry.getValue().toString()) < 1)
 						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
-					vacio = daoHelper.insert(hotelDao, dataVacio);
-					vacio.setCode(1);
-					vacio.setMessage("Las estrellas tienen que ir entre 1 y 5");
-					return vacio;
+					res.setCode(EntityResult.OPERATION_WRONG);
+					res.setMessage("ERROR - ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+					return res;
 				}
 			}
 		}
 
-		bien = this.daoHelper.insert(this.hotelDao, attrMap);
-		bien.setMessage("Todo ok horseluis");
-		return bien;
+		try {
+			return this.daoHelper.insert(this.hotelDao, attrMap);
+		} catch (DuplicateKeyException e) {
+			res.setCode(EntityResult.OPERATION_WRONG);
+			res.setMessage(e.getMessage());
+			return res;
+		}
 	}
 
 	@Override
 	public EntityResult hotelUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
-		return this.daoHelper.update(this.hotelDao, attrMap, keyMap);
+
+		EntityResult res = new EntityResultMapImpl();
+
+		for (Entry<String, Object> entry : attrMap.entrySet()) {
+			if (entry.getKey().equals(HotelDao.ATTR_STARS)) {
+				if ((Integer.parseInt(entry.getValue().toString()) < 1)
+						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
+					res.setCode(EntityResult.OPERATION_WRONG);
+					res.setMessage("ERROR - ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+					return res;
+				}
+			}
+		}
+
+		try {
+			return this.daoHelper.update(this.hotelDao, attrMap, keyMap);
+		} catch (DuplicateKeyException e) {
+			res.setCode(EntityResult.OPERATION_WRONG);
+			res.setMessage(e.getMessage());
+			return res;
+		}
+
 	}
 
 	@Override
