@@ -1,7 +1,10 @@
 package com.ontimize.hr.model.core.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,23 +18,42 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @Service("HotelService")
 @Lazy
-public class HotelService implements IHotelService{
+public class HotelService implements IHotelService {
 
 	@Autowired
 	private HotelDao hotelDao;
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
-	
+
 	@Override
 	public EntityResult hotelQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.hotelDao, keyMap, attrList);
+
 	}
 
 	@Override
 	public EntityResult hotelInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		return this.daoHelper.insert(this.hotelDao, attrMap);
+		// para pasar datos vacios
+		Map<String, Object> dataVacio = new HashMap<String, Object>();
+		EntityResult vacio, bien;
+
+		for (Entry<String, Object> entry : attrMap.entrySet()) {
+			if (entry.getKey().equals(HotelDao.ATTR_STARS)) {
+				if ((Integer.parseInt(entry.getValue().toString()) < 1)
+						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
+					vacio = daoHelper.insert(hotelDao, dataVacio);
+					vacio.setCode(1);
+					vacio.setMessage("Las estrellas tienen que ir entre 1 y 5");
+					return vacio;
+				}
+			}
+		}
+
+		bien = this.daoHelper.insert(this.hotelDao, attrMap);
+		bien.setMessage("Todo ok horseluis");
+		return bien;
 	}
 
 	@Override
