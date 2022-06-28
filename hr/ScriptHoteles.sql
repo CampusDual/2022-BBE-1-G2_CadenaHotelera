@@ -38,7 +38,7 @@ CREATE TABLE if not exists client(
     cli_email varchar(150),
     CONSTRAINT CK_client_cli_name CHECK (ltrim(rtrim(client.cli_name))<>''),
     CONSTRAINT CK_client_cli_surname1 CHECK (ltrim(rtrim(client.cli_surname1))<>''),
-    CONSTRAINT UQ_client_cli_name UNIQUE (cli_name)
+    CONSTRAINT UQ_client_cli_email UNIQUE (cli_email)
 
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE if not exists booking(
 	bok_rom_number varchar(15)NOT NULL,
     bok_entry_date date NOT NULL,
     bok_departure_date date,
-    bok_coments varchar(255)
+    bok_comments varchar(255)
 );
 
 ALTER TABLE booking ADD CONSTRAINT fk_client_booking FOREIGN KEY(bok_cli_id) REFERENCES client(cli_id);
