@@ -33,7 +33,9 @@ CREATE TABLE if not exists client(
     cli_surname2 varchar(30),
     cli_identification varchar(20) not null,
     cli_phone varchar(20),
-    cli_email varchar(150)
+    cli_email varchar(150),
+    CONSTRAINT UQ_client_cli_name UNIQUE (cli_name)
+
 );
 
 
@@ -88,4 +90,11 @@ INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1001',3);
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1002',3);
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1003',3);
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1004',3);
+
+
+
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('CARLOS', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'PÉREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JUAN', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
+
 
