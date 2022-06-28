@@ -13,7 +13,8 @@ CREATE TABLE if not exists hotel(
     htl_email varchar(150),
     htl_phone varchar(20),
     htl_stars integer,
-    CONSTRAINT UQ_hotel_htl_name UNIQUE (htl_name)
+    CONSTRAINT CK_hotel_htl_name CHECK (ltrim(rtrim(hotel.htl_name))<>''),
+    CONSTRAINT UQ_hotel_htl_email UNIQUE (htl_email)
 );
 
 
@@ -22,6 +23,7 @@ CREATE TABLE if not exists room_type(
     typ_name varchar(20) NOT NULL,
     typ_bed_number integer NOT NULL,
     typ_base_price decimal(10,2) NOT NULL,
+    CONSTRAINT CK_room_type_typ_name CHECK (ltrim(rtrim(room_type.typ_name))<>''),
     CONSTRAINT UQ_room_type_typ_name UNIQUE (typ_name)
 );
 
@@ -34,6 +36,8 @@ CREATE TABLE if not exists client(
     cli_identification varchar(20) not null,
     cli_phone varchar(20),
     cli_email varchar(150),
+    CONSTRAINT CK_client_cli_name CHECK (ltrim(rtrim(client.cli_name))<>''),
+    CONSTRAINT CK_client_cli_surname1 CHECK (ltrim(rtrim(client.cli_surname1))<>''),
     CONSTRAINT UQ_client_cli_name UNIQUE (cli_name)
 
 );
@@ -43,6 +47,7 @@ CREATE TABLE if not exists room(
    	rom_htl_id INTEGER,
 	rom_number varchar(15),
     rom_typ_id integer NOT NULL,
+    CONSTRAINT CK_room_rom_number CHECK (ltrim(rtrim(room.rom_number))<>''),
     constraint pk_room primary key (rom_htl_id,rom_number)
 );
 
@@ -96,5 +101,6 @@ INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (1,'1004',3);
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('CARLOS', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'PÉREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JUAN', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
+
 
 

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,12 @@ public class RoomTypeService implements IRoomTypeService{
 			res.setMessage("DUPLICATED ROOM TYPE NAME");
 			return res;
 		}
+		catch (DataIntegrityViolationException e) {
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			res.setMessage("ROOM TYPE CAN NOT BE BLANK");
+			return res;
+		}
 	}
 
 	@Override
@@ -53,6 +60,12 @@ public class RoomTypeService implements IRoomTypeService{
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			res.setMessage("DUPLICATED ROOM TYPE NAME");
+			return res;
+		}
+		catch (DataIntegrityViolationException e) {
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			res.setMessage("ROOM TYPE CAN NOT BE BLANK");
 			return res;
 		}
 	}

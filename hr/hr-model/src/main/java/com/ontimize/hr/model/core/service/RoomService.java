@@ -55,6 +55,9 @@ public class RoomService implements IRoomService {
 				} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
 					result.setMessage("NO SUCH HOTEL");
 				}
+				if(e.getMessage()!=null &&e.getMessage().contains("ck_room_type_typ_name")) {
+					result.setMessage("ROOM NUMBER CANT BE BLANK");
+				}
 				return result;
 			}
 			catch (Exception e) {
