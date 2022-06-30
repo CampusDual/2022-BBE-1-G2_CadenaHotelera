@@ -7,4 +7,26 @@
 		<Column>bok_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>bok_id</GeneratedKey>
+	<Queries>
+  		<Query id="freeRoomsQuery">
+      		<Sentence>
+			   <![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.room
+			     EXCEPT
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.room r
+			     LEFT JOIN
+			     	PUBLIC.booking b
+			     on 
+			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id			     	
+			    #WHERE# 
+			   ]]>
+   			</Sentence>
+  		</Query>
+ 	</Queries>
 </JdbcEntitySetup>

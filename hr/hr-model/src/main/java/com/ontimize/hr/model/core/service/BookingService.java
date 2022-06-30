@@ -52,5 +52,12 @@ public class BookingService implements IBookingService {
 		return this.daoHelper.delete(this.bookingDao, keyMap);
 	}
 
+	@Override
+	public EntityResult bookingFreeQuery(Map<String, Object> keyMap, List<String> attrList)
+			throws OntimizeJEERuntimeException {
+		// TODO Auto-generated method stub
+		return this.daoHelper.query(this.bookingDao, keyMap, attrList,BookingDao.QUERY_FREE_ROOMS);
+	}
+
 
 }

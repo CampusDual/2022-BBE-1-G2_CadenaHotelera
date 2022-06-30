@@ -18,5 +18,8 @@ public interface IBookingService {
 			throws OntimizeJEERuntimeException;
 
 	public EntityResult bookingDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+	
+	public EntityResult bookingFreeQuery(Map<String, Object> keyMap, List<String> attrList)
+			throws OntimizeJEERuntimeException;
 
 }
