@@ -86,6 +86,34 @@ public class BookingService implements IBookingService {
 			  }
 	}
 	
+	@Override
+	public EntityResult bookingOcupiedQuery(Map<String, Object> req)
+			throws OntimizeJEERuntimeException {
+		try {
+			   List<String> columns = (List<String>) req.get("columns");
+			   Map<String, Object> filter = (Map<String, Object>) req.get("filter");
+			   int hotelId =  Integer.parseInt(filter.get("hotel").toString());
+			   Date startDate = new SimpleDateFormat("dd/MM/yyyy").parse(filter.get("inicio").toString());
+			   Date endDate = new SimpleDateFormat("dd/MM/yyyy").parse(filter.get("fin").toString());
+			   Map<String, Object> keyMap = new HashMap<String, Object>();
+			   keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
+			   searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE,BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_ID,
+					   				 startDate, endDate, hotelId));			   
+			    
+			   EntityResult res = new EntityResultMapImpl();
+			   res = this.daoHelper.query(this.bookingDao, keyMap, columns, bookingDao.QUERY_OCUPIED_ROOMS);
+			   EntityResult resFilter = EntityResultTools.dofilter(res,EntityResultTools.keysvalues("rom_htl_id",hotelId) );
+			   
+			   return resFilter;
+			   
+			  } catch (Exception e) {
+			   e.printStackTrace();
+			   EntityResult res = new EntityResultMapImpl();
+			   res.setCode(EntityResult.OPERATION_WRONG);
+			   return res;
+			  }
+	}
+	
 	private BasicExpression searchBetweenWithYear(String entryDate, String departureDate,String hotelIdS, Date inicio, Date fin, int hotelId) {
 		  
 		  Date startDate = inicio;

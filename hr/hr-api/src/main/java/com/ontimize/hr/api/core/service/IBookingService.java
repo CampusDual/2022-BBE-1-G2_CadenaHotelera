@@ -22,5 +22,7 @@ public interface IBookingService {
 	
 	public EntityResult bookingFreeQuery(Map<String, Object> req)
 			throws OntimizeJEERuntimeException;
+	public EntityResult bookingOcupiedQuery(Map<String, Object> req)
+			throws OntimizeJEERuntimeException;
 
 }

@@ -450,6 +450,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "HabitacionesOcupadas",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"hotel\":\"1\",\r\n        \"inicio\": \"04/07/2022\",\r\n        \"fin\" : \"05/07/2022\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ],\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingOcupied/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingOcupied",
+								"search"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
