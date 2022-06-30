@@ -3,7 +3,6 @@ package com.ontimize.hr.api.core.service;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -21,7 +20,7 @@ public interface IBookingService {
 
 	public EntityResult bookingDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 	
-	public EntityResult bookingFreeQuery(@RequestBody Map<String, Object> req)
+	public EntityResult bookingFreeQuery(Map<String, Object> req)
 			throws OntimizeJEERuntimeException;
 
 }

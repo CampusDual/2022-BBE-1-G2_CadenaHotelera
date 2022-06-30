@@ -9,7 +9,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
@@ -60,7 +59,7 @@ public class BookingService implements IBookingService {
 	}
 
 	@Override
-	public EntityResult bookingFreeQuery(@RequestBody Map<String, Object> req)
+	public EntityResult bookingFreeQuery(Map<String, Object> req)
 			throws OntimizeJEERuntimeException {
 		try {
 			   List<String> columns = (List<String>) req.get("columns");
