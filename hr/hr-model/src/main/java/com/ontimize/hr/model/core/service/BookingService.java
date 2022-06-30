@@ -74,7 +74,7 @@ public class BookingService implements IBookingService {
 			    
 			   EntityResult res = new EntityResultMapImpl();
 			   res = this.daoHelper.query(this.bookingDao, keyMap, columns, bookingDao.QUERY_FREE_ROOMS);
-			   EntityResult resFilter = EntityResultTools.dofilter(res,EntityResultTools.keysvalues("rom_htl_id",hotelId) );
+			   EntityResult resFilter = EntityResultTools.dofilter(res,EntityResultTools.keysvalues(RoomDao.ATTR_ID,hotelId) );
 			   
 			   return resFilter;
 			   
@@ -102,9 +102,9 @@ public class BookingService implements IBookingService {
 			    
 			   EntityResult res = new EntityResultMapImpl();
 			   res = this.daoHelper.query(this.bookingDao, keyMap, columns, bookingDao.QUERY_OCUPIED_ROOMS);
-			   EntityResult resFilter = EntityResultTools.dofilter(res,EntityResultTools.keysvalues("rom_htl_id",hotelId) );
+			   EntityResult resFilter = EntityResultTools.dofilter(res,EntityResultTools.keysvalues(RoomDao.ATTR_ID,hotelId) );
 			   
-			   return resFilter;
+			   return res;
 			   
 			  } catch (Exception e) {
 			   e.printStackTrace();
@@ -123,12 +123,12 @@ public class BookingService implements IBookingService {
 		  BasicField departure = new BasicField(departureDate);
 		  BasicField hotelIdB = new BasicField(hotelIdS);
 		  BasicExpression bexp = new BasicExpression(hotelIdB, BasicOperator.EQUAL_OP, hotelId);
-		  BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, endDate);
-		  BasicExpression bexp2 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, startDate);
-		  BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
-		  BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, startDate);
-		  BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, endDate);
-		  BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, startDate);
+		  BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
+		  BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, endDate);
+		  BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, startDate);
+		  BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
+		  BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
+		  BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
 		  
 		  BasicExpression bexp7 = new BasicExpression(bexp1, BasicOperator.AND_OP, bexp2);
 		  BasicExpression bexp8 = new BasicExpression(bexp3, BasicOperator.AND_OP, bexp4);

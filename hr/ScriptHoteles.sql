@@ -103,17 +103,15 @@ insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_p
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'PÉREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JUAN', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
 
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'101','2022-06-25','2022-06-28','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'102','2022-06-25','2022-06-28','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'102','2022-06-30','2022-07-02','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'103','2022-06-30','2022-07-02','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'103','2022-07-05','2022-07-10','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'101','2022-06-25','2022-06-30','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'102','2022-06-27','2022-07-02','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'103','2022-07-03','2022-07-04','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'104','2022-07-03','2022-07-07','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'105','2022-06-28','2022-07-07','comments');
 
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (2,'101',3);
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (2,'2101',3);
-
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,2,'101','2022-06-25','2022-06-28','comments');
-
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,2,'101','2022-06-25','2022-07-28','comments');
 
 
 
