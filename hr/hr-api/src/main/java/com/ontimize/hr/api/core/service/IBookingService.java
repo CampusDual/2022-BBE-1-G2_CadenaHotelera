@@ -26,4 +26,6 @@ public interface IBookingService {
 			throws OntimizeJEERuntimeException;
 	
 	public EntityResult bookingByType(Map<String, Object>req) throws OntimizeJEERuntimeException;
+	
+	public EntityResult bookingFreeByTypeQuery(Map<String, Object>req) throws OntimizeJEERuntimeException;
 }

@@ -17,51 +17,61 @@ import com.ontimize.jee.server.rest.ORestController;
 @RestController
 @RequestMapping("/bookings")
 public class BookingRestController extends ORestController<IBookingService> {
-	
+
 	@Autowired
 	private IBookingService bookingService;
-	
+
 	@Override
 	public IBookingService getService() {
 		return this.bookingService;
 	}
-	
+
 	@RequestMapping(value = "bookingFree/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	 public EntityResult bookingLibresSearch(@RequestBody Map<String, Object> req) {
+	public EntityResult bookingLibresSearch(@RequestBody Map<String, Object> req) {
 		try {
 			return this.bookingService.bookingFreeQuery(req);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
 		}
-	 }
-	
+	}
+
 	@RequestMapping(value = "bookingOcupied/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	 public EntityResult bookingOcupadoSearch(@RequestBody Map<String, Object> req) {
+	public EntityResult bookingOcupadoSearch(@RequestBody Map<String, Object> req) {
 		try {
 			return this.bookingService.bookingOcupiedQuery(req);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
 		}
-	 }
-	
-	@RequestMapping(value = "booking/bookingbytype", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public EntityResult bookingByType (@RequestBody Map<String, Object> req) {
+	}
+
+	@RequestMapping(value = "booking/bookingbytype/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingByType(@RequestBody Map<String, Object> req) {
 		try {
 			return this.bookingService.bookingByType(req);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
 		}
-		
+
+	}
+
+	@RequestMapping(value = "bookingFreeByType/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingFreeByType(@RequestBody Map<String, Object> req) {
+		try {
+			return this.bookingService.bookingFreeByTypeQuery(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+
 	}
 }
