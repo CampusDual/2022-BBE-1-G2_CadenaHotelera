@@ -51,5 +51,17 @@ public class BookingRestController extends ORestController<IBookingService> {
 			return res;
 		}
 	 }
-
+	
+	@RequestMapping(value = "booking/bookingbytype", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingByType (@RequestBody Map<String, Object> req) {
+		try {
+			return this.bookingService.bookingByType(req);
+		}
+		catch (Exception e) {
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+		
+	}
 }
