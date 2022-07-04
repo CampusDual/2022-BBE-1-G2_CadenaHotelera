@@ -20,5 +20,6 @@ public class BookingDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_BOK_COMMENTS = "bok_comments";
 	public static final String QUERY_FREE_ROOMS = "freeRoomsQuery";
 	public static final String QUERY_OCUPIED_ROOMS = "ocupiedRoomsQuery";
+	public static final String QUERY_CHECKIN_TODAY ="checkintoday";
 }
 
