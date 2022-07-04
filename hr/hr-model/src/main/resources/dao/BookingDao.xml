@@ -43,5 +43,42 @@
 			   ]]>
    			</Sentence>
   		</Query>
+  		<Query id="freeRoomsByTypeQuery">
+  			<Sentence>
+  				<![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.room
+			     EXCEPT
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.room r
+			     LEFT JOIN
+			     	PUBLIC.booking b
+			     on 
+			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id			     	
+			    #WHERE# 
+			   ]]>
+  			</Sentence>
+  		</Query>
+  		<Query id="checkintoday">
+  			<Sentence>
+  				<![CDATA[
+			     SELECT
+			     	 DISTINCT #COLUMNS#
+			     FROM
+			     	PUBLIC.client c
+			     JOIN
+			     	PUBLIC.booking b
+			     on 
+			     	c.cli_id = b.bok_cli_id
+			     WHERE
+			     	b.bok_entry_date = CURRENT_DATE 				     	
+			    #WHERE_CONCAT# 
+			   ]]>
+  			</Sentence>
+  		</Query>
  	</Queries>
 </JdbcEntitySetup>
