@@ -18,5 +18,6 @@ public class ClientDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_IDENTIFICATION = "cli_identification";
 	public static final String ATTR_PHONE = "cli_phone";
 	public static final String ATTR_EMAIL = "cli_email";
+	public static final String QUERY_CLIENTS_DATE = "clientsInDateQuery";
 }
 

@@ -7,4 +7,21 @@
 		<Column>cli_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>cli_id</GeneratedKey>
+	<Queries>
+  		<Query id="clientsInDateQuery">
+      		<Sentence>
+			   <![CDATA[
+			     SELECT DISTINCT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.client c
+			     LEFT JOIN 
+			     	PUBLIC.booking b
+			     ON
+			     	 c.cli_id = b.bok_cli_id
+			     #WHERE#
+			   ]]>
+   			</Sentence>
+  		</Query>
+ 	</Queries>
 </JdbcEntitySetup>

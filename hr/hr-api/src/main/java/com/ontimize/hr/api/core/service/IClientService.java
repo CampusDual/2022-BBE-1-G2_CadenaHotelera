@@ -18,5 +18,7 @@ public interface IClientService {
 			throws OntimizeJEERuntimeException;
 
 	public EntityResult clientDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
-
+	
+	public EntityResult clientsInDateQuery(Map<String, Object> keyMap)
+			throws OntimizeJEERuntimeException;
 }
