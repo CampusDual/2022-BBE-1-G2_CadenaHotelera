@@ -40,10 +40,6 @@ public class BookingService implements IBookingService {
 
 	
 	@Autowired
-	private RoomDao roomDao;
-
-	
-	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	/**
@@ -55,8 +51,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
-	public EntityResult bookingQuery(Map<String, Object> keyMap, List<String> attrList)
-			throws OntimizeJEERuntimeException {
+	public EntityResult bookingQuery(Map<String, Object> keyMap, List<String> attrList) throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.bookingDao, keyMap, attrList);
 
 	}
@@ -70,7 +65,6 @@ public class BookingService implements IBookingService {
 	 */
 	@Override
 	public EntityResult bookingInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		// TODO Auto-generated method stub
 		return this.daoHelper.insert(this.bookingDao, attrMap);
 	}
 
@@ -83,9 +77,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
-	public EntityResult bookingUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
-			throws OntimizeJEERuntimeException {
-		// TODO Auto-generated method stub
+	public EntityResult bookingUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.update(this.bookingDao, attrMap, keyMap);
 	}
 
@@ -98,7 +90,6 @@ public class BookingService implements IBookingService {
 	 */
 	@Override
 	public EntityResult bookingDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		// TODO Auto-generated method stub
 		return this.daoHelper.delete(this.bookingDao, keyMap);
 	}
 
@@ -153,12 +144,8 @@ public class BookingService implements IBookingService {
 					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_ID,
 							startDate, endDate, hotelId));
 
-			EntityResult res = new EntityResultMapImpl();
-			res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);
-			EntityResult resFilter = EntityResultTools.dofilter(res,
-					EntityResultTools.keysvalues(RoomDao.ATTR_ID, hotelId));
-
-			return resFilter;
+			EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);
+			return EntityResultTools.dofilter(res,EntityResultTools.keysvalues(RoomDao.ATTR_ID, hotelId));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -166,6 +153,9 @@ public class BookingService implements IBookingService {
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
 		}
+			   
+			   
+			  
 	}
 
 	/**
@@ -202,9 +192,8 @@ public class BookingService implements IBookingService {
 
 		BasicExpression bexp10 = new BasicExpression(bexp7, BasicOperator.OR_OP, bexp8);
 		BasicExpression bexp11 = new BasicExpression(bexp9, BasicOperator.OR_OP, bexp10);
-		BasicExpression bexp12 = new BasicExpression(bexp, BasicOperator.AND_OP, bexp11);
 
-		return bexp12;
+		return new BasicExpression(bexp, BasicOperator.AND_OP, bexp11);
 	}
 
 	/**
@@ -368,5 +357,53 @@ public class BookingService implements IBookingService {
 		}
 
 	}
+	/**
+	 * Method to return the free rooms for a range of dates, and of a specific room
+	 * type.
+	 * 
+	 * @param req Receives the request data from the controller. Which contains the
+	 *            columns to return, and the filters for the WHERE of the query.
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
+	@Override
+	public EntityResult bookingDeleteById(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		List<String> columns = new ArrayList<String>();
+		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
+		Date actualDate = new Date();
+		 
+		columns.add(BookingDao.ATTR_ENTRY_DATE);
+		 
+		try {
+			EntityResult res = this.daoHelper.query(this.bookingDao, filter, columns);
+			String date = res.get(BookingDao.ATTR_ENTRY_DATE).toString();
+			 
+			date = date.replaceAll("\\[", "");
+			date = date.replaceAll("\\]", "");
+			
+			Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+			if(actualDate.compareTo(startDate)>0) {
+				EntityResult result = new EntityResultMapImpl();
+				result.setCode(EntityResult.OPERATION_WRONG);
+				result.setMessage("The Booking has already started");
+				return result;
+			}
+			else {
+				return this.daoHelper.delete(this.bookingDao, filter);
+			}
+		} catch (ParseException e) {
+			EntityResult result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage("The date parse failed");
+			return result;
+		} catch (NullPointerException e) {
+			EntityResult result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage("The booking does not exist");
+			return result;
+		}		
+	}
+	
+	
 
 }

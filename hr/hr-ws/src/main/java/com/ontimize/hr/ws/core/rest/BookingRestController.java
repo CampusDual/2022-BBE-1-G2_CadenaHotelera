@@ -74,4 +74,17 @@ public class BookingRestController extends ORestController<IBookingService> {
 		}
 
 	}
+	
+	@RequestMapping(value = "booking/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingDeleteById(@RequestBody Map<String, Object> req) {
+		try {
+			return this.bookingService.bookingDeleteById(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+
+	}
 }

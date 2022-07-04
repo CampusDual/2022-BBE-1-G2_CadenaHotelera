@@ -28,4 +28,6 @@ public interface IBookingService {
 	public EntityResult bookingByType(Map<String, Object>req) throws OntimizeJEERuntimeException;
 	
 	public EntityResult bookingFreeByTypeQuery(Map<String, Object>req) throws OntimizeJEERuntimeException;
+	
+	public EntityResult bookingDeleteById(Map<String, Object> keyMap)throws OntimizeJEERuntimeException;
 }
