@@ -1,5 +1,8 @@
 package com.ontimize.hr.ws.core.rest;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,5 +89,20 @@ public class BookingRestController extends ORestController<IBookingService> {
 			return res;
 		}
 
+	}
+	
+	@RequestMapping(value ="bookingcheckintoday/search", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingCheckInToday(@RequestBody Map<String,Object>req) {
+		try {
+			 List<String> attrList= (List<String>)req.get("columns");
+				Map<String, Object> filter = (Map<String, Object>)req.get("filter");
+				Map<String, Object> keyMap= new HashMap<String, Object>();
+				filter.forEach(keyMap::put);
+			return this.bookingService.bookingcheckintodayQuery(keyMap,attrList);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
 	}
 }

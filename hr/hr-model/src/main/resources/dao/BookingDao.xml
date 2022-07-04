@@ -63,5 +63,22 @@
 			   ]]>
   			</Sentence>
   		</Query>
+  		<Query id="checkintoday">
+  			<Sentence>
+  				<![CDATA[
+			     SELECT
+			     	 DISTINCT #COLUMNS#
+			     FROM
+			     	PUBLIC.client c
+			     JOIN
+			     	PUBLIC.booking b
+			     on 
+			     	c.cli_id = b.bok_cli_id
+			     WHERE
+			     	b.bok_entry_date = CURRENT_DATE 				     	
+			    #WHERE_CONCAT# 
+			   ]]>
+  			</Sentence>
+  		</Query>
  	</Queries>
 </JdbcEntitySetup>

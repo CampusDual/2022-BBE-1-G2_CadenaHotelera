@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.aspectj.apache.bcel.generic.ReturnaddressType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,7 +17,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.jee.common.db.Entity;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
@@ -402,6 +405,12 @@ public class BookingService implements IBookingService {
 			result.setMessage("The booking does not exist");
 			return result;
 		}		
+	}
+
+	@Override
+	public EntityResult bookingcheckintodayQuery(Map<String, Object> keyMap,List<String>attrList) throws OntimizeJEERuntimeException {
+		if (!keyMap.containsKey(bookingDao.ATTR_HTL_ID)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,bookingDao.ATTR_HTL_ID +" is mandatory");
+		return this.daoHelper.query(this.bookingDao, keyMap, attrList,"checkintoday");		
 	}
 	
 	
