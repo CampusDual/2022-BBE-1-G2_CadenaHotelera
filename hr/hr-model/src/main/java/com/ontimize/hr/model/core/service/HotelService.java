@@ -39,14 +39,13 @@ public class HotelService implements IHotelService {
 		EntityResult res = new EntityResultMapImpl();
 
 		for (Entry<String, Object> entry : attrMap.entrySet()) {
-			if (entry.getKey().equals(HotelDao.ATTR_STARS)) {
-				if ((Integer.parseInt(entry.getValue().toString()) < 1)
-						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
-					res.setCode(EntityResult.OPERATION_WRONG);
-					res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
-					return res;
-				}
+			if (entry.getKey().equals(HotelDao.ATTR_STARS) && (Integer.parseInt(entry.getValue().toString()) < 1)
+					|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
+				res.setCode(EntityResult.OPERATION_WRONG);
+				res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+				return res;
 			}
+
 		}
 
 		try {
@@ -65,14 +64,12 @@ public class HotelService implements IHotelService {
 		EntityResult res = new EntityResultMapImpl();
 
 		for (Entry<String, Object> entry : attrMap.entrySet()) {
-			if (entry.getKey().equals(HotelDao.ATTR_STARS)) {
-				if ((Integer.parseInt(entry.getValue().toString()) < 1)
+				if (entry.getKey().equals(HotelDao.ATTR_STARS) &&(Integer.parseInt(entry.getValue().toString()) < 1)
 						|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
 					res.setCode(EntityResult.OPERATION_WRONG);
 					res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
 					return res;
 				}
-			}
 		}
 
 		try {

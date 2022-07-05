@@ -62,12 +62,24 @@ CREATE TABLE if not exists booking(
 	bok_rom_number varchar(15)NOT NULL,
     bok_entry_date date NOT NULL,
     bok_departure_date date,
-    bok_comments varchar(255)
+    bok_comments varchar(255),
+    bok_created_by_user varchar(255),
+    bok_created_date timestamp default current_timestamp,
+    bok_modified_date timestamp, 
+    CONSTRAINT fk_client_booking FOREIGN KEY(bok_cli_id) REFERENCES client(cli_id),
+    CONSTRAINT fk_room_booking FOREIGN KEY(bok_rom_number,bok_htl_id) REFERENCES room(rom_number,rom_htl_id)
 );
 
-ALTER TABLE booking ADD CONSTRAINT fk_client_booking FOREIGN KEY(bok_cli_id) REFERENCES client(cli_id);
-ALTER TABLE booking ADD CONSTRAINT fk_room_booking FOREIGN KEY(bok_rom_number,bok_htl_id) REFERENCES room(rom_number,rom_htl_id);
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.bok_modified_date = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
 
+
+CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON booking FOR EACH ROW EXECUTE PROCEDURE  update_modified_column();
 
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Las Vegas','Las vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Vigo','Vigo','Avda Castelao 67','36208','vigo@exceptionshoteles.com','986 50 48 67',2);

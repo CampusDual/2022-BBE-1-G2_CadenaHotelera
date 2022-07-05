@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "fc5e178c-2b34-4b4a-a702-02fd6febb88d",
+		"_postman_id": "efe00189-bbe4-4c7f-aa06-50fde1d35bf5",
 		"name": "Hoteles",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19197582"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -458,7 +457,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"hotel\":\"1\",\r\n        \"inicio\": \"04/07/2022\",\r\n        \"fin\" : \"05/07/2022\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ],\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":1,\r\n        \"bok_entry_date\": \"2022-07-04\",\r\n        \"bok_departure_date\" : \"2022-07-05\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ],\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -476,6 +475,95 @@
 								"bookings",
 								"bookingOcupied",
 								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkins hoy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"bok_htl_id\":1\r\n    },\r\n    \"columns\":[\r\n        \"bok_htl_id\",\r\n        \"cli_name\",\r\n        \"cli_surname2\",\r\n        \"cli_surname1\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingcheckintoday/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingcheckintoday",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Booking a room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"rom_typ_id\":2,\r\n        \"bok_entry_date\":\"2022-07-07\",\r\n        \"bok_departure_date\":\"2022-07-08\"\r\n    }\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingbytype",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingbytype"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"bok_id\" : 2\r\n    },\r\n    \"data\":{\r\n        \"bok_entry_date\":\"2022-06-28\",\r\n        \"bok_departure_date\":\"2022-07-05\",\r\n        \"rom_typ_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/booking/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"booking",
+								"update"
 							]
 						}
 					},
