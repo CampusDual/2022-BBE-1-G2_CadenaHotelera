@@ -91,6 +91,19 @@ public class BookingRestController extends ORestController<IBookingService> {
 
 	}
 	
+	@RequestMapping(value = "booking/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingUpdateById(@RequestBody Map<String, Object> req) {
+		try {
+			return this.bookingService.bookingUpdateById(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+
+	}
+	
 	@RequestMapping(value ="bookingcheckintoday/search", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public EntityResult bookingCheckInToday(@RequestBody Map<String,Object>req) {
 		try {
