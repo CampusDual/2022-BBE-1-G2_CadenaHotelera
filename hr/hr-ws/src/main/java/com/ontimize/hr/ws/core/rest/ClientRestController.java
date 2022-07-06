@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ontimize.hr.api.core.service.IClientService;
@@ -26,7 +26,7 @@ public class ClientRestController extends ORestController<IClientService> {
 		return this.clientService;
 	}
 	
-	@RequestMapping(value = "clientsDate/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "clientsDate/search", produces = MediaType.APPLICATION_JSON_VALUE)
 	public EntityResult bookingLibresSearch(@RequestBody Map<String, Object> req) {
 		try {
 			return this.clientService.clientsInDateQuery(req);

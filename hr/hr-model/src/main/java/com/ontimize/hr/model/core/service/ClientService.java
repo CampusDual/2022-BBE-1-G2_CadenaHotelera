@@ -29,6 +29,8 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class ClientService implements IClientService {
 
+	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+
 	@Autowired
 	private ClientDao clientDao;
 
@@ -97,7 +99,7 @@ public class ClientService implements IClientService {
 			List<String> columns = (List<String>) req.get("columns");
 			Map<String, Object> filter = (Map<String, Object>) req.get("filter");
 
-			int hotelId = Integer.parseInt(filter.get("hotel").toString());
+			int hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 
 			// Check exists hotel
 			Map<String, Object> keyMapHotel = new HashMap<>();
@@ -113,7 +115,7 @@ public class ClientService implements IClientService {
 			}
 
 			// if Hotel exists
-			Date fechaPasada = new SimpleDateFormat("dd/MM/yyyy").parse(filter.get("fecha").toString());
+			Date fechaPasada = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
 
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
