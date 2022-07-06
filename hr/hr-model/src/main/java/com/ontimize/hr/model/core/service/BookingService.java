@@ -37,7 +37,7 @@ public class BookingService implements IBookingService {
 
 	private static final String ERROR = "error";
 	private static final String COLUMNS = "columns";
-	private static final String HOTEL = "hotel";
+	//private static final String HOTEL = "hotel";
 	private static final String FILTER = "filter";
 	private static final String DATE_FORMAT_SPAIN = "dd/MM/yyyy";
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
@@ -118,7 +118,7 @@ public class BookingService implements IBookingService {
 		try {			
 			List<String> columns = (List<String>) req.get(COLUMNS);
 			Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
-			int hotelId = Integer.parseInt(filter.get(HOTEL).toString());
+			int hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 			Date startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 			Date endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 			Map<String, Object> keyMap = new HashMap<>();
@@ -208,9 +208,9 @@ public class BookingService implements IBookingService {
 	}
 
 	/**
-	 * Booking by type.
+	 * Books a new room by type and date.
 	 *
-	 * @param req the req
+	 * @param req the req contains data with the hotel, client, arrival and departure dates and room type. The columns retrieved are preset
 	 * @return the entity result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
@@ -281,7 +281,7 @@ public class BookingService implements IBookingService {
 		Map<String, Object> filterMap = new HashMap<>();
 		filterMap.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(entryDate));
 		filterMap.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(departureDate));
-		filterMap.put(HOTEL, hotelId);
+		filterMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomMap.put(FILTER, filterMap);
 
@@ -341,7 +341,7 @@ public class BookingService implements IBookingService {
 
 			Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
 
-			int idHotel = Integer.parseInt(filter.get(HOTEL).toString());
+			int idHotel = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 			int idTypeRoom = Integer.parseInt(filter.get("tipohabitacion").toString());
 			Date startDate = new SimpleDateFormat(DATE_FORMAT_SPAIN).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 			Date endDate = new SimpleDateFormat(DATE_FORMAT_SPAIN).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
@@ -416,7 +416,7 @@ public class BookingService implements IBookingService {
 	 * Method to return the list of bookings that start today at a given hotel
 	 * 
 	 * 
-	 * @param keyMap map with the filter where the key is the name of the column in the DB and the value is the value to search
+	 * @param keyMap map with the filter with the hotel ID
 	 * @param attrList List with the names of all the columns to retrieve from the query
 	 * @return the entity result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
@@ -527,7 +527,7 @@ public class BookingService implements IBookingService {
 		c.setTime(oldEntryDate);
 		c.add(Calendar.DAY_OF_MONTH, -1);
 		filterEntryMap.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(c.getTime()));
-		filterEntryMap.put(HOTEL, hotelId);
+		filterEntryMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomEntryMap.put(FILTER, filterEntryMap);
 
@@ -543,7 +543,7 @@ public class BookingService implements IBookingService {
 		d.add(Calendar.DAY_OF_MONTH, +1);
 		filterDepartureMap.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(d.getTime()));
 		filterDepartureMap.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(newDepartureDate));
-		filterDepartureMap.put(HOTEL, hotelId);
+		filterDepartureMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomDepartureMap.put(FILTER, filterDepartureMap);
 
