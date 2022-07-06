@@ -38,15 +38,10 @@ public class HotelService implements IHotelService {
 
 		EntityResult res = new EntityResultMapImpl();
 
-		for (Entry<String, Object> entry : attrMap.entrySet()) {
-			if (entry.getKey().equals(HotelDao.ATTR_STARS) && (Integer.parseInt(entry.getValue().toString()) < 1)
-					|| (Integer.parseInt(entry.getValue().toString()) > 5)) {
-				res.setCode(EntityResult.OPERATION_WRONG);
-				res.setMessage("ONLY STARS BETWEEN 1 AND 5 ALLOWED");
-				return res;
-			}
-
-		}
+		if(attrMap.containsKey(HotelDao.ATTR_STARS)) {
+			Integer stars =  (Integer)attrMap.get(HotelDao.ATTR_STARS);
+			if(stars<1 ||stars>5) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,"ONLY STARS BETWEEN 1 AND 5 ALLOWED");
+		}		
 
 		try {
 			return this.daoHelper.insert(this.hotelDao, attrMap);
