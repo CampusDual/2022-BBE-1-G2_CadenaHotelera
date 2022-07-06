@@ -10,25 +10,24 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 public interface IBookingService {
 
 	// BOOKING 
-	public EntityResult bookingQuery(Map<String, Object> keyMap, List<String> attrList)
-			throws OntimizeJEERuntimeException;
+	public EntityResult bookingQuery(Map<String, Object> keyMap, List<String> attrList) throws OntimizeJEERuntimeException;
 
 	public EntityResult bookingInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException;
 
-	public EntityResult bookingUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
-			throws OntimizeJEERuntimeException;
+	public EntityResult bookingUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 
 	public EntityResult bookingDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 	
-	public EntityResult bookingFreeQuery(Map<String, Object> req)
-			throws OntimizeJEERuntimeException;
-	public EntityResult bookingOcupiedQuery(Map<String, Object> req)
-			throws OntimizeJEERuntimeException;
+	public EntityResult bookingFreeQuery(Map<String, Object> req) throws OntimizeJEERuntimeException;
+	
+	public EntityResult bookingOcupiedQuery(Map<String, Object> req) throws OntimizeJEERuntimeException;
 	
 	public EntityResult bookingByType(Map<String, Object>req) throws OntimizeJEERuntimeException;
 	
 	public EntityResult bookingFreeByTypeQuery(Map<String, Object>req) throws OntimizeJEERuntimeException;
+	
 	public EntityResult bookingDeleteById(Map<String, Object> req)throws OntimizeJEERuntimeException;
+	
 	public EntityResult bookingUpdateById(Map<String, Object> req)throws OntimizeJEERuntimeException;
 
 	public EntityResult bookingcheckintodayQuery(Map<String, Object> keyMap,List<String>attrList) throws OntimizeJEERuntimeException;

@@ -109,8 +109,8 @@ public class BookingService implements IBookingService {
 	/**
 	 * Booking free query.
 	 *
-	 * @param req the req
-	 * @return the entity result
+	 * @param req come the data of the rooms to consult, columns and conditions
+	 * @return the entity result return a list of free rooms
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
@@ -140,8 +140,8 @@ public class BookingService implements IBookingService {
 	/**
 	 * Booking ocupied query.
 	 *
-	 * @param req the req
-	 * @return the entity result
+	 * @param req come the data of the rooms to consult, columns and conditions
+	 * @return the entity result return a list of ocupied rooms
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
@@ -172,11 +172,11 @@ public class BookingService implements IBookingService {
 	/**
 	 * Search between with year.
 	 *
-	 * @param entryDate     the entry date
-	 * @param departureDate the departure date
-	 * @param hotelIdS      the hotel id S
-	 * @param inicio        the inicio
-	 * @param fin           the fin
+	 * @param entryDate     name of the field in the database
+	 * @param departureDate name of the field in the database
+	 * @param hotelIdS      name of the field in the database
+	 * @param inicio        start date on request
+	 * @param fin           end date on request
 	 * @param hotelId       the hotel id
 	 * @return the basic expression
 	 */
@@ -372,12 +372,10 @@ public class BookingService implements IBookingService {
 	}
 
 	/**
-	 * Method to return the free rooms for a range of dates, and of a specific room
-	 * type.
+	 * method to delete bookings using their id
 	 * 
-	 * @param req Receives the request data from the controller. Which contains the
-	 *            columns to return, and the filters for the WHERE of the query.
-	 * @return the entity result
+	 * @param req Receives the request data. Which contains the id of the Booking.
+	 * @return the entity result comes an ok.
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
@@ -430,7 +428,14 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BookingDao.ATTR_HTL_ID + " is mandatory");
 		return this.daoHelper.query(this.bookingDao, keyMap, attrList, BookingDao.QUERY_CHECKIN_TODAY);
 	}
-
+	
+	/**
+	 * Method to update a booking.
+	 * 
+	 * @param req Receives the request data. Which contains the FILTER and the DATA.
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	public EntityResult bookingUpdateById(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
@@ -449,6 +454,8 @@ public class BookingService implements IBookingService {
 		
 		EntityResult result = bookingQuery(filter,attrList);
 		
+		//obtenemos los datos de la booking a modificar
+		
 		int hotelId = (int) result.getRecordValues(0).get(BookingDao.ATTR_HTL_ID);
 		String roomNumber = (String) result.getRecordValues(0).get(BookingDao.ATTR_ROM_NUMBER);
 		int cliId = (int) result.getRecordValues(0).get(BookingDao.ATTR_CLI_ID);
@@ -463,7 +470,7 @@ public class BookingService implements IBookingService {
 		} catch (ParseException e1) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(ERROR);
+			res.setMessage("Date parse exception");
 			return res;
 		}
 		
@@ -480,6 +487,8 @@ public class BookingService implements IBookingService {
 		EntityResult resultType = roomService.roomQuery(filterRoom,attrListRoom);
 		oldType  = Integer.parseInt(resultType.getRecordValues(0).get(RoomDao.ATTR_TYPE_ID).toString());
 		
+		//obtenemos el tipo de la habitacion de la reserva origen
+		
 		
 		if(!data.containsKey(BookingDao.ATTR_ENTRY_DATE))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Request contains no starting date");
@@ -490,7 +499,7 @@ public class BookingService implements IBookingService {
 		} catch (ParseException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(ERROR);
+			res.setMessage("Date parse exception");
 			return res;
 		}				
 			
@@ -503,11 +512,13 @@ public class BookingService implements IBookingService {
 		} catch (ParseException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(ERROR);
+			res.setMessage("Date parse exception");
 			return res;
 		}
 		if (newDepartureDate.before(newEntryDate))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE DATE BEFORE ENTRY DATE");
+		
+		//hasta aqui cargamos todos los datos necesarios en variables
 		
 		Map<String, Object> queryFreeRoomEntryMap = new HashMap<>();
 		Map<String, Object> filterEntryMap = new HashMap<>();
@@ -541,8 +552,11 @@ public class BookingService implements IBookingService {
 		EntityResult freeRoomsDeparture = this.bookingFreeQuery(queryFreeRoomDepartureMap);
 		EntityResult freeRoomsDepartureFilter = EntityResultTools.dofilter(freeRoomsDeparture, EntityResultTools.keysvalues(RoomDao.ATTR_NUMBER, roomNumber));
 		
+		//hasta aqui obtenemos si la misma habitacion esta libre en las nuevas fechas
+		
 		if(newType==oldType) {
 			if	(	
+					//entramos aqui si NO se cambia el tipo de habitacion
 					((freeRoomsEntryFilter.calculateRecordNumber()!=0&&freeRoomsDepartureFilter.calculateRecordNumber()!=0)||
 					(freeRoomsEntryFilter.calculateRecordNumber()!=0&&(oldDepartureDate.equals(newDepartureDate)))||
 					(oldEntryDate.equals(newEntryDate)&&freeRoomsDepartureFilter.calculateRecordNumber()!=0)||
@@ -557,7 +571,7 @@ public class BookingService implements IBookingService {
 				return this.daoHelper.update(this.bookingDao, attrMap, filter);
 			}
 		}else {
-			
+			//entramos aqui si se cambia el tipo de habitacion
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
 					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,
@@ -590,7 +604,7 @@ public class BookingService implements IBookingService {
 		
 		EntityResult res = new EntityResultMapImpl();
 		res.setCode(EntityResult.OPERATION_WRONG);
-		res.setMessage("no se modifica ningun campo");
+		res.setMessage("no changes in booking");
 		return res;
 				
 	}	

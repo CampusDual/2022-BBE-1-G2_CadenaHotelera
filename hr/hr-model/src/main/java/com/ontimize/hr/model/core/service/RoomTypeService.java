@@ -15,7 +15,9 @@ import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
-
+/**
+ * The Class RoomTypeService.
+ */
 @Service("RoomTypeService")
 @Lazy
 public class RoomTypeService implements IRoomTypeService{
@@ -25,7 +27,15 @@ public class RoomTypeService implements IRoomTypeService{
 	
 	@Autowired
 	private RoomTypeDao roomTypeDao;
-
+	
+	/**
+	 * RoomTypeQuery.
+	 *
+	 * @param keyMap   the key map in which you enter the conditions of the query
+	 * @param attrList the attr list where you enter the columns to get
+	 * @return the entity result come the results of the query
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	public EntityResult roomTypeQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
@@ -33,6 +43,13 @@ public class RoomTypeService implements IRoomTypeService{
 		return this.daoHelper.query(this.roomTypeDao, keyMap, attrList);
 	}
 
+	/**
+	 * RoomTypeInsert.
+	 *
+	 * @param attrMap the attr Map where you enter the data to insert
+	 * @return the entity result comes an ok and the id of the created element
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	public EntityResult roomTypeInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		try {
@@ -51,6 +68,14 @@ public class RoomTypeService implements IRoomTypeService{
 		}
 	}
 
+	/**
+	 * RoomTypeUpdate.
+	 *
+	 * @param attrMap the attr Map where you enter the data to update
+	 * @param keyMap the key map in which you enter the conditions of the query
+	 * @return the entity result comes an ok
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	public EntityResult roomTypeUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
@@ -70,6 +95,13 @@ public class RoomTypeService implements IRoomTypeService{
 		}
 	}
 
+	/**
+	 * RoomTypeDelete.
+	 *
+	 * @param keyMap the key map in which you enter the conditions of the query
+	 * @return the entity result comes an ok
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	public EntityResult roomTypeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.roomTypeDao, keyMap);
