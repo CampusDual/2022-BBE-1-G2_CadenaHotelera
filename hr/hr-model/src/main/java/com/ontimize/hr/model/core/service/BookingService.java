@@ -342,9 +342,9 @@ public class BookingService implements IBookingService {
 			Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
 
 			int idHotel = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
-			int idTypeRoom = Integer.parseInt(filter.get("tipohabitacion").toString());
-			Date startDate = new SimpleDateFormat(DATE_FORMAT_SPAIN).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
-			Date endDate = new SimpleDateFormat(DATE_FORMAT_SPAIN).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+			int idTypeRoom = Integer.parseInt(filter.get(RoomDao.ATTR_TYPE_ID).toString());
+			Date startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
+			Date endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
@@ -388,7 +388,7 @@ public class BookingService implements IBookingService {
 
 		try {
 			EntityResult res = this.daoHelper.query(this.bookingDao, filter, columns);
-			String date = (String) res.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE);
+			String date = res.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE).toString();
 
 			Date startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(date);
 			if (actualDate.compareTo(startDate) > 0) {
@@ -453,6 +453,9 @@ public class BookingService implements IBookingService {
 		attrList.add(BookingDao.ATTR_BOK_COMMENTS);
 		
 		EntityResult result = bookingQuery(filter,attrList);
+		
+		if(result.calculateRecordNumber()==0)
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Booking does not exist");
 		
 		//obtenemos los datos de la booking a modificar
 		
