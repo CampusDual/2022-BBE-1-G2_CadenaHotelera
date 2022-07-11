@@ -10,8 +10,8 @@ import com.ontimize.jee.server.dao.jdbc.OntimizeJdbcDaoSupport;
 @Lazy
 @ConfigurationFile(configurationFile = "dao/RoomTypeDao.xml", configurationFilePlaceholder = "dao/placeholders.properties")
 public class RoomTypeDao extends OntimizeJdbcDaoSupport{
-	public static final String ATTR_ID = "typ_id";
-	public static final String ATTR_NAME = "typ_name";
-	public static final String ATTR_BED_NUMBER = "typ_bed_number";
-	public static final String ATTR_BASE_PRICE = "typ_base_price";
+	public static final String ATTR_ID = "rtyp_id";
+	public static final String ATTR_NAME = "rtyp_name";
+	public static final String ATTR_BED_NUMBER = "rtyp_bed_number";
+	public static final String ATTR_BASE_PRICE = "rtyp_base_price";
 }

@@ -33,7 +33,6 @@ public class UserService implements IUserService {
 		//To shut up sonarLint
 	}
 
-	//Sample to permission
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult userQuery(Map<?, ?> keyMap, List<?> attrList) {
 		return this.daoHelper.query(userDao, keyMap, attrList);

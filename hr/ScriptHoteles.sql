@@ -1,4 +1,4 @@
---creaci髇 tablas usuarios--
+--creaci贸n tablas usuarios--
 
 drop table if exists TROLE_SERVER_PERMISSION;
 DROP table if exists TUSER_ROLE;
@@ -127,6 +127,12 @@ INSERT INTO TSERVER_PERMISSION VALUES(31,'com.ontimize.hr.api.core.service.IRoom
 INSERT INTO TSERVER_PERMISSION VALUES(32,'com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeUpdate');
 INSERT INTO TSERVER_PERMISSION VALUES(33,'com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeDelete');
 
+INSERT INTO TSERVER_PERMISSION VALUES(34,'com.ontimize.hr.api.core.service.IEmployeeService/employeeQuery');
+INSERT INTO TSERVER_PERMISSION VALUES(35,'com.ontimize.hr.api.core.service.IEmployeeService/employeeInsert');
+INSERT INTO TSERVER_PERMISSION VALUES(36,'com.ontimize.hr.api.core.service.IEmployeeService/employeeUpdate');
+INSERT INTO TSERVER_PERMISSION VALUES(37,'com.ontimize.hr.api.core.service.IEmployeeService/employeeDelete');
+
+
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
 INSERT INTO TSETTING VALUES(1,'mail_port','587','Puerto del servidor de email');
 INSERT INTO TSETTING VALUES(2,'mail_protocol','smtp','Protocolo de env\u005cu00edo de mails');
@@ -171,9 +177,12 @@ INSERT INTO TROLE_SERVER_PERMISSION VALUES(30,0,30);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(31,0,31);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(32,0,32);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(33,0,33);
+INSERT INTO TROLE_SERVER_PERMISSION VALUES(34,0,34);
+INSERT INTO TROLE_SERVER_PERMISSION VALUES(35,0,35);
+INSERT INTO TROLE_SERVER_PERMISSION VALUES(36,0,36);
+INSERT INTO TROLE_SERVER_PERMISSION VALUES(37,0,37);
 
-
---Creaci髇 de tablas de hotel--
+--Creaci贸n de tablas de hotel--
 
 drop  table if exists booking;
 drop  table if exists room;
@@ -261,6 +270,9 @@ create table if not exists employee(
 	emp_name varchar(30) not null,
 	emp_surname1 varchar(30) not null,
 	emp_surname2 varchar(30),
+    emp_birth_date date,
+    emp_address varchar(150),
+    emp_bank_account varchar(40) not null,
 	emp_identification varchar(20) not null,
 	emp_email varchar(150),
 	emp_phone varchar(20) not null,
@@ -287,7 +299,7 @@ CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON booking FOR EACH ROW EXE
 
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Las Vegas','Las vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Vigo','Vigo','Avda Castelao 67','36208','vigo@exceptionshoteles.com','986 50 48 67',2);
-INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Coru帽a','Coru帽a','C\ Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3);
+INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Coru脙卤a','Coru脙卤a','C\ Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3);
 
 INSERT INTO room_type(rtyp_name,rtyp_bed_number,rtyp_base_price) VALUES('doble',2,200);
 INSERT INTO room_type(rtyp_name,rtyp_bed_number,rtyp_base_price) VALUES('simple',1,120);
@@ -319,7 +331,7 @@ INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (2,'1002',2);
 INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (2,'1003',3);
 
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('CARLOS', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
-insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'P脡REZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'P脙聣REZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JUAN', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'101','2022-06-25','2022-06-30','comments');
@@ -340,14 +352,14 @@ insert into trole(rolename,xmlclientpermission) values('recepcionista','<?xml ve
 insert into tuser_role(id_user_role,id_rolename,user_) values(1,1,'juan');
 
 --insert into trole_server_permission  values(2,1,0);
-insert into trole_server_permission  values(34,1,1);
+--insert into trole_server_permission  values(34,1,1);
 
 
-insert into employee_type (etyp_name,etyp_desc) values('Recepcionista','descripci髇');
-insert into employee_type (etyp_name,etyp_desc) values('Limpieza','descripci髇');
+insert into employee_type (etyp_name,etyp_desc) values('Recepcionista','descripci贸n');
+insert into employee_type (etyp_name,etyp_desc) values('Limpieza','descripci贸n');
 
-insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user) 
-values('1','Juan','Perico','Palotes','11223344J','juan-perico@Yahoo.es','666555444','1','juan'); 
+insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user) 
+values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','juan-perico@Yahoo.es','666555444','1','juan'); 
 
 insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
 
