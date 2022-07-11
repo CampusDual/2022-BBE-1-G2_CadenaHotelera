@@ -277,7 +277,7 @@ create table if not exists employee(
 	emp_email varchar(150),
 	emp_phone varchar(20) not null,
 	emp_htl_id INTEGER,
-	emp_created_data timestamp default current_timestamp,
+	emp_created_date timestamp default current_timestamp,
 	emp_usr_user varchar(50),
 
 	constraint uq_emp_identification unique (emp_identification),
@@ -286,18 +286,6 @@ create table if not exists employee(
 	constraint fk_employee_user foreign key (emp_usr_user) references tuser(user_)
 );
 
-/*
-CREATE OR REPLACE FUNCTION update_modified_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.bok_modified_date = now();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
-
-CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON booking FOR EACH ROW EXECUTE PROCEDURE  update_modified_column();
-*/
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Las Vegas','Las vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Vigo','Vigo','Avda Castelao 67','36208','vigo@exceptionshoteles.com','986 50 48 67',2);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel CoruÃ±a','CoruÃ±a','C\ Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3);
