@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
@@ -25,6 +26,7 @@ import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.common.tools.EntityResultTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
@@ -62,6 +64,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.bookingDao, keyMap, attrList);
@@ -76,6 +79,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.insert(this.bookingDao, attrMap);
 	}
@@ -89,6 +93,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.update(this.bookingDao, attrMap, keyMap);
@@ -102,6 +107,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.bookingDao, keyMap);
 	}
@@ -114,6 +120,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingFreeQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		try {			
 			List<String> columns = (List<String>) req.get(COLUMNS);
@@ -145,6 +152,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingOcupiedQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		try {
 			List<String> columns = (List<String>) req.get(COLUMNS);
@@ -215,6 +223,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingByType(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		if (!req.containsKey("data"))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Request contains no data");
@@ -335,6 +344,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingFreeByTypeQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		try {
 			List<String> columns = (List<String>) req.get(COLUMNS);
@@ -379,6 +389,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDeleteById(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		List<String> columns = new ArrayList<>();
 		Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
@@ -422,6 +433,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingcheckintodayQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		if (!keyMap.containsKey(BookingDao.ATTR_HTL_ID))
@@ -437,6 +449,7 @@ public class BookingService implements IBookingService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingUpdateById(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
 		Map<String, Object> data = (Map<String, Object>) req.get("data");

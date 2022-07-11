@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IClientService;
@@ -23,6 +24,7 @@ import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @Service("ClientService")
@@ -41,6 +43,7 @@ public class ClientService implements IClientService {
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.clientDao, keyMap, attrList);
@@ -48,6 +51,7 @@ public class ClientService implements IClientService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 
 		EntityResult result = null;
@@ -63,6 +67,7 @@ public class ClientService implements IClientService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 
@@ -80,6 +85,7 @@ public class ClientService implements IClientService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.clientDao, keyMap);
 
@@ -94,6 +100,7 @@ public class ClientService implements IClientService {
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientsInDateQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		try {
 			List<String> columns = (List<String>) req.get("columns");

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IEmployeeTypeService;
@@ -13,6 +14,7 @@ import com.ontimize.hr.model.core.dao.EmployeeTypeDao;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @Service("EmployeeTypeService")
@@ -26,6 +28,7 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeTypeQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.employeeTypeDao, keyMap, attrList);
@@ -33,6 +36,7 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeTypeInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 
 		try {
@@ -52,6 +56,7 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeTypeUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 
@@ -73,6 +78,7 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeTypeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.employeeTypeDao, keyMap);
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IRoomService;
@@ -13,6 +14,7 @@ import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @Service("RoomService")
@@ -26,6 +28,7 @@ public class RoomService implements IRoomService {
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.roomDao, keyMap, attrList);
@@ -33,6 +36,7 @@ public class RoomService implements IRoomService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomInsert(Map<String, Object> attrMap) {
 			EntityResult result = null;
 			try
@@ -66,6 +70,7 @@ public class RoomService implements IRoomService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 		EntityResult result = null;
@@ -97,6 +102,7 @@ public class RoomService implements IRoomService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.roomDao, keyMap);
 	}
