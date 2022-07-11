@@ -76,7 +76,7 @@ create table if not exists employee_type(
 	emp_typ_name varchar(50) not null,
 	emp_typ_desc varchar(255),
 	constraint uq_emp_typ_name UNIQUE (emp_typ_name)
-)
+);
 
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
