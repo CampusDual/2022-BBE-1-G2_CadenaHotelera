@@ -39,9 +39,7 @@ public class BookingService implements IBookingService {
 
 	private static final String ERROR = "error";
 	private static final String COLUMNS = "columns";
-	//private static final String HOTEL = "hotel";
 	private static final String FILTER = "filter";
-	private static final String DATE_FORMAT_SPAIN = "dd/MM/yyyy";
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	
@@ -583,6 +581,7 @@ public class BookingService implements IBookingService {
 				Map<String, Object> attrMap = new HashMap<>();
 				attrMap.put(BookingDao.ATTR_ENTRY_DATE, newEntryDate);
 				attrMap.put(BookingDao.ATTR_DEPARTURE_DATE, newDepartureDate);
+				attrMap.put(BookingDao.ATTR_BOK_MODIFIED_DATE,new Date());
 				
 				return this.daoHelper.update(this.bookingDao, attrMap, filter);
 			}
@@ -608,7 +607,8 @@ public class BookingService implements IBookingService {
 			keyMapInsert.put(BookingDao.ATTR_ENTRY_DATE, newEntryDate);
 			keyMapInsert.put(BookingDao.ATTR_DEPARTURE_DATE, newDepartureDate);
 			keyMapInsert.put(BookingDao.ATTR_BOK_COMMENTS, comments);
-			
+			keyMapInsert.put(BookingDao.ATTR_BOK_MODIFIED_DATE, new Date());
+
 			EntityResult resultado = this.daoHelper.update(this.bookingDao, keyMapInsert,filter );
 			resultado.put(BookingDao.ATTR_ROM_NUMBER, freeRoomsFilter.getRecordValues(0).get(RoomDao.ATTR_NUMBER).toString());
 			return resultado;

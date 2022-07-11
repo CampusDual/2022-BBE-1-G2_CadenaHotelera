@@ -252,7 +252,7 @@ CREATE TABLE if not exists booking(
     bok_comments varchar(255),
     bok_created_by_user varchar(255),
     bok_created_date timestamp default current_timestamp,
-    bok_modified_date timestamp, 
+    bok_modified_date timestamp,
     CONSTRAINT fk_client_booking FOREIGN KEY(bok_cli_id) REFERENCES client(cli_id),
     CONSTRAINT fk_room_booking FOREIGN KEY(bok_rom_number,bok_htl_id) REFERENCES room(rom_number,rom_htl_id)
 );
@@ -277,15 +277,16 @@ create table if not exists employee(
 	emp_email varchar(150),
 	emp_phone varchar(20) not null,
 	emp_htl_id INTEGER,
+	emp_created_data timestamp default current_timestamp,
 	emp_usr_user varchar(50),
-	
+
 	constraint uq_emp_identification unique (emp_identification),
 	constraint fk_employee_type_employee foreign key (emp_etyp_id) references employee_type(etyp_id),
 	constraint fk_employee_hotel foreign key (emp_htl_id) references hotel(htl_id),
-	constraint fk_employee_user foreign key (emp_usr_user) references tuser(user_)	
+	constraint fk_employee_user foreign key (emp_usr_user) references tuser(user_)
 );
 
-
+/*
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -296,7 +297,7 @@ $$ language 'plpgsql';
 
 
 CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON booking FOR EACH ROW EXECUTE PROCEDURE  update_modified_column();
-
+*/
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Las Vegas','Las vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel Vigo','Vigo','Avda Castelao 67','36208','vigo@exceptionshoteles.com','986 50 48 67',2);
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars) VALUES('Exceptions Hotel CoruÃ±a','CoruÃ±a','C\ Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3);
@@ -358,8 +359,8 @@ insert into tuser_role(id_user_role,id_rolename,user_) values(1,1,'juan');
 insert into employee_type (etyp_name,etyp_desc) values('Recepcionista','descripción');
 insert into employee_type (etyp_name,etyp_desc) values('Limpieza','descripción');
 
-insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user) 
-values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','juan-perico@Yahoo.es','666555444','1','juan'); 
+insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
+values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','juan-perico@Yahoo.es','666555444','1','juan');
 
 insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
 

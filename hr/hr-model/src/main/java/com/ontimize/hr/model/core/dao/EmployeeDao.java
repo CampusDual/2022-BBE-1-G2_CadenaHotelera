@@ -23,6 +23,7 @@ public class EmployeeDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_EMAIL = "emp_email";
 	public static final String ATTR_PHONE = "emp_phone";
 	public static final String ATTR_HTL_ID = "emp_htl_id";
+	public static final String ATTR_EMP_CREATION_DATE = "emp_created_data";
 	public static final String ATTR_USER = "emp_usr_user";
 	
 	
