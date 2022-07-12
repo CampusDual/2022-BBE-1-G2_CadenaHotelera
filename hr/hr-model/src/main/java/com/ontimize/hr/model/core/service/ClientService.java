@@ -35,6 +35,9 @@ public class ClientService implements IClientService {
 
 	@Autowired
 	private ClientDao clientDao;
+	
+	@Autowired
+	private HotelDao hotelDao;
 
 	@Autowired
 	private HotelService hotelService;
@@ -113,7 +116,7 @@ public class ClientService implements IClientService {
 			keyMapHotel.put(HotelDao.ATTR_ID, hotelId);
 			List<String> attrList = new ArrayList<>();
 			attrList.add(HotelDao.ATTR_NAME);
-			EntityResult existsHotel = hotelService.hotelQuery(keyMapHotel, attrList);
+			EntityResult existsHotel =  daoHelper.query(hotelDao, keyMapHotel, attrList);
 			if (existsHotel.calculateRecordNumber() == 0) {
 				EntityResult res = new EntityResultMapImpl();
 				res.setCode(EntityResult.OPERATION_WRONG);

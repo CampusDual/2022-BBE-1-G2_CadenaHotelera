@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,9 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Type name already exists");
 
 		}
+		catch (DataIntegrityViolationException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Role does not exist");
+		}
 	}
 
 	@Override
@@ -73,6 +77,9 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 		} catch (DuplicateKeyException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Type name already exists");
 
+		}
+		catch (DataIntegrityViolationException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Role does not exist");
 		}
 
 	}

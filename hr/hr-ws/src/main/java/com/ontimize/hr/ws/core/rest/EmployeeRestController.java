@@ -1,10 +1,16 @@
 package com.ontimize.hr.ws.core.rest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ontimize.hr.api.core.service.IEmployeeService;
+import com.ontimize.jee.common.dto.EntityResult;
+import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.server.rest.ORestController;
 
 	@RestController
@@ -19,4 +25,8 @@ import com.ontimize.jee.server.rest.ORestController;
 			return this.employeeService;
 		}
 		
+		@PostMapping(value = "/createUser" , produces = MediaType.APPLICATION_JSON_VALUE)
+		public EntityResult employeeCreateUser(Map<String, Object> attrMap) throws OntimizeJEERuntimeException{
+			return employeeCreateUser(attrMap);
+		}
 }

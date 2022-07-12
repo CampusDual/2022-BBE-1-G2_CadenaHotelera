@@ -14,6 +14,7 @@ public class EmployeeTypeDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_ID = "etyp_id";
 	public static final String ATTR_NAME = "etyp_name";
 	public static final String ATTR_DESCRIPTION = "etyp_desc";
+	public static final String ATTR_ROLE_ID= "etyp_role_id";
 	
 }
 

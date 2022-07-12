@@ -18,4 +18,6 @@ public interface IEmployeeService {
 				throws OntimizeJEERuntimeException;
 
 		public EntityResult employeeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+		
+		public EntityResult employeeCreateUser(Map<String, Object>attrMap) throws OntimizeJEERuntimeException;
 }
