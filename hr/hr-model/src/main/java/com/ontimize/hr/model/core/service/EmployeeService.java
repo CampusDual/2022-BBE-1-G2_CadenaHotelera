@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ontimize.hr.api.core.service.IEmployeeService;
 import com.ontimize.hr.model.core.dao.EmployeeDao;
@@ -257,45 +259,73 @@ public class EmployeeService implements IEmployeeService {
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
+	@Transactional(rollbackFor = Exception.class)
 	public EntityResult employeeCreateUser(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		if (!attrMap.containsKey("data"))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "REQUEST CONTAINS NO DATA");
-		Map<String, Object> data = (Map<String, Object>) attrMap.get("data");
-		if (!data.containsKey(EmployeeDao.ATTR_ID))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING EMPLOYEE ID");
-		if (!data.containsKey(EmployeeDao.ATTR_USER))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING USERNAME");
-		if (!data.containsKey("qry_password"))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING PASSWORD");
-		Integer employeeId = Integer.parseInt(data.get(employeeDao.ATTR_ID).toString());
-		String username = data.get(employeeDao.ATTR_USER).toString();
-		String password = data.get("qry_password").toString();
-		if (Utils.stringIsNullOrBlank(password))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PASSWORD IS BLANK");
-
-		Integer roleID = null;
 		try {
-			roleID = getRoleFromEmployee(employeeId);
-		} catch (IllegalArgumentException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+			if (!attrMap.containsKey("data"))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "REQUEST CONTAINS NO DATA");
+			Map<String, Object> data = (Map<String, Object>) attrMap.get("data");
+			if (!data.containsKey(EmployeeDao.ATTR_ID))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING EMPLOYEE ID");
+			if (!data.containsKey(EmployeeDao.ATTR_USER))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING USERNAME");
+			if (!data.containsKey("qry_password"))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING PASSWORD");
+			Integer employeeId = Integer.parseInt(data.get(EmployeeDao.ATTR_ID).toString());
+			String username = data.get(EmployeeDao.ATTR_USER).toString();
+			String password = data.get("qry_password").toString();
+			if (Utils.stringIsNullOrBlank(password))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PASSWORD IS BLANK");
+			
+			List<String>columns = Arrays.asList(EmployeeDao.ATTR_USER);
+			Map<String, Object> keyMap = new HashMap<>();
+			keyMap.put(EmployeeDao.ATTR_ID, employeeId);
+			
+			EntityResult resultUser = daoHelper.query(this.employeeDao, keyMap, columns);
+			if (resultUser.calculateRecordNumber()==1)
+			{
+				String tempUser = (String)resultUser.getRecordValues(0).get(EmployeeDao.ATTR_USER);
+				if (tempUser != null) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "EMPLOYEE ALREADY HAS USER");
+			}
+			else {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNABLE TO RETRIEVE USER");
+			}
+			
+			
+			Integer roleID = null;
+			try {
+				roleID = getRoleFromEmployee(employeeId);
+			} catch (IllegalArgumentException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+			}
+			if (roleID == null)
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ROLE NOT FOUND");
+
+			Map<String, Object> attrMapUser = new HashMap<>();
+
+			attrMapUser.put("user_", username);
+			attrMapUser.put("password", password);
+
+			try {
+				if(daoHelper.insert(this.userDao, attrMapUser).getCode()!=0) throw new OntimizeJEERuntimeException();
+			} catch (DuplicateKeyException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "USERNAME ALREADY IN USE");
+			}
+			Map<String, Object> attrMapUserRole = new HashMap<>();
+			attrMapUserRole.put("id_rolename", roleID);
+			attrMapUserRole.put("user_", username);
+			if (daoHelper.insert(userRoleDao, attrMapUserRole).getCode()!=0) throw new OntimizeJEERuntimeException();
+			
+			Map<String, Object> attrMapEmployee = new HashMap<>();
+			attrMapEmployee.put(EmployeeDao.ATTR_USER, username);
+			Map<String, Object> keyMapEmployee = new HashMap<>();
+			keyMapEmployee.put(EmployeeDao.ATTR_ID, employeeId);
+			if(daoHelper.update(employeeDao, attrMapEmployee, keyMapEmployee).getCode()!=0) throw new OntimizeJEERuntimeException();
+			return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,12);
+		} catch (Exception e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNKOWN ERROR");
 		}
-		if (roleID == null)
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ROLE NOT FOUND");
-
-		Map<String, Object> attrMapUser = new HashMap<String, Object>();
-
-		attrMapUser.put("user_", username);
-		attrMapUser.put("password", password);
-
-		try {
-			daoHelper.insert(this.userDao, attrMapUser);
-		} catch (DuplicateKeyException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "USERNAME ALREADY IN USE");
-		}
-		Map<String, Object> attrMapUserRole = new HashMap<>();
-		attrMapUserRole.put("id_rolename", roleID);
-		attrMapUserRole.put("user_", username);
-		return daoHelper.insert(userRoleDao, attrMapUserRole);
+		
 	}
 
 }

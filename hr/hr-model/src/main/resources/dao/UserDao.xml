@@ -6,12 +6,12 @@
     catalog="" schema="${mainschema}" table="TUSER"
     datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
     <DeleteKeys>
-        <Column>USER_</Column>
+        <Column>user_</Column>
     </DeleteKeys>
     <UpdateKeys>
-        <Column>USER_</Column>
+        <Column>user_</Column>
     </UpdateKeys>
-    <GeneratedKey>USER_</GeneratedKey>
+    <!-- <GeneratedKey>USER_</GeneratedKey> -->
     <Queries>
         <Query id="default">
             <ValidColumns>

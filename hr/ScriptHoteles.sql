@@ -85,7 +85,7 @@ CONSTRAINT FK_TSERVER_PERMISSION FOREIGN KEY(ID_SERVER_PERMISSION) REFERENCES PU
 
 INSERT INTO TUSER VALUES('god','password','name','surname',NULL,'44460713B',NULL,NULL,NULL);
 INSERT INTO TROLE VALUES(0,'admin','<?xml version="1.0" encoding="UTF-8"?><security></security>');
-INSERT INTO TUSER_ROLE VALUES(0,0,'god');
+INSERT INTO TUSER_ROLE(id_rolename,user_) VALUES(0,'god');
 INSERT INTO TSERVER_PERMISSION VALUES(0,'com.ontimize.jee.common.services.user.IUserInformationService/getUserInformation');
 
 INSERT INTO TSERVER_PERMISSION VALUES(1,'com.ontimize.hr.api.core.service.IUserService/userQuery');
@@ -132,6 +132,7 @@ INSERT INTO TSERVER_PERMISSION VALUES(34,'com.ontimize.hr.api.core.service.IEmpl
 INSERT INTO TSERVER_PERMISSION VALUES(35,'com.ontimize.hr.api.core.service.IEmployeeService/employeeInsert');
 INSERT INTO TSERVER_PERMISSION VALUES(36,'com.ontimize.hr.api.core.service.IEmployeeService/employeeUpdate');
 INSERT INTO TSERVER_PERMISSION VALUES(37,'com.ontimize.hr.api.core.service.IEmployeeService/employeeDelete');
+INSERT INTO TSERVER_PERMISSION VALUES(38,'com.ontimize.hr.api.core.service.IEmployeeService/employeeCreateUser');
 
 
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
@@ -182,7 +183,7 @@ INSERT INTO TROLE_SERVER_PERMISSION VALUES(34,0,34);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(35,0,35);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(36,0,36);
 INSERT INTO TROLE_SERVER_PERMISSION VALUES(37,0,37);
-
+INSERT INTO TROLE_SERVER_PERMISSION VALUES(38,0,38);
 
 --Creación de tablas de hotel--
 
@@ -343,8 +344,8 @@ insert into tuser (user_,password,name,surname,email,nif) values('juan','passwor
 
 insert into trole(rolename,xmlclientpermission) values('recepcionista','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 
-insert into tuser_role(id_user_role,id_rolename,user_) values(1,1,'juan');
-
+--insert into tuser_role(id_user_role,id_rolename,user_) values(1,1,'juan');
+insert into tuser_role(id_rolename,user_) values(1,'juan');
 --insert into trole_server_permission  values(2,1,0);
 --insert into trole_server_permission  values(34,1,1);
 
@@ -357,7 +358,7 @@ values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','ju
 
 insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
 
-insert into tuser_role(id_user_role,id_rolename,user_) values(2,1,'Mario');
-INSERT INTO TROLE_SERVER_PERMISSION VALUES(38,1,17);
+insert into tuser_role(id_rolename,user_) values(1,'Mario');
+--INSERT INTO TROLE_SERVER_PERMISSION VALUES(3,1,17);
 --INSERT INTO TROLE_SERVER_PERMISSION VALUES(39,1,17);
 

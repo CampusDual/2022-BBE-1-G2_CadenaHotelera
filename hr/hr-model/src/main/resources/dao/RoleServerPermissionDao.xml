@@ -11,4 +11,5 @@
     <UpdateKeys>
         <Column>ID_ROLE_SERVER_PERMISSION</Column>
     </UpdateKeys>
+    <GeneratedKey>ID_ROLE_SERVER_PERMISSION</GeneratedKey>
 </JdbcEntitySetup>

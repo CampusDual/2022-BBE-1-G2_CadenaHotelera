@@ -11,6 +11,7 @@
 	<UpdateKeys>
 		<Column>id_user_role</Column>
 	</UpdateKeys>
+	<GeneratedKey>id_user_role</GeneratedKey>
 	<Queries>
 		<Query id="login">
 			<Sentence>
