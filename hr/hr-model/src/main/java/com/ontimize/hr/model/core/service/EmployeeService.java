@@ -59,7 +59,7 @@ public class EmployeeService implements IEmployeeService {
 		keyMap.put(EmployeeDao.ATTR_USER, user);
 
 		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG) {
+		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG && result.calculateRecordNumber()==1) {
 			return Integer.parseInt(result.getRecordValues(0).get(EmployeeDao.ATTR_HTL_ID).toString());
 		} else
 			return -1;
@@ -76,7 +76,7 @@ public class EmployeeService implements IEmployeeService {
 		keyMap.put(EmployeeDao.ATTR_USER, user);
 
 		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG) {
+		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG && result.calculateRecordNumber()==1) {
 			return Integer.parseInt(result.getRecordValues(0).get(EmployeeDao.ATTR_ID).toString());
 		} else
 			return null;
@@ -187,20 +187,13 @@ public class EmployeeService implements IEmployeeService {
 							EmployeeDao.ATTR_IDENTIFICATION + " IS BLANK");
 			}
 			
-
-			if (attrMap.containsKey(EmployeeDao.ATTR_USER)) {
-				String type = null;
-				try {
-					type= getTypeFromUser(daoHelper.getUser().getUsername());
-					if (!Utils.stringsEquals(type, "Gerente"))
-						attrMap.remove(EmployeeDao.ATTR_USER);						
-				} catch (IllegalArgumentException e) {
-					if (!Utils.stringsEquals("god",  daoHelper.getUser().getUsername()))
-						attrMap.remove(EmployeeDao.ATTR_USER);
+			if(isUserEmployee(daoHelper.getUser().getUsername())) {
+				attrMap.remove(EmployeeDao.ATTR_USER);
+				int auxHotelid =getHotelFromUser(daoHelper.getUser().getUsername());				
+				if(auxHotelid!=-1) {
+					attrMap.remove(EmployeeDao.ATTR_HTL_ID);
+					attrMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
 				}
-				
-				
-
 			}
 			return this.daoHelper.insert(this.employeeDao, attrMap);
 
@@ -259,6 +252,15 @@ public class EmployeeService implements IEmployeeService {
 					&& !Utils.checkEmail(attrMap.get(EmployeeDao.ATTR_EMAIL).toString()))
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INVALID EMAIL FORMAT");
 
+			if(isUserEmployee(daoHelper.getUser().getUsername())) {
+				attrMap.remove(EmployeeDao.ATTR_USER);
+				int auxHotelid =getHotelFromUser(daoHelper.getUser().getUsername());				
+				if(auxHotelid!=-1) {
+					attrMap.remove(EmployeeDao.ATTR_HTL_ID);
+					attrMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
+				}
+			}
+			
 			return this.daoHelper.update(this.employeeDao, attrMap, keyMap);
 
 		} catch (DuplicateKeyException e) {
