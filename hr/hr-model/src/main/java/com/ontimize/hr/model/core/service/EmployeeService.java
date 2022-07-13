@@ -64,6 +64,23 @@ public class EmployeeService implements IEmployeeService {
 		} else
 			return -1;
 	}
+	
+	public boolean isUserEmployee(String user) {
+		return getEmployeeIDFromUser(user)!=null;
+	}
+	
+	public Integer getEmployeeIDFromUser(String user) {
+		List<String> columns = new ArrayList<>();
+		columns.add(EmployeeDao.ATTR_ID);
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(EmployeeDao.ATTR_USER, user);
+
+		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
+		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG) {
+			return Integer.parseInt(result.getRecordValues(0).get(EmployeeDao.ATTR_ID).toString());
+		} else
+			return null;
+	}
 
 	public String getTypeFromUser(String user) {
 		if (Utils.stringIsNullOrBlank(user))
@@ -169,6 +186,7 @@ public class EmployeeService implements IEmployeeService {
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 							EmployeeDao.ATTR_IDENTIFICATION + " IS BLANK");
 			}
+			
 
 			if (attrMap.containsKey(EmployeeDao.ATTR_USER)) {
 				String type = null;
