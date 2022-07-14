@@ -18,6 +18,7 @@ import com.ontimize.hr.model.core.dao.EmployeeDao;
 import com.ontimize.hr.model.core.dao.EmployeeTypeDao;
 import com.ontimize.hr.model.core.dao.UserDao;
 import com.ontimize.hr.model.core.dao.UserRoleDao;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -32,6 +33,9 @@ public class EmployeeService implements IEmployeeService {
 	@Autowired
 	private EmployeeDao employeeDao;
 
+	@Autowired
+	private CredentialUtils credentialUtils;
+	
 	@Autowired
 	private EmployeeTypeDao employeeTypeDao;
 
@@ -52,91 +56,6 @@ public class EmployeeService implements IEmployeeService {
 
 	}
 
-	public int getHotelFromUser(String user) {
-		List<String> columns = new ArrayList<>();
-		columns.add(EmployeeDao.ATTR_HTL_ID);
-		Map<String, Object> keyMap = new HashMap<>();
-		keyMap.put(EmployeeDao.ATTR_USER, user);
-
-		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG && result.calculateRecordNumber()==1) {
-			return Integer.parseInt(result.getRecordValues(0).get(EmployeeDao.ATTR_HTL_ID).toString());
-		} else
-			return -1;
-	}
-	
-	public boolean isUserEmployee(String user) {
-		return getEmployeeIDFromUser(user)!=null;
-	}
-	
-	public Integer getEmployeeIDFromUser(String user) {
-		List<String> columns = new ArrayList<>();
-		columns.add(EmployeeDao.ATTR_ID);
-		Map<String, Object> keyMap = new HashMap<>();
-		keyMap.put(EmployeeDao.ATTR_USER, user);
-
-		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG && result.calculateRecordNumber()==1) {
-			return Integer.parseInt(result.getRecordValues(0).get(EmployeeDao.ATTR_ID).toString());
-		} else
-			return null;
-	}
-
-	public String getTypeFromUser(String user) {
-		if (Utils.stringIsNullOrBlank(user))
-			return null;
-		List<String> columns = new ArrayList<>();
-		columns.add(EmployeeDao.ATTR_TYPE_ID);
-		Map<String, Object> keyMap = new HashMap<>();
-		keyMap.put(EmployeeDao.ATTR_USER, user);
-
-		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG) {
-			if (result.calculateRecordNumber() == 1) {
-				Integer typeID = (Integer) result.getRecordValues(0).get(EmployeeDao.ATTR_TYPE_ID);
-				List<String> columnsType = new ArrayList<>();
-				columnsType.add(EmployeeTypeDao.ATTR_NAME);
-				Map<String, Object> keyMapType = new HashMap<>();
-				keyMapType.put(EmployeeTypeDao.ATTR_ID, typeID);
-				EntityResult resultType = this.daoHelper.query(employeeTypeDao, keyMapType, columnsType);
-				if (resultType.calculateRecordNumber() == 1) {
-					return resultType.getRecordValues(0).get(EmployeeTypeDao.ATTR_NAME).toString();
-				} else
-					return null;
-			} else
-				throw new IllegalArgumentException("USER IS NOT AN EMPLOYEE");
-
-		} else
-			return null;
-
-	}
-
-	public Integer getRoleFromEmployee(int employeeID) {
-		List<String> columns = new ArrayList<>();
-		columns.add(EmployeeDao.ATTR_TYPE_ID);
-		Map<String, Object> keyMap = new HashMap<>();
-		keyMap.put(EmployeeDao.ATTR_ID, employeeID);
-
-		EntityResult result = this.daoHelper.query(employeeDao, keyMap, columns);
-		if (result != null && result.getCode() != EntityResult.OPERATION_WRONG) {
-			if (result.calculateRecordNumber() == 1) {
-				Integer typeID = (Integer) result.getRecordValues(0).get(EmployeeDao.ATTR_TYPE_ID);
-				List<String> columnsType = new ArrayList<>();
-				columnsType.add(EmployeeTypeDao.ATTR_ROLE_ID);
-				Map<String, Object> keyMapType = new HashMap<>();
-				keyMapType.put(EmployeeTypeDao.ATTR_ID, typeID);
-				EntityResult resultType = this.daoHelper.query(employeeTypeDao, keyMapType, columnsType);
-				if (resultType.calculateRecordNumber() == 1) {
-					return (Integer) resultType.getRecordValues(0).get(EmployeeTypeDao.ATTR_ROLE_ID);
-				} else
-					throw new IllegalArgumentException("EMPLOYEE TYPE ERROR");
-			} else
-				throw new IllegalArgumentException("INVALID EMPLOYEE ID");
-
-		} else
-			throw new IllegalArgumentException("INVALID EMPLOYEE ID");
-
-	}
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
@@ -187,9 +106,9 @@ public class EmployeeService implements IEmployeeService {
 							EmployeeDao.ATTR_IDENTIFICATION + " IS BLANK");
 			}
 			
-			if(isUserEmployee(daoHelper.getUser().getUsername())) {
+			if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
 				attrMap.remove(EmployeeDao.ATTR_USER);
-				int auxHotelid =getHotelFromUser(daoHelper.getUser().getUsername());				
+				int auxHotelid =credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());				
 				if(auxHotelid!=-1) {
 					attrMap.remove(EmployeeDao.ATTR_HTL_ID);
 					attrMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
@@ -242,9 +161,9 @@ public class EmployeeService implements IEmployeeService {
 					&& !Utils.checkEmail(attrMap.get(EmployeeDao.ATTR_EMAIL).toString()))
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INVALID EMAIL FORMAT");
 
-			if(isUserEmployee(daoHelper.getUser().getUsername())) {
+			if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
 				attrMap.remove(EmployeeDao.ATTR_USER);
-				int auxHotelid =getHotelFromUser(daoHelper.getUser().getUsername());				
+				int auxHotelid =credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());				
 				if(auxHotelid!=-1) {
 					attrMap.remove(EmployeeDao.ATTR_HTL_ID);
 					attrMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
@@ -263,10 +182,10 @@ public class EmployeeService implements IEmployeeService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		if (isUserEmployee(daoHelper.getUser().getUsername())&& getHotelFromUser(daoHelper.getUser().getUsername())!=-1)
+		if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())&& credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername())!=-1)
 		{
 			keyMap.remove(EmployeeDao.ATTR_HTL_ID);
-			keyMap.put(EmployeeDao.ATTR_HTL_ID, getHotelFromUser(daoHelper.getUser().getUsername()));
+			keyMap.put(EmployeeDao.ATTR_HTL_ID, credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername()));
 			
 		}
 		EntityResult resultExists = this.daoHelper.query(employeeDao, keyMap, Arrays.asList(EmployeeDao.ATTR_ID));
@@ -302,8 +221,8 @@ public class EmployeeService implements IEmployeeService {
 			List<String>columns = Arrays.asList(EmployeeDao.ATTR_USER);
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(EmployeeDao.ATTR_ID, employeeId);
-			int auxHotelid = getHotelFromUser(daoHelper.getUser().getUsername());
-			if(isUserEmployee(daoHelper.getUser().getUsername()) && auxHotelid!=-1)
+			int auxHotelid = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername()) && auxHotelid!=-1)
 			{
 				keyMap.remove(EmployeeDao.ATTR_HTL_ID);
 				keyMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
@@ -323,7 +242,7 @@ public class EmployeeService implements IEmployeeService {
 			
 			Integer roleID = null;
 			try {
-				roleID = getRoleFromEmployee(employeeId);
+				roleID = credentialUtils.getRoleFromEmployee(employeeId);
 			} catch (IllegalArgumentException e) {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 			}

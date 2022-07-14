@@ -29,6 +29,7 @@ import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
@@ -48,10 +49,8 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class BookingService implements IBookingService {
 
-	private static final String ERROR = "error";
 	private static final String COLUMNS = "columns";
 	private static final String FILTER = "filter";
-	private static final String DATA = "data";
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	
@@ -59,16 +58,13 @@ public class BookingService implements IBookingService {
 	private BookingDao bookingDao;
 	
 	@Autowired
-	private RoomTypeDao roomTypeDao;
-	
-	@Autowired
 	private OffersService offersService;
 	
 	@Autowired
-	private RoomService roomService;
-	
+	private RoomDao roomDao;
+
 	@Autowired
-	private EmployeeService employeeService;
+	private CredentialUtils credentialUtils;
 
 	@Autowired
 	private HotelService hotelService;
@@ -285,8 +281,8 @@ public class BookingService implements IBookingService {
 		Integer hotelId;
 
 		String auxUsername = daoHelper.getUser().getUsername();
-		int auxHotelID = employeeService.getHotelFromUser(auxUsername);
-		if(employeeService.isUserEmployee(auxUsername) && auxHotelID!=-1)
+		int auxHotelID = credentialUtils.getHotelFromUser(auxUsername);
+		if(credentialUtils.isUserEmployee(auxUsername) && auxHotelID!=-1)
 		{
 			parameters.remove(BookingDao.ATTR_HTL_ID);
 			parameters.put(BookingDao.ATTR_HTL_ID, auxHotelID);
@@ -540,7 +536,7 @@ public class BookingService implements IBookingService {
 		List<String> attrListRoom = new ArrayList<>();
 		attrListRoom.add(RoomDao.ATTR_NUMBER);	
 		attrListRoom.add(RoomDao.ATTR_TYPE_ID);	
-		EntityResult resultType = roomService.roomQuery(filterRoom,attrListRoom);
+		EntityResult resultType = daoHelper.query(roomDao, filterRoom, attrListRoom);
 		oldType  = Integer.parseInt(resultType.getRecordValues(0).get(RoomDao.ATTR_TYPE_ID).toString());
 		
 		//obtenemos el tipo de la habitacion de la reserva origen
