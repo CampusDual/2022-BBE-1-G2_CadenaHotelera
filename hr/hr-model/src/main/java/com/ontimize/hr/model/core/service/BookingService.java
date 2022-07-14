@@ -2,6 +2,9 @@ package com.ontimize.hr.model.core.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -16,9 +20,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.dao.HotelDao;
+import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.hr.model.core.dao.RoomTypeDao;
+import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
@@ -40,18 +51,31 @@ public class BookingService implements IBookingService {
 	private static final String ERROR = "error";
 	private static final String COLUMNS = "columns";
 	private static final String FILTER = "filter";
+	private static final String DATA = "data";
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	
 	@Autowired
 	private BookingDao bookingDao;
 	
+	@Autowired
+	private RoomTypeDao roomTypeDao;
+	
+	@Autowired
+	private OffersService offersService;
 	
 	@Autowired
 	private RoomService roomService;
+	
+	@Autowired
+	private HotelService hotelService;
+	
+	@Autowired
+	private RoomTypeService roomTypeService;
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
+	
 
 	/**
 	 * Booking query.
@@ -624,4 +648,161 @@ public class BookingService implements IBookingService {
 		return res;
 				
 	}	
+	
+	
+	public Double getPriceNight(int roomTypeId,int hotelId, Date day) {
+		Map<String, Object> filterMap = new HashMap<>();
+		filterMap.put(OffersDao.ATTR_DAY, day);
+		filterMap.put(OffersDao.ATTR_HTL_OFFER, hotelId);
+		filterMap.put(OffersDao.ATTR_ROOM_TYPE_ID, roomTypeId);
+
+		List<String> returnList = new ArrayList();
+		returnList.add(OffersDao.ATTR_NIGHT_PRICE);
+
+		// Compruebo si hay oferta ese dia
+		EntityResult haveOfferER = offersService.offerQuery(filterMap, returnList);
+
+		if (haveOfferER.calculateRecordNumber() != 0) {
+			return Double.parseDouble(haveOfferER.getRecordValues(0).get(OffersDao.ATTR_NIGHT_PRICE).toString());
+		}
+
+		else {
+			// si no hay oferta la calculamos en función del multiplicador de temporada y precio base de tipo
+			Map<String, Object> keyMap = new HashMap<>();
+			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
+					searchPriceNight(DatesSeasonDao.ATTR_START_DATE, DatesSeasonDao.ATTR_END_DATE, RoomTypeDao.ATTR_ID,
+							HotelDao.ATTR_ID, day, roomTypeId, hotelId));
+
+			List<String> columns = new ArrayList<>(
+					Arrays.asList(SeasonDao.ATTR_MULTIPLIER, RoomTypeDao.ATTR_BASE_PRICE));
+			
+			EntityResult price = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_PRICE_NIGHT);
+			
+			Double multi = Double.parseDouble(price.getRecordValues(0).get(SeasonDao.ATTR_MULTIPLIER).toString());
+			Double priceBaseType = Double.parseDouble(price.getRecordValues(0).get(RoomTypeDao.ATTR_BASE_PRICE).toString());
+			
+
+			return multi*priceBaseType;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param req, Receives the request data from the controller. Which the filters
+	 *             for the WHERE of the query. (
+	 *             htl_id,day,rtyp_id,start_day,end_day(optional) )
+	 * @return
+	 * @throws OntimizeJEERuntimeException
+	 */
+	public EntityResult getBudget(Map<String, Object> req) throws OntimizeJEERuntimeException {
+
+		EntityResult budgetER = new EntityResultMapImpl();
+
+		Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
+
+		// Comprobamos htl_id y rtp_id
+		Integer roomTypeId;
+		Integer hotelId;
+		try {
+			roomTypeId = Integer.parseInt(filter.get(RoomTypeDao.ATTR_ID).toString());
+		} catch (NumberFormatException ex) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_TYPE_ROOM_FORMAT");
+		}
+
+		try {
+			hotelId = Integer.parseInt(filter.get(HotelDao.ATTR_ID).toString());
+		} catch (NumberFormatException ex) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_HOTEL_ID_FORMAT");
+		}
+
+		// Compruebo hotel existe
+		Map<String, Object> filterHotel = new HashMap<>();
+		filterHotel.put(HotelDao.ATTR_ID, hotelId);
+
+		List<String> attrListHotel = new ArrayList<>();
+		attrListHotel.add(HotelDao.ATTR_NAME);
+		EntityResult existsHotelER = hotelService.hotelQuery(filterHotel, attrListHotel);
+		if (existsHotelER.calculateRecordNumber() == 0) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_HOTEL_NOT_EXISTS");
+		}
+
+		// Compruebo tipo habitación existe
+		Map<String, Object> filterTypeRoom = new HashMap<>();
+		filterTypeRoom.put(RoomTypeDao.ATTR_ID, roomTypeId);
+
+		List<String> attrListRoomType = new ArrayList<>();
+		attrListRoomType.add(RoomTypeDao.ATTR_NAME);
+		EntityResult existsTypeRoomER = roomTypeService.roomTypeQuery(filterTypeRoom, attrListRoomType);
+		if (existsTypeRoomER.calculateRecordNumber() == 0) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_ROOM_TYPE_NOT_EXISTS");
+		}
+
+		// Comprobamos formato fechas
+		Date startDate = null;
+		Date endDate = null;
+
+		try {
+			startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get("start_day").toString());
+
+		} catch (ParseException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
+		} catch (NullPointerException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_START_DAY_MANDATORY");
+		}
+
+		try {
+			endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get("end_day").toString());
+		} catch (ParseException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
+		} catch (NullPointerException ex) {
+
+			// aqui se calcula precio de una noche sola, pq no se metió fecha final
+			budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
+			budgetER.put("TOTAL_PRICE", getPriceNight(roomTypeId, hotelId, startDate));
+			return budgetER;
+		}
+
+		// comprobar fechas no iguales
+		if (startDate.equals(endDate)) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+		}
+
+		// comprobar fecha inicial superior a final
+		if (endDate.before(startDate)) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+		}
+
+		long diffrenceDays = Utils.getNumberDays(startDate, endDate);
+
+		// sumo los días
+		Double total = 0.0;
+		for (int i = 0; i < diffrenceDays; i++) {
+			total += getPriceNight(roomTypeId, hotelId, Utils.sumarDiasAFecha(startDate, i));
+		}
+
+		budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
+		budgetER.put("TOTAL_PRICE", total);
+		return budgetER;
+	}
+
+	private BasicExpression searchPriceNight(String startDateTag, String endDateTag, String roomTypeIdTag,
+			String hotelIdTag, Date day, int roomTypeId, int hotelId) {
+
+		BasicField startTag = new BasicField(startDateTag);
+		BasicField endTag = new BasicField(endDateTag);
+		BasicField roomTypeTag = new BasicField(roomTypeIdTag);
+		BasicField hotelTag = new BasicField(hotelIdTag);
+
+		BasicExpression bexpType = new BasicExpression(roomTypeTag, BasicOperator.EQUAL_OP, roomTypeId);
+
+		BasicExpression bexpHotel = new BasicExpression(hotelTag, BasicOperator.EQUAL_OP, hotelId);
+
+		BasicExpression bexpStart = new BasicExpression(startTag, BasicOperator.LESS_EQUAL_OP, day);
+		BasicExpression bexpEnd = new BasicExpression(endTag, BasicOperator.MORE_OP, day);
+		BasicExpression bexpDay = new BasicExpression(bexpStart, BasicOperator.AND_OP, bexpEnd);
+
+		BasicExpression bexpTypeAndHotel = new BasicExpression(bexpType, BasicOperator.AND_OP, bexpHotel);
+		return new BasicExpression(bexpTypeAndHotel, BasicOperator.AND_OP, bexpDay);
+	}
+
 }

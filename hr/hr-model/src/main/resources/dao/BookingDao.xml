@@ -80,5 +80,20 @@
 			   ]]>
   			</Sentence>
   		</Query>
+  		<Query id="priceNightByType">
+  			<Sentence>
+  				<![CDATA[
+			    SELECT
+			    	DISTINCT #COLUMNS#
+			    FROM
+      				season s
+    			INNER JOIN dates_season ds on s.sea_id = ds.dts_sea_id
+   				INNER JOIN hotel h ON ds.dts_htl_id = h.htl_id
+    			INNER JOIN room r ON h.htl_id = r.rom_htl_id
+   				INNER JOIN room_type rt ON r.rom_typ_id = rt.rtyp_id				     	
+			    #WHERE# 
+			   ]]>
+  			</Sentence>
+  		</Query>
  	</Queries>
 </JdbcEntitySetup>

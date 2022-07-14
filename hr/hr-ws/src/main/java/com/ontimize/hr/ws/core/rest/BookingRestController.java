@@ -118,4 +118,16 @@ public class BookingRestController extends ORestController<IBookingService> {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
 	}
+	
+	
+	@PostMapping(value ="bookingGetBudget/search",  produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingGetBudget(@RequestBody Map<String,Object>req) {
+		try {
+			return this.bookingService.getBudget(req);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
+	}
 }

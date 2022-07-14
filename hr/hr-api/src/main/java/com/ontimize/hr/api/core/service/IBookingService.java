@@ -31,4 +31,6 @@ public interface IBookingService {
 	public EntityResult bookingUpdateById(Map<String, Object> req)throws OntimizeJEERuntimeException;
 
 	public EntityResult bookingcheckintodayQuery(Map<String, Object> keyMap,List<String>attrList) throws OntimizeJEERuntimeException;
+	
+	public EntityResult getBudget(Map<String, Object> req) throws OntimizeJEERuntimeException;
 }
