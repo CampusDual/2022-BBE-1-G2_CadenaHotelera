@@ -68,6 +68,9 @@ public class BookingService implements IBookingService {
 	private RoomService roomService;
 	
 	@Autowired
+	private EmployeeService employeeService;
+
+	@Autowired
 	private HotelService hotelService;
 	
 	@Autowired
@@ -279,15 +282,28 @@ public class BookingService implements IBookingService {
 			departureDate = new java.sql.Date(cal.getTimeInMillis());
 		}
 
-		if (!parameters.containsKey(BookingDao.ATTR_HTL_ID))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Hotel id is mandatory");
-
 		Integer hotelId;
-		try {
-			hotelId = (Integer) parameters.get(BookingDao.ATTR_HTL_ID);
-		} catch (Exception e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INVALID HOTEL ID FORMAT");
+
+		String auxUsername = daoHelper.getUser().getUsername();
+		int auxHotelID = employeeService.getHotelFromUser(auxUsername);
+		if(employeeService.isUserEmployee(auxUsername) && auxHotelID!=-1)
+		{
+			parameters.remove(BookingDao.ATTR_HTL_ID);
+			parameters.put(BookingDao.ATTR_HTL_ID, auxHotelID);
+			hotelId= auxHotelID;
 		}
+		else
+		{
+			if (!parameters.containsKey(BookingDao.ATTR_HTL_ID))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Hotel id is mandatory");
+			
+			try {
+				hotelId = (Integer) parameters.get(BookingDao.ATTR_HTL_ID);
+			} catch (Exception e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INVALID HOTEL ID FORMAT");
+			}			
+		}
+		
 
 		if (!parameters.containsKey(BookingDao.ATTR_CLI_ID))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Client id is mandatory");
@@ -313,6 +329,8 @@ public class BookingService implements IBookingService {
 		filterMap.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(entryDate));
 		filterMap.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).format(departureDate));
 		filterMap.put(BookingDao.ATTR_HTL_ID, hotelId);
+
+		
 
 		queryFreeRoomMap.put(FILTER, filterMap);
 
@@ -667,7 +685,7 @@ public class BookingService implements IBookingService {
 		}
 
 		else {
-			// si no hay oferta la calculamos en función del multiplicador de temporada y precio base de tipo
+			// si no hay oferta la calculamos en funci�n del multiplicador de temporada y precio base de tipo
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
 					searchPriceNight(DatesSeasonDao.ATTR_START_DATE, DatesSeasonDao.ATTR_END_DATE, RoomTypeDao.ATTR_ID,
@@ -726,7 +744,7 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_HOTEL_NOT_EXISTS");
 		}
 
-		// Compruebo tipo habitación existe
+		// Compruebo tipo habitaci�n existe
 		Map<String, Object> filterTypeRoom = new HashMap<>();
 		filterTypeRoom.put(RoomTypeDao.ATTR_ID, roomTypeId);
 
@@ -756,7 +774,7 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
 		} catch (NullPointerException ex) {
 
-			// aqui se calcula precio de una noche sola, pq no se metió fecha final
+			// aqui se calcula precio de una noche sola, pq no se meti� fecha final
 			budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
 			budgetER.put("TOTAL_PRICE", getPriceNight(roomTypeId, hotelId, startDate));
 			return budgetER;
@@ -774,7 +792,7 @@ public class BookingService implements IBookingService {
 
 		long diffrenceDays = Utils.getNumberDays(startDate, endDate);
 
-		// sumo los días
+		// sumo los d�as
 		Double total = 0.0;
 		for (int i = 0; i < diffrenceDays; i++) {
 			total += getPriceNight(roomTypeId, hotelId, Utils.sumarDiasAFecha(startDate, i));

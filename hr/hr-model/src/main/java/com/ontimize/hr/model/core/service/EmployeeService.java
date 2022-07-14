@@ -210,38 +210,28 @@ public class EmployeeService implements IEmployeeService {
 
 		try {
 
-			if (!attrMap.containsKey(EmployeeDao.ATTR_NAME)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING " + EmployeeDao.ATTR_NAME);
-			} else {
+			if (attrMap.containsKey(EmployeeDao.ATTR_NAME)) {
 				String name = attrMap.get(EmployeeDao.ATTR_NAME).toString();
 				if (name.isBlank())
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 							EmployeeDao.ATTR_NAME + " IS BLANK");
 			}
 
-			if (!attrMap.containsKey(EmployeeDao.ATTR_SURNAME1)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-						"MISSING " + EmployeeDao.ATTR_SURNAME1);
-			} else {
+			if (attrMap.containsKey(EmployeeDao.ATTR_SURNAME1)) {
 				String surname = attrMap.get(EmployeeDao.ATTR_SURNAME1).toString();
 				if (surname.isBlank())
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 							EmployeeDao.ATTR_SURNAME1 + " IS BLANK");
 			}
 
-			if (!attrMap.containsKey(EmployeeDao.ATTR_PHONE)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MISSING " + EmployeeDao.ATTR_PHONE);
-			} else {
+			if (attrMap.containsKey(EmployeeDao.ATTR_PHONE)) {
 				String surname = attrMap.get(EmployeeDao.ATTR_PHONE).toString();
 				if (surname.isBlank())
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 							EmployeeDao.ATTR_PHONE + " IS BLANK");
 			}
 
-			if (!attrMap.containsKey(EmployeeDao.ATTR_IDENTIFICATION)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-						"MISSING " + EmployeeDao.ATTR_IDENTIFICATION);
-			} else {
+			if (attrMap.containsKey(EmployeeDao.ATTR_IDENTIFICATION)) {
 				String surname = attrMap.get(EmployeeDao.ATTR_IDENTIFICATION).toString();
 				if (surname.isBlank())
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
@@ -273,6 +263,18 @@ public class EmployeeService implements IEmployeeService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
+		if (isUserEmployee(daoHelper.getUser().getUsername())&& getHotelFromUser(daoHelper.getUser().getUsername())!=-1)
+		{
+			keyMap.remove(EmployeeDao.ATTR_HTL_ID);
+			keyMap.put(EmployeeDao.ATTR_HTL_ID, getHotelFromUser(daoHelper.getUser().getUsername()));
+			
+		}
+		EntityResult resultExists = this.daoHelper.query(employeeDao, keyMap, Arrays.asList(EmployeeDao.ATTR_ID));
+		if (resultExists.getCode()== EntityResult.OPERATION_SUCCESSFUL && resultExists.calculateRecordNumber()==0)
+		{
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "EMPLOYEE DOES NOT EXIST OR IS IN ANOTHER HOTEL");			
+		}
+		
 		return this.daoHelper.delete(this.employeeDao, keyMap);
 
 	}
@@ -300,6 +302,13 @@ public class EmployeeService implements IEmployeeService {
 			List<String>columns = Arrays.asList(EmployeeDao.ATTR_USER);
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(EmployeeDao.ATTR_ID, employeeId);
+			int auxHotelid = getHotelFromUser(daoHelper.getUser().getUsername());
+			if(isUserEmployee(daoHelper.getUser().getUsername()) && auxHotelid!=-1)
+			{
+				keyMap.remove(EmployeeDao.ATTR_HTL_ID);
+				keyMap.put(EmployeeDao.ATTR_HTL_ID,auxHotelid);
+			}
+			
 			
 			EntityResult resultUser = daoHelper.query(this.employeeDao, keyMap, columns);
 			if (resultUser.calculateRecordNumber()==1)
@@ -308,7 +317,7 @@ public class EmployeeService implements IEmployeeService {
 				if (tempUser != null) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "EMPLOYEE ALREADY HAS USER");
 			}
 			else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNABLE TO RETRIEVE USER");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNABLE TO CHECK IF EMPLOYEE HAS USER");
 			}
 			
 			
