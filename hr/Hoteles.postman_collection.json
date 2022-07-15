@@ -1369,6 +1369,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Post BookingCheckOut",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :11\r\n\t}    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/bookings/bookingCheckOut",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingCheckOut"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

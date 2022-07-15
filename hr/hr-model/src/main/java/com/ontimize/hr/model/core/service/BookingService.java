@@ -971,4 +971,44 @@ public class BookingService implements IBookingService {
 		return new BasicExpression(bexpTypeAndHotel, BasicOperator.AND_OP, bexpDay);
 	}
 
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult checkOut(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		Map<String, Object> keyMap = (Map<String, Object>) req.get("filter");		
+		Map<String, Object> attrMap = new HashMap<String, Object>();
+		attrMap.put(BookingDao.ATTR_BOK_STATUS_CODE, "F");	
+		
+		List<String> attrListBooking = new ArrayList<String>();
+		attrListBooking.add(BookingDao.ATTR_ENTRY_DATE);
+		attrListBooking.add(BookingDao.ATTR_DEPARTURE_DATE);
+		
+		if(!keyMap.containsKey(BookingDao.ATTR_ID)) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "RESERVATION_ID_IS_REQUIRED");
+		}
+		
+		EntityResult resultBooking = daoHelper.query(this.bookingDao, keyMap, attrListBooking);
+		
+		Date entry = null;
+		Date departure = null;
+		Date today = new Date();
+		
+		if(resultBooking.calculateRecordNumber()==1) {
+			try {
+				entry = new SimpleDateFormat(DATE_FORMAT_ISO).parse(resultBooking.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE).toString());
+				departure = new SimpleDateFormat(DATE_FORMAT_ISO).parse(resultBooking.getRecordValues(0).get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			
+			if(entry.before(today)&& departure.after(today)) {
+				departure=today;
+				attrMap.put(BookingDao.ATTR_DEPARTURE_DATE, departure);
+			}
+		}else {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "RESERVATION_NOT_EXISTS");
+		}
+		
+		return daoHelper.update(this.bookingDao, attrMap, keyMap);		
+	}
+
 }
