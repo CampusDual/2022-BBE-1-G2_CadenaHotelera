@@ -14,5 +14,11 @@ public class RoomDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_HTL_ID = "rom_htl_id";
 	public static final String ATTR_NUMBER = "rom_number";
 	public static final String ATTR_TYPE_ID = "rom_typ_id";
+	public static final String ATTR_STATUS_ID = "rom_rsts_id";
+	public static final String ATTR_STATUS_START = "rom_status_start";
+	public static final String ATTR_STATUS_END = "rom_status_end";
+
+
+
 
 }
