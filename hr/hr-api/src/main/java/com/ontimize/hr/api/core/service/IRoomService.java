@@ -18,5 +18,8 @@ public interface IRoomService {
 			throws OntimizeJEERuntimeException;
 
 	public EntityResult roomDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+	
+	public EntityResult roomUpdateStatus(Map<String, Object> req)
+			throws OntimizeJEERuntimeException;
 
 }

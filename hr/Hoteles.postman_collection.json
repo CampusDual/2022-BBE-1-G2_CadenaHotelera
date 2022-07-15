@@ -537,6 +537,35 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Post roomStatus",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"rom_number\" :\"108\",\r\n        \"rom_htl_id\":1\r\n\t},\r\n    \"data\": {\r\n        \"rom_rsts_id\":2,\r\n        \"rom_status_start\":\"2022-06-17\",\r\n        \"rom_status_end\":\"2022-06-20\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/rooms/roomUpdate/status",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"rooms",
+								"roomUpdate",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

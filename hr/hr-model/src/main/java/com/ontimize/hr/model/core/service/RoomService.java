@@ -2,7 +2,9 @@ package com.ontimize.hr.model.core.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class RoomService implements IRoomService {
 
 	@Autowired
 	private RoomDao roomDao;
+	
+	@Autowired
+	private BookingDao bookingDao;
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -150,6 +155,151 @@ public class RoomService implements IRoomService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.roomDao, keyMap);
+	}
+	
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult roomUpdateStatus(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
+		Map<String, Object> data = (Map<String, Object>) req.get("data");
+		EntityResult result = null;
+		Date startDate = null;
+		Date endDate = null;
+		int hotelId;
+		
+		if(data.containsKey(RoomDao.ATTR_HTL_ID))
+			data.remove(RoomDao.ATTR_HTL_ID);
+		if(data.containsKey(RoomDao.ATTR_NUMBER))
+			data.remove(RoomDao.ATTR_NUMBER);
+		if(data.containsKey(RoomDao.ATTR_TYPE_ID))
+			data.remove(RoomDao.ATTR_TYPE_ID);
+		
+		//eliminamos cualquier intento de modificar otro campo de la tabla rooms
+		
+		Map<String, Object> keyMapRoom = new HashMap<String, Object>();
+		List<String> attrListRoom = new ArrayList<String>();
+		
+		keyMapRoom.put(RoomDao.ATTR_NUMBER, filter.get(RoomDao.ATTR_NUMBER).toString());
+		
+		attrListRoom.add(RoomDao.ATTR_NUMBER);
+		
+		EntityResult rooms = daoHelper.query(this.roomDao, keyMapRoom, attrListRoom);
+		
+		if(rooms.calculateRecordNumber()==0) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage("ROOM_DOESNT_EXIST");
+			return result;
+		}
+		
+		//comprobamos que la habitacion exista
+		
+		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)&&!data.containsKey(RoomDao.ATTR_STATUS_START)&&!data.containsKey(RoomDao.ATTR_STATUS_END)) {
+			Map<String,Object> dataNull = new HashMap<String, Object>();
+			
+			dataNull.put(RoomDao.ATTR_STATUS_ID, null);
+			dataNull.put(RoomDao.ATTR_STATUS_START, null);
+			dataNull.put(RoomDao.ATTR_STATUS_END, null);
+			
+			result = this.daoHelper.update(this.roomDao, dataNull,filter);
+			return result;
+		}
+		
+		//si no enviamos datos ponemos los campos de status a null
+			
+		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage("STATUS_ID_IS_MANDATORY");
+			return result;
+		}
+		
+		if(!filter.containsKey(RoomDao.ATTR_NUMBER)) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage("ROOM_NUMBER_IS_MANDATORY");
+			return result;
+		}
+					
+		if(data.containsKey(RoomDao.ATTR_STATUS_START)&&data.containsKey(RoomDao.ATTR_STATUS_END)) {
+			try {
+				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
+				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
+				
+				if(startDate.after(endDate)) {
+					result = new EntityResultMapImpl();
+					result.setCode(EntityResult.OPERATION_WRONG);
+					result.setMessage("END_DATE_MUST_BE_AFTER_START_DATE");
+					return result;
+				}
+				
+				data.remove(RoomDao.ATTR_STATUS_START);
+				data.remove(RoomDao.ATTR_STATUS_END);
+				
+				data.put(RoomDao.ATTR_STATUS_START, startDate);
+				data.put(RoomDao.ATTR_STATUS_END, endDate);
+			} catch (ParseException e) {
+				result = new EntityResultMapImpl();
+				result.setCode(EntityResult.OPERATION_WRONG);
+				result.setMessage("DATE_FORMAT_INCORRECT");
+				return result;
+			}
+		}
+		//hasta aqui comprobamos que se le meta una fecha al estado de la habitación
+		
+		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+			hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			
+			filter.remove(RoomDao.ATTR_HTL_ID);
+			
+			filter.put(RoomDao.ATTR_HTL_ID, hotelId);
+		}
+		hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);
+		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
+				
+		Map<String, Object> keyMapBooking = new HashMap<String, Object>();
+		List<String> attrListBooking = new ArrayList<String>();
+		
+		keyMapBooking.put(BookingDao.ATTR_HTL_ID, hotelId);
+		keyMapBooking.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
+		
+		attrListBooking.add(BookingDao.ATTR_ROM_NUMBER);
+		
+		EntityResult bookings = daoHelper.query(this.bookingDao, keyMapBooking, attrListBooking);
+		
+		int c = bookings.calculateRecordNumber();
+		
+		for(int i=0;i<c;i++) {
+			if(bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
+				result = new EntityResultMapImpl();
+				result.setCode(EntityResult.OPERATION_WRONG);
+				result.setMessage("ROOM_OCUPIED");
+				return result;
+			}
+		}
+		//hasta aqui cpmprobamos que la habitacion no este ocupada o tenga reservas a futuro
+		
+		
+		try
+		{					
+			result = this.daoHelper.update(this.roomDao, data,filter);
+			return result;				
+		}
+		catch (DataIntegrityViolationException e)
+		{
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
+				result.setMessage("NO SUCH HOTEL");
+			}
+			else if(e.getMessage()!=null && e.getMessage().contains("fk_room_room_status")) {
+				result.setMessage("NO SUCH STATUS");
+			}
+			return result;
+		}
+		catch (Exception e) {
+			throw e;
+		}
 	}
 
 }
