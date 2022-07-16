@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
+import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.server.rest.ORestController;
 
 @RestController
@@ -151,5 +152,10 @@ public class BookingRestController extends ORestController<IBookingService> {
 			e.printStackTrace();
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
+	}
+	
+	@PostMapping(value = "bookingFreeByCityorHotel", produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingFreeByCityOrHotel(@RequestBody Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
+			return this.bookingService.bookingFreeByCityOrHotel(keyMap);		
 	}
 }

@@ -36,8 +36,11 @@ import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.gui.SearchValue;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
+import com.ontimize.jee.common.tools.BasicExpressionTools;
 import com.ontimize.jee.common.tools.EntityResultTools;
+import com.ontimize.jee.common.tools.ertools.CountAggregateFunction;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 /**
@@ -57,6 +60,9 @@ public class BookingService implements IBookingService {
 	
 	@Autowired
 	private RoomTypeDao roomTypeDao;
+	
+	@Autowired
+	private HotelDao hotelDao;
 	
 	@Autowired  
 	private OffersDao offersDao;
@@ -276,6 +282,41 @@ public class BookingService implements IBookingService {
 
 		return new BasicExpression(bexp, BasicOperator.AND_OP, bexp11);
 	}
+	
+	/**
+	 * Search between with year.
+	 *
+	 * @param entryDate     name of the field in the database
+	 * @param departureDate name of the field in the database
+	 * @param inicio        start date on request
+	 * @param fin           end date on request
+	 * @return the basic expression
+	 */
+	private BasicExpression searchBetweenWithYearNoHotel(String entryDate, String departureDate, Date inicio,
+			Date fin) {
+
+		Date startDate = inicio;
+		Date endDate = fin;
+
+		BasicField entry = new BasicField(entryDate);
+		BasicField departure = new BasicField(departureDate);
+		BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
+		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, endDate);
+		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, startDate);
+		BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
+		BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
+		BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
+
+		BasicExpression bexp7 = new BasicExpression(bexp1, BasicOperator.AND_OP, bexp2);
+		BasicExpression bexp8 = new BasicExpression(bexp3, BasicOperator.AND_OP, bexp4);
+		BasicExpression bexp9 = new BasicExpression(bexp5, BasicOperator.AND_OP, bexp6);
+
+		BasicExpression bexp10 = new BasicExpression(bexp7, BasicOperator.OR_OP, bexp8);
+		BasicExpression bexp11 = new BasicExpression(bexp9, BasicOperator.OR_OP, bexp10);
+
+		return bexp11;
+	}
+	
 	
 	/**
 	 * Search between with year.
@@ -1070,5 +1111,115 @@ public class BookingService implements IBookingService {
 		
 		return daoHelper.update(this.bookingDao, attrMap, keyMap);		
 	}
+	
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult bookingFreeByCityOrHotel(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
+		Map<String, Object> filter = null;		
+		if (keyMap.containsKey(FILTER)){
+			filter= (Map<String, Object>) keyMap.get(FILTER);
+		}
+		else
+			return new  EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,"REQUEST CONTAINS NO FILTER");
+		
+		if (filter.containsKey(HotelDao.ATTR_CITY) && filter.containsKey(HotelDao.ATTR_ID))
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+					"Cannot search by city and hotel at the same time");
+
+		if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+			filter.remove(HotelDao.ATTR_CITY);
+			filter.remove(BookingDao.ATTR_HTL_ID);
+			int hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			if (hotelId != -1)
+				filter.put(BookingDao.ATTR_HTL_ID, hotelId);
+		}
+
+		List<Integer> hotelList = null;
+		Map<String, Object> keyMapHotel = new HashMap<>();
+		List<String> columnsHotel = Arrays.asList(HotelDao.ATTR_ID);
+
+		if (filter.containsKey(HotelDao.ATTR_CITY)) {
+			keyMapHotel.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,new BasicExpression(new BasicField(HotelDao.ATTR_CITY),BasicOperator.LIKE_OP,filter.get(HotelDao.ATTR_CITY)));
+			
+			
+			EntityResult hotelsResult = daoHelper.query(hotelDao, keyMapHotel, columnsHotel);
+			if (hotelsResult.getCode() != EntityResult.OPERATION_WRONG) {
+				if (hotelsResult.calculateRecordNumber() != 0)
+					hotelList = (List<Integer>) hotelsResult.get(HotelDao.ATTR_ID);
+			} else
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "HOTEL DOES NOT EXIST");
+		}
+
+		if (filter.containsKey(BookingDao.ATTR_HTL_ID)) {
+			hotelList = new ArrayList<>();
+			hotelList.add((Integer) filter.get(BookingDao.ATTR_HTL_ID));
+		}
+
+		Date entry = null;
+		if (filter.containsKey(BookingDao.ATTR_ENTRY_DATE)) {
+			if (filter.get(BookingDao.ATTR_ENTRY_DATE) instanceof String)
+				try {
+					entry = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
+				} catch (ParseException e) {
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"INVALID START DATE FORMAT");
+				}
+			else
+				entry = (Date)filter.get(BookingDao.ATTR_ENTRY_DATE);
+		}
+		else
+		{
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"START DATE IS MANDATORY");
+		}
+
+		Date departure = null;
+		if (filter.containsKey(BookingDao.ATTR_DEPARTURE_DATE)) {
+			if (filter.get(BookingDao.ATTR_DEPARTURE_DATE) instanceof String)
+				try {
+					departure= new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+				} catch (ParseException e) {
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"INVALID END DATE FORMAT");
+				}
+			else
+				departure = (Date)filter.get(BookingDao.ATTR_DEPARTURE_DATE);
+		}
+		else
+		{
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"END DATE IS MANDATORY");
+		}
+		
+		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.EQUAL_OP, 1);
+		
+		BasicExpression where = BasicExpressionTools.combineExpressionOr(
+				searchBetweenWithYearNoHotel(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE,
+						 entry, departure),
+				searchBetweenStatus(RoomDao.ATTR_STATUS_START, RoomDao.ATTR_STATUS_END, RoomDao.ATTR_STATUS_ID, entry,
+						departure));
+		where = BasicExpressionTools.combineExpression(whereHotelIn,where); 
+		keyMap.clear();
+		keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, where);
+		EntityResult result = daoHelper.query(bookingDao, keyMap, Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_TYPE_ID,RoomDao.ATTR_NUMBER), "freeRoomsByCityQuery");
+		
+		SearchValue value = new SearchValue(SearchValue.IN, hotelList);
+		
+		Map<Object, Object> keysFilter = null;
+		if (filter.containsKey(RoomDao.ATTR_TYPE_ID))
+		{
+			keysFilter= EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value,roomDao.ATTR_TYPE_ID,filter.get(RoomDao.ATTR_TYPE_ID));
+		}
+		else
+		{
+			keysFilter =EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value);
+		}
+		
+		result = EntityResultTools.dofilter(result, keysFilter);
+		try {
+			result = EntityResultTools.doGroup(result, new String[] {RoomDao.ATTR_HTL_ID,RoomDao.ATTR_TYPE_ID}, new CountAggregateFunction(RoomDao.ATTR_NUMBER,"count"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
 
 }
