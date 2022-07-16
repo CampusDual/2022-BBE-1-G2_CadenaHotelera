@@ -16,4 +16,5 @@ public class OffersDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_HTL_OFFER = "ofe_htl_id";
 	public static final String ATTR_ROOM_TYPE_ID = "ofe_rom_typ_id";
 	public static final String ATTR_NIGHT_PRICE = "ofe_night_price";
+	public static final String QUERY_PRICES_BY_DAYS = "priceByDays";
 }

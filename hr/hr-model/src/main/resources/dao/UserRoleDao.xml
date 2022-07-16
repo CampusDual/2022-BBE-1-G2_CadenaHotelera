@@ -45,7 +45,8 @@
 		<Query id="serverPermissions">
 			<AmbiguousColumns>
 				<AmbiguousColumn name="ID_ROLENAME" prefix="tr" />
-				<AmbiguousColumn name="ID_SERVER_PERMISSION" prefix="tsp" />
+				<AmbiguousColumn name="ID_SERVER_PERMISSION"
+					prefix="tsp" />
 			</AmbiguousColumns>
 			<Sentence>
 					<![CDATA[

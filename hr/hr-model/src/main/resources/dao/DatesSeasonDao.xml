@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<JdbcEntitySetup xmlns="http://www.ontimize.com/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd" catalog="" schema="${mainschema}" table="dates_season" datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+<JdbcEntitySetup
+	xmlns="http://www.ontimize.com/schema/jdbc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
+	catalog="" schema="${mainschema}" table="dates_season"
+	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
 		<Column>dts_id</Column>
 	</DeleteKeys>
@@ -7,4 +12,18 @@
 		<Column>dts_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>dts_id</GeneratedKey>
+	<Queries>
+		<Query id="getMultiplierByDatesSeason">
+			<Sentence>
+			   <![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.dates_season d
+			     INNER JOIN PUBLIC.season s ON d.dts_sea_id = s.sea_id		     	
+			    #WHERE# 
+			   ]]>
+   			</Sentence>
+		</Query>
+	</Queries>
 </JdbcEntitySetup>

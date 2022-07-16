@@ -17,4 +17,5 @@ public class DatesSeasonDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_END_DATE = "dts_end_date";
 	public static final String ATTR_SEASON_ID = "dts_sea_id";
 	public static final String ATTR_COMMENTS = "dts_comments";
+	public static final String QUERY_MULTIPLIER_DATES_SEASON = "getMultiplierByDatesSeason";
 }

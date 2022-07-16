@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<JdbcEntitySetup xmlns="http://www.ontimize.com/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd" catalog="" schema="${mainschema}" table="booking" datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+<JdbcEntitySetup
+	xmlns="http://www.ontimize.com/schema/jdbc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
+	catalog="" schema="${mainschema}" table="booking"
+	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
 		<Column>bok_id</Column>
 	</DeleteKeys>
@@ -8,8 +13,8 @@
 	</UpdateKeys>
 	<GeneratedKey>bok_id</GeneratedKey>
 	<Queries>
-  		<Query id="freeRoomsQuery">
-      		<Sentence>
+		<Query id="freeRoomsQuery">
+			<Sentence>
 			   <![CDATA[
 			     SELECT
 			     	#COLUMNS#
@@ -28,9 +33,9 @@
 			    Order by rom_number 
 			   ]]>
    			</Sentence>
-  		</Query>
-  		<Query id="ocupiedRoomsQuery">
-      		<Sentence>
+		</Query>
+		<Query id="ocupiedRoomsQuery">
+			<Sentence>
 			   <![CDATA[
 			     SELECT
 			     	#COLUMNS#
@@ -43,9 +48,9 @@
 			    #WHERE# 
 			   ]]>
    			</Sentence>
-  		</Query>
-  		<Query id="freeRoomsByTypeQuery">
-  			<Sentence>
+		</Query>
+		<Query id="freeRoomsByTypeQuery">
+			<Sentence>
   				<![CDATA[
 			     SELECT
 			     	#COLUMNS#
@@ -63,9 +68,9 @@
 			    #WHERE# 
 			   ]]>
   			</Sentence>
-  		</Query>
-  		<Query id="checkintoday">
-  			<Sentence>
+		</Query>
+		<Query id="checkintoday">
+			<Sentence>
   				<![CDATA[
 			     SELECT
 			     	 DISTINCT #COLUMNS#
@@ -80,9 +85,9 @@
 			    #WHERE_CONCAT# 
 			   ]]>
   			</Sentence>
-  		</Query>
-  		<Query id="priceNightByType">
-  			<Sentence>
+		</Query>
+		<Query id="priceNightByType">
+			<Sentence>
   				<![CDATA[
 			    SELECT
 			    	DISTINCT #COLUMNS#
@@ -95,6 +100,6 @@
 			    #WHERE# 
 			   ]]>
   			</Sentence>
-  		</Query>
- 	</Queries>
+		</Query>
+	</Queries>
 </JdbcEntitySetup>
