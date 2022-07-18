@@ -8,7 +8,6 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 
 public interface IBookingDetailsService {
 	
-	// EMPLOYEE
 		public EntityResult bookingDetailsQuery(Map<String, Object> keyMap, List<String> attrList)
 				throws OntimizeJEERuntimeException;
 
