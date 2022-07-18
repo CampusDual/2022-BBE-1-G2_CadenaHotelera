@@ -104,6 +104,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingSearchByClient');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/checkOut');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingFreeByCityOrHotel');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingService/getBudget');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientInsert');
@@ -138,6 +139,31 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IEmployeeService/employeeUpdate');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IEmployeeService/employeeDelete');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IEmployeeService/employeeCreateUser');
+
+INSERT INTO tserver_permission(permission_name) values ('com.ontimize.hr.api.core.service.ISeasonService/seasonQuery');
+INSERT INTO tserver_permission(permission_name) values ('com.ontimize.hr.api.core.service.ISeasonService/seasonInsert');
+INSERT INTO tserver_permission(permission_name) values ('com.ontimize.hr.api.core.service.ISeasonService/seasonUpdate');
+INSERT INTO tserver_permission(permission_name) values ('com.ontimize.hr.api.core.service.ISeasonService/seasonDelete');
+
+INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonQuery');
+INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonInsert');
+INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonUpdate');
+INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonUpdate');
+
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerQuery');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerInsert');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerUpdate');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerDelete');
+
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeQuery');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeInsert');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeUpdate');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeDelete');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsDelete');
 
 
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
@@ -194,7 +220,31 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,4
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,41);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,42);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,43);
---select * from trole_server_permission;
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,44);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,45);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,46);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,47);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,48);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,49);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,50);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,51);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,52);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,53);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,54);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,55);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,56);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,57);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,58);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,59);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,60);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,61);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,62);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,63);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,64);
+
+select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
+from trole_server_permission t
+inner join TSERVER_PERMISSION TP on t.ID_SERVER_PERMISSION = TP.ID_SERVER_PERMISSION;
 --Creación de tablas de hotel--
 
 
@@ -489,3 +539,4 @@ insert into details_type(det_code, det_description) values ('MNBAR','Minibar');
 -- inserto ejemplo bok_details
 insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_price,bok_det_paid) values
                             (1,2,'2022-06-27',25,false);
+

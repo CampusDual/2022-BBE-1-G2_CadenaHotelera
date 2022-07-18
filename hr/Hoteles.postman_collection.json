@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "fc5e178c-2b34-4b4a-a702-02fd6febb88d",
+		"_postman_id": "0af6637b-da37-49bb-8626-d47c105c8c2d",
 		"name": "Hoteles",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19197582"
+		"_exporter_id": "21530519"
 	},
 	"item": [
 		{
@@ -62,10 +62,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -238,10 +238,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -413,10 +413,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -475,10 +475,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -625,10 +625,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -740,10 +740,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -931,10 +931,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -995,10 +995,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1057,10 +1057,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1119,10 +1119,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1181,10 +1181,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1243,10 +1243,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1303,10 +1303,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				},
@@ -1397,6 +1397,35 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "getBudget",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"start_day\": \"2022-07-11\",\r\n        \"end_day\":\"2022-07-25\",\r\n        \"htl_id\": 2,\r\n        \"rtyp_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/bookings/bookingGetBudget/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingGetBudget",
+								"search"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1461,7 +1490,10 @@
 					"name": "New Request",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				},
@@ -1533,6 +1565,120 @@
 							"path": [
 								"employees",
 								"createUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Season",
+			"item": [
+				{
+					"name": "get Season",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:33333/seasons/season?columns=sea_id,sea_name,sea_multiplier",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"seasons",
+								"season"
+							],
+							"query": [
+								{
+									"key": "columns",
+									"value": "sea_id,sea_name,sea_multiplier"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert season",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"sea_name\":\"Prueba postman\",\r\n        \"sea_multiplier\":10\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/seasons/season",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"seasons",
+								"season"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update Season",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"sea_id\": 3\r\n    },\r\n    \"data\":{\r\n        \"sea_name\":\"update\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/seasons/season",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"seasons",
+								"season"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete season",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"sea_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/seasons/season",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"seasons",
+								"season"
 							]
 						}
 					},
