@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,12 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("ClientService")
 @Lazy
 public class ClientService implements IClientService {
+
+	public static final String ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL = "ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL";
+
+	public static final String MAIL_ALREADY_EXISTS_IN_OUR_DATABASE = "MAIL_ALREADY_EXISTS_IN_OUR_DATABASE";
+
+	public static final String THE_HOTEL_DOES_NOT_EXIST = "THE_HOTEL_DOES_NOT_EXIST";
 
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
@@ -63,7 +70,7 @@ public class ClientService implements IClientService {
 		} catch (DuplicateKeyException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("MAIL ALREADY EXISTS IN OUR DATABASE");
+			result.setMessage(MAIL_ALREADY_EXISTS_IN_OUR_DATABASE);
 			return result;
 		}
 
@@ -81,7 +88,7 @@ public class ClientService implements IClientService {
 		} catch (DuplicateKeyException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("MAIL ALREADY EXISTS IN OUR DATABASE");
+			result.setMessage(MAIL_ALREADY_EXISTS_IN_OUR_DATABASE);
 			return result;
 		}
 
@@ -120,7 +127,7 @@ public class ClientService implements IClientService {
 			if (existsHotel.calculateRecordNumber() == 0) {
 				EntityResult res = new EntityResultMapImpl();
 				res.setCode(EntityResult.OPERATION_WRONG);
-				res.setMessage("the hotel does not exist");
+				res.setMessage(THE_HOTEL_DOES_NOT_EXIST);
 				return res;
 			}
 
@@ -135,13 +142,13 @@ public class ClientService implements IClientService {
 			EntityResult res = daoHelper.query(this.clientDao, keyMap, columns, ClientDao.QUERY_CLIENTS_DATE);
 
 			if (res.calculateRecordNumber() == 0) {
-				res.setMessage("On this date there are no clients in the hotel.");
+				res.setCode(EntityResult.OPERATION_WRONG);
+				res.setMessage(ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL);
 			}
 
 			return res;
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
@@ -149,7 +156,7 @@ public class ClientService implements IClientService {
 
 	}
 
-	private BasicExpression searchClientInDate(String entryDate, String departureDate, String hotelIdS,
+	BasicExpression searchClientInDate(String entryDate, String departureDate, String hotelIdS,
 			Date fechaPasada, int hotelId) {
 
 		BasicField entry = new BasicField(entryDate);
