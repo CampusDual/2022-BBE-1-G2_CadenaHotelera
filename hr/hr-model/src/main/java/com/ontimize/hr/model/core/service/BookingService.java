@@ -50,6 +50,15 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class BookingService implements IBookingService {
 
+	public static final String DATES_REVERSED = "START DATE AFTER END DATE";
+	public static final String END_DATE_FORMAT = "INVALID END DATE FORMAT";
+	public static final String NO_END_DATE = "END DATE IS MANDATORY";
+	public static final String START_DATE_FORMAT = "INVALID START DATE FORMAT";
+	public static final String NO_START_DATE = "START DATE IS MANDATORY";
+	public static final String ERROR_HOTELS = "ERROR WHILE QUERYING HOTELS";
+	public static final String CITY_HOTEL_ID_EXCLUSIVE = "Cannot search by city and hotel at the same time";
+	public static final String NO_HOTELS_FOUND = "NO HOTELS FOUND";
+	public static final String REQUEST_NO_FILTER = "REQUEST CONTAINS NO FILTER";
 	private static final String COLUMNS = "columns";
 	private static final String FILTER = "filter";
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
@@ -1120,18 +1129,21 @@ public class BookingService implements IBookingService {
 			filter= (Map<String, Object>) keyMap.get(FILTER);
 		}
 		else
-			return new  EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,"REQUEST CONTAINS NO FILTER");
+			return new  EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,REQUEST_NO_FILTER);
 		
-		if (filter.containsKey(HotelDao.ATTR_CITY) && filter.containsKey(HotelDao.ATTR_ID))
+		
+		if (filter.containsKey(HotelDao.ATTR_CITY) && filter.containsKey(BookingDao.ATTR_HTL_ID))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-					"Cannot search by city and hotel at the same time");
+					CITY_HOTEL_ID_EXCLUSIVE);
 
-		if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
-			filter.remove(HotelDao.ATTR_CITY);
-			filter.remove(BookingDao.ATTR_HTL_ID);
+		String user = daoHelper.getUser().getUsername();
+		if (credentialUtils.isUserEmployee(user)) {
 			int hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			if (hotelId != -1)
+			if (hotelId != -1) {
+				filter.remove(HotelDao.ATTR_CITY);
+				filter.remove(BookingDao.ATTR_HTL_ID);
 				filter.put(BookingDao.ATTR_HTL_ID, hotelId);
+				}
 		}
 
 		List<Integer> hotelList = null;
@@ -1147,28 +1159,31 @@ public class BookingService implements IBookingService {
 				if (hotelsResult.calculateRecordNumber() != 0)
 					hotelList = (List<Integer>) hotelsResult.get(HotelDao.ATTR_ID);
 			} else
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "HOTEL DOES NOT EXIST");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_HOTELS);
 		}
 
 		if (filter.containsKey(BookingDao.ATTR_HTL_ID)) {
 			hotelList = new ArrayList<>();
 			hotelList.add((Integer) filter.get(BookingDao.ATTR_HTL_ID));
 		}
-
+		
+		if(hotelList == null ||hotelList.isEmpty())
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,NO_HOTELS_FOUND);
+		
 		Date entry = null;
 		if (filter.containsKey(BookingDao.ATTR_ENTRY_DATE)) {
 			if (filter.get(BookingDao.ATTR_ENTRY_DATE) instanceof String)
 				try {
 					entry = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 				} catch (ParseException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"INVALID START DATE FORMAT");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,START_DATE_FORMAT);
 				}
 			else
 				entry = (Date)filter.get(BookingDao.ATTR_ENTRY_DATE);
 		}
 		else
 		{
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"START DATE IS MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,NO_START_DATE);
 		}
 
 		Date departure = null;
@@ -1177,17 +1192,19 @@ public class BookingService implements IBookingService {
 				try {
 					departure= new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 				} catch (ParseException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"INVALID END DATE FORMAT");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,END_DATE_FORMAT);
 				}
 			else
 				departure = (Date)filter.get(BookingDao.ATTR_DEPARTURE_DATE);
 		}
 		else
 		{
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"END DATE IS MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,NO_END_DATE);
 		}
 		
-		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.EQUAL_OP, 1);
+		if(departure.before(entry)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,DATES_REVERSED);
+		
+		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.EQUAL_OP, hotelList);
 		
 		BasicExpression where = BasicExpressionTools.combineExpressionOr(
 				searchBetweenWithYearNoHotel(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE,
@@ -1204,7 +1221,7 @@ public class BookingService implements IBookingService {
 		Map<Object, Object> keysFilter = null;
 		if (filter.containsKey(RoomDao.ATTR_TYPE_ID))
 		{
-			keysFilter= EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value,roomDao.ATTR_TYPE_ID,filter.get(RoomDao.ATTR_TYPE_ID));
+			keysFilter= EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value,RoomDao.ATTR_TYPE_ID,filter.get(RoomDao.ATTR_TYPE_ID));
 		}
 		else
 		{
