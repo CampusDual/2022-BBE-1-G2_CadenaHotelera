@@ -11,7 +11,6 @@ public class Season {
 	private Integer multiplier;
 
 	public Season(Date startDate, Date endDate, Integer multiplier) {
-		super();
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.multiplier = multiplier;
