@@ -22,7 +22,7 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 
 @ExtendWith(MockitoExtension.class)
-class HotelTest {
+class HotelServiceTest {
 
 	@Mock
 	private DefaultOntimizeDaoHelper daoHelper;

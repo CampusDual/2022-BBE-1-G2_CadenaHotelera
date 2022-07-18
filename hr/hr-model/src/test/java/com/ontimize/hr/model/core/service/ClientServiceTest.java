@@ -28,7 +28,7 @@ import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @ExtendWith(MockitoExtension.class)
-class ClientTest {
+class ClientServiceTest {
 	@Mock
 	private DefaultOntimizeDaoHelper daoHelper;
 	
