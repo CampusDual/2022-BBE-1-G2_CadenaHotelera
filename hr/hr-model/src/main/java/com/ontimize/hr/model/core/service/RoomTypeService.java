@@ -24,6 +24,10 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class RoomTypeService implements IRoomTypeService{
 	
+	public static final String ROOM_TYPE_CAN_NOT_BE_BLANK = "ROOM TYPE CAN NOT BE BLANK";
+
+	public static final String DUPLICATED_ROOM_TYPE_NAME = "DUPLICATED ROOM TYPE NAME";
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 	
@@ -61,13 +65,13 @@ public class RoomTypeService implements IRoomTypeService{
 		} catch (DuplicateKeyException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("DUPLICATED ROOM TYPE NAME");
+			res.setMessage(DUPLICATED_ROOM_TYPE_NAME);
 			return res;
 		}
 		catch (DataIntegrityViolationException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("ROOM TYPE CAN NOT BE BLANK");
+			res.setMessage(ROOM_TYPE_CAN_NOT_BE_BLANK);
 			return res;
 		}
 	}
@@ -89,13 +93,13 @@ public class RoomTypeService implements IRoomTypeService{
 		} catch (DuplicateKeyException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("DUPLICATED ROOM TYPE NAME");
+			res.setMessage(DUPLICATED_ROOM_TYPE_NAME);
 			return res;
 		}
 		catch (DataIntegrityViolationException e) {
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("ROOM TYPE CAN NOT BE BLANK");
+			res.setMessage(ROOM_TYPE_CAN_NOT_BE_BLANK);
 			return res;
 		}
 	}
