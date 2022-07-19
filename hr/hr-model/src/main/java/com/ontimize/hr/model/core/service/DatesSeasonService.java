@@ -28,6 +28,32 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class DatesSeasonService implements IDatesSeasonService {
 
+	public static final String DEPARTURE_DATE_BEFORE_ENTRY_DATE = "DEPARTURE_DATE_BEFORE_ENTRY DATE";
+
+	public static final String SEASON_NOT_EXISTS = "SEASON_NOT_EXISTS";
+
+	public static final String HOTEL_NOT_EXISTS = "HOTEL_NOT_EXISTS";
+
+	public static final String END_BEFORE_START = "END_DATE_BEFORE_START DATE";
+
+	public static final String SAME_DATES_ERROR = "SAME_DATES_ERROR";
+
+	public static final String ERROR_END_DAY_MANDATORY = "ERROR_END_DAY_MANDATORY";
+
+	public static final String ERROR_PARSE_END_DAY = "ERROR_PARSE_END_DAY";
+
+	public static final String ERROR_START_DAY_MANDATORY = "ERROR_START_DAY_MANDATORY";
+
+	public static final String ERROR_PARSE_START_DAY = "ERROR_PARSE_START_DAY";
+
+	public static final String END_DATE_IS_MANDATORY = "End Date is mandatory";
+
+	public static final String START_DATE_IS_MANDATORY = "Start date is mandatory";
+
+	public static final String SEASON_IS_MANDATORY = "Season is mandatory";
+
+	public static final String HOTEL_IS_MANDATORY = "Hotel is mandatory";
+
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Autowired
@@ -65,19 +91,19 @@ public class DatesSeasonService implements IDatesSeasonService {
 
 		try {
 			if (!attrMap.containsKey(DatesSeasonDao.ATTR_HTL_ID)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Hotel is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_IS_MANDATORY);
 			}
 
 			if (!attrMap.containsKey(DatesSeasonDao.ATTR_SEASON_ID)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Season is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SEASON_IS_MANDATORY);
 			}
 
 			if (!attrMap.containsKey(DatesSeasonDao.ATTR_START_DATE)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Start date is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, START_DATE_IS_MANDATORY);
 			}
 
 			if (!attrMap.containsKey(DatesSeasonDao.ATTR_END_DATE)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "End Date is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, END_DATE_IS_MANDATORY);
 			}
 
 			Date startDate = null;
@@ -88,34 +114,34 @@ public class DatesSeasonService implements IDatesSeasonService {
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_START_DAY);
 			} catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_START_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_START_DAY_MANDATORY);
 			}
 
 			try {
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_END_DAY);
 			} catch (NullPointerException ex) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_END_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_END_DAY_MANDATORY);
 			}
 
 			if (startDate.equals(endDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SAME_DATES_ERROR);
 			}
 
 			if (endDate.before(startDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, END_BEFORE_START);
 			}
 
 			return this.daoHelper.insert(this.datesSeasonDao, attrMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage().contains("fk_htl_season")) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "HOTEL_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SEASON_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SEASON_NOT_EXISTS);
 			}
 		}
 	}
@@ -141,26 +167,26 @@ public class DatesSeasonService implements IDatesSeasonService {
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_START_DAY);
 			} catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_START_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_START_DAY_MANDATORY);
 			}
 
 			try {
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_END_DAY);
 			} catch (NullPointerException ex) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_END_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_END_DAY_MANDATORY);
 			}
 
 			if (startDate.equals(endDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SAME_DATES_ERROR);
 			}
 
 			if (endDate.before(startDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DEPARTURE_DATE_BEFORE_ENTRY_DATE);
 			}
 		}
 
@@ -172,9 +198,9 @@ public class DatesSeasonService implements IDatesSeasonService {
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_START_DAY);
 			} catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_START_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_START_DAY_MANDATORY);
 			}
 
 			// recupero end date
@@ -193,11 +219,11 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			if (startDate.equals(endDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SAME_DATES_ERROR);
 			}
 
 			if (endDate.before(startDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DEPARTURE_DATE_BEFORE_ENTRY_DATE);
 			}
 
 		}
@@ -211,9 +237,9 @@ public class DatesSeasonService implements IDatesSeasonService {
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_END_DAY);
 			} catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_END_DAY_MANDATORY");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_END_DAY_MANDATORY);
 			}
 
 			// recupero start date
@@ -232,11 +258,11 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			if (startDate.equals(endDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SAME_DATES_ERROR);
 			}
 
 			if (endDate.before(startDate)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DEPARTURE_DATE_BEFORE_ENTRY_DATE);
 			}
 
 		}
@@ -246,9 +272,9 @@ public class DatesSeasonService implements IDatesSeasonService {
 			return this.daoHelper.update(this.datesSeasonDao, attrMap, keyMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage() != null && ex.getMessage().contains("fk_htl_season")) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "HOTEL_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SEASON_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SEASON_NOT_EXISTS);
 			}
 		}
 	}

@@ -432,8 +432,7 @@ insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_dep
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'104','2022-07-03','2022-07-07','comments');
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'105','2022-06-28','2022-07-07','comments');
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'106','2022-07-05','2022-07-07','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (2,1,'106','2022-07-05','2022-07-07','comments');
-insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'103','2022-07-13','2022-07-15','comments');
+insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,1,'103','2022-07-19','2022-07-25','comments');
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,2,'101','2022-06-25','2022-07-28','comments');
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_comments) values (1,2,'102','2022-06-15','2022-07-15','comments');
@@ -445,7 +444,7 @@ insert into trole(rolename,xmlclientpermission) values('botones','<?xml version=
 insert into tuser (user_,password,name,surname,email,nif) values('juan','password','juan','Perico','juan-perioc@examlpe.com','11223344J');
 insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
 
-insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Recepcionista','descripción',1);
+insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Recepcionista','descripción',0);
 insert into employee_type (etyp_name,etyp_desc) values('Limpieza','descripción');
 
 insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
