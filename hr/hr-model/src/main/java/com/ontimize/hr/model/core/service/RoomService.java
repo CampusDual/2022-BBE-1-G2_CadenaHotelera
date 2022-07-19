@@ -28,6 +28,24 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class RoomService implements IRoomService {
 
+	public static final String HOTEL_ID_MANDATORY = "HOTEL ID MANDATORY";
+
+	public static final String NO_SUCH_STATUS = "NO SUCH STATUS";
+
+	public static final String NO_SUCH_HOTEL = "NO SUCH HOTEL";
+
+	public static final String ROOM_OCUPIED = "ROOM_OCUPIED";
+
+	public static final String DATE_FORMAT_INCORRECT = "DATE_FORMAT_INCORRECT";
+
+	public static final String END_DATE_BEFORE_START_DATE = "END_DATE_MUST_BE_AFTER_START_DATE";
+
+	public static final String ROOM_NUMBER_MANDATORY = "ROOM_NUMBER_IS_MANDATORY";
+
+	public static final String STATUS_ID_MANDATORY = "STATUS_ID_IS_MANDATORY";
+
+	public static final String ROOM_DOESNT_EXIST = "ROOM_DOESNT_EXIST";
+
 	@Autowired
 	private RoomDao roomDao;
 	
@@ -76,7 +94,7 @@ public class RoomService implements IRoomService {
 				if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
 					result.setMessage("NO SUCH TYPE OF ROOM");					
 				} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-					result.setMessage("NO SUCH HOTEL");
+					result.setMessage(NO_SUCH_HOTEL);
 				}
 				if(e.getMessage()!=null &&e.getMessage().contains("ck_room_type_typ_name")) {
 					result.setMessage("ROOM NUMBER CANT BE BLANK");
@@ -109,7 +127,7 @@ public class RoomService implements IRoomService {
 			} catch (ParseException e) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage("DATE_FORMAT_INCORRECT");
+				result.setMessage(DATE_FORMAT_INCORRECT);
 				return result;
 			}
 		}
@@ -142,7 +160,7 @@ public class RoomService implements IRoomService {
 			if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
 				result.setMessage("NO SUCH TYPE OF ROOM");					
 			} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-				result.setMessage("NO SUCH HOTEL");
+				result.setMessage(NO_SUCH_HOTEL);
 			}
 			return result;
 		}
@@ -176,8 +194,30 @@ public class RoomService implements IRoomService {
 		
 		//eliminamos cualquier intento de modificar otro campo de la tabla rooms
 		
-		Map<String, Object> keyMapRoom = new HashMap<String, Object>();
-		List<String> attrListRoom = new ArrayList<String>();
+		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+			hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			
+			filter.remove(RoomDao.ATTR_HTL_ID);
+			
+			filter.put(RoomDao.ATTR_HTL_ID, hotelId);
+		}
+		if(!filter.containsKey(RoomDao.ATTR_HTL_ID))
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_ID_MANDATORY);
+		
+		hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);
+		
+		
+		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
+		
+		if(!filter.containsKey(RoomDao.ATTR_NUMBER)) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage(ROOM_NUMBER_MANDATORY);
+			return result;
+		}
+		
+		Map<String, Object> keyMapRoom = new HashMap<>();
+		List<String> attrListRoom = new ArrayList<>();
 		
 		keyMapRoom.put(RoomDao.ATTR_NUMBER, filter.get(RoomDao.ATTR_NUMBER).toString());
 		
@@ -188,7 +228,7 @@ public class RoomService implements IRoomService {
 		if(rooms.calculateRecordNumber()==0) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("ROOM_DOESNT_EXIST");
+			result.setMessage(ROOM_DOESNT_EXIST);
 			return result;
 		}
 		
@@ -210,16 +250,10 @@ public class RoomService implements IRoomService {
 		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("STATUS_ID_IS_MANDATORY");
+			result.setMessage(STATUS_ID_MANDATORY);
 			return result;
 		}
 		
-		if(!filter.containsKey(RoomDao.ATTR_NUMBER)) {
-			result = new EntityResultMapImpl();
-			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("ROOM_NUMBER_IS_MANDATORY");
-			return result;
-		}
 					
 		if(data.containsKey(RoomDao.ATTR_STATUS_START)&&data.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
@@ -229,7 +263,7 @@ public class RoomService implements IRoomService {
 				if(startDate.after(endDate)) {
 					result = new EntityResultMapImpl();
 					result.setCode(EntityResult.OPERATION_WRONG);
-					result.setMessage("END_DATE_MUST_BE_AFTER_START_DATE");
+					result.setMessage(END_DATE_BEFORE_START_DATE);
 					return result;
 				}
 				
@@ -241,21 +275,12 @@ public class RoomService implements IRoomService {
 			} catch (ParseException e) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage("DATE_FORMAT_INCORRECT");
+				result.setMessage(DATE_FORMAT_INCORRECT);
 				return result;
 			}
 		}
 		//hasta aqui comprobamos que se le meta una fecha al estado de la habitación
 		
-		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
-			hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			
-			filter.remove(RoomDao.ATTR_HTL_ID);
-			
-			filter.put(RoomDao.ATTR_HTL_ID, hotelId);
-		}
-		hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);
-		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
 				
 		Map<String, Object> keyMapBooking = new HashMap<String, Object>();
 		List<String> attrListBooking = new ArrayList<String>();
@@ -273,7 +298,7 @@ public class RoomService implements IRoomService {
 			if(bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage("ROOM_OCUPIED");
+				result.setMessage(ROOM_OCUPIED);
 				return result;
 			}
 		}
@@ -290,10 +315,10 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-				result.setMessage("NO SUCH HOTEL");
+				result.setMessage(NO_SUCH_HOTEL);
 			}
 			else if(e.getMessage()!=null && e.getMessage().contains("fk_room_room_status")) {
-				result.setMessage("NO SUCH STATUS");
+				result.setMessage(NO_SUCH_STATUS);
 			}
 			return result;
 		}
