@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -42,6 +43,9 @@ class BookingServiceTest {
 	
 	@Mock
 	private BookingDao bookingDao;
+	
+	@Mock
+	private RoomTypeDao roomtypeDao;
 	
 	@InjectMocks
 	private BookingService service;
@@ -67,9 +71,7 @@ class BookingServiceTest {
 		filter.put(HotelDao.ATTR_CITY, "Las Vegas");
 		req.put("filter",filter);
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
-		//when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(credential.isUserEmployee("Mister X")).thenReturn(false);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
@@ -87,9 +89,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,"ERROR"));
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -109,9 +109,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createNohotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -131,9 +129,6 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -156,9 +151,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -180,9 +173,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -205,9 +196,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -231,9 +220,6 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
@@ -257,9 +243,7 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
+
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList(),anyString())).thenReturn(new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_TYPE_ID,RoomDao.ATTR_NUMBER)));
@@ -284,9 +268,6 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList(),anyString())).thenReturn(createRoomListFromHotelOneTwo());
@@ -314,11 +295,13 @@ class BookingServiceTest {
 		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 		when(daoHelper.getUser()).thenReturn(userinfo);
-		//when(userinfo.getUsername()).thenReturn("MisterX");
-		//when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
-		//when(userinfo.getUsername()).thenReturn("Mister X");
 		
 		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
+		
+		EntityResult resultType = new EntityResultMapImpl(Arrays.asList(RoomTypeDao.ATTR_ID));
+		resultType.addRecord(new HashMap<String, Object>(){{put(RoomTypeDao.ATTR_ID,1);}});
+		
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(resultType);
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList(),anyString())).thenReturn(createRoomListFromHotelOneTwo());
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
@@ -326,6 +309,57 @@ class BookingServiceTest {
 		assertEquals(1,result.calculateRecordNumber());
 		assertEquals(8, result.getRecordValues(0).get("count"));
 	}
+	
+	
+	@Test
+	@DisplayName("Filter by city results from hotel 1 type -432  bookingFreeByCityOrHotel")
+	void bookingFreeByCityResultFromHotelOneFilterByBadTypeTest() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(HotelDao.ATTR_CITY,"Las Vegas");
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-28");
+		filter.put(RoomDao.ATTR_TYPE_ID, -432);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+	
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl(Arrays.asList(RoomTypeDao.ATTR_ID)));
+		EntityResult result = service.bookingFreeByCityOrHotel(req);
+				
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+		assertEquals(BookingService.ROOM_TYPE_NOT_EXIST,result.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("Filter by city results from hotel 1 type \"2345a\"  bookingFreeByCityOrHotel")
+	void bookingFreeByCityResultFromHotelOneFilterByInvalidTypeTest() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(HotelDao.ATTR_CITY,"Las Vegas");
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-28");
+		filter.put(RoomDao.ATTR_TYPE_ID, "2345a");
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+	
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(createOnehotelResult());
+		EntityResult result = service.bookingFreeByCityOrHotel(req);
+				
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+		assertEquals(BookingService.TYPE_FORMAT,result.getMessage());
+	}
+	
 		
 	public EntityResult createNohotelResult() {
 		return new EntityResultMapImpl(new ArrayList<>(Arrays.asList(HotelDao.ATTR_ID)));
@@ -387,5 +421,7 @@ class BookingServiceTest {
 			put(RoomDao.ATTR_NUMBER,roomNumber);}};
 		
 	}
+	
+	
 	
 }

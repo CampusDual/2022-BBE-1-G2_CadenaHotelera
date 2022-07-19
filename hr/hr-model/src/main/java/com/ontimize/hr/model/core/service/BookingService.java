@@ -50,6 +50,8 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class BookingService implements IBookingService {
 
+	public static final String ROOM_TYPE_NOT_EXIST = "ROOM TYPE DOES NOT EXIST";
+	public static final String TYPE_FORMAT = "INVALID TYPE FORMAT";
 	public static final String DATES_REVERSED = "START DATE AFTER END DATE";
 	public static final String END_DATE_FORMAT = "INVALID END DATE FORMAT";
 	public static final String NO_END_DATE = "END DATE IS MANDATORY";
@@ -1204,6 +1206,23 @@ public class BookingService implements IBookingService {
 		
 		if(departure.before(entry)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,DATES_REVERSED);
 		
+		Integer type = null; 
+		if (filter.containsKey(RoomDao.ATTR_TYPE_ID))
+			try {
+				type = Integer.parseInt(filter.get(RoomDao.ATTR_TYPE_ID).toString()) ;
+				Map<String, Object> keyMapType = new HashMap<>();
+				keyMapType.put(RoomTypeDao.ATTR_ID,type);				
+				if (daoHelper.query(roomTypeDao, keyMapType, new ArrayList<>(Arrays.asList(RoomTypeDao.ATTR_ID))).calculateRecordNumber()==0)
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,ROOM_TYPE_NOT_EXIST);
+			}
+			catch (NumberFormatException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, TYPE_FORMAT);
+		}
+		
+		
+		
+		
+		
 		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.EQUAL_OP, hotelList);
 		
 		BasicExpression where = BasicExpressionTools.combineExpressionOr(
@@ -1219,21 +1238,20 @@ public class BookingService implements IBookingService {
 		SearchValue value = new SearchValue(SearchValue.IN, hotelList);
 		
 		Map<Object, Object> keysFilter = null;
-		if (filter.containsKey(RoomDao.ATTR_TYPE_ID))
+		if (type!=null)
 		{
-			keysFilter= EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value,RoomDao.ATTR_TYPE_ID,filter.get(RoomDao.ATTR_TYPE_ID));
+			keysFilter= EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value,RoomDao.ATTR_TYPE_ID,type);
 		}
 		else
 		{
 			keysFilter =EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID,value);
 		}
 		
-		result = EntityResultTools.dofilter(result, keysFilter);
 		try {
+			result = EntityResultTools.dofilter(result, keysFilter);
 			result = EntityResultTools.doGroup(result, new String[] {RoomDao.ATTR_HTL_ID,RoomDao.ATTR_TYPE_ID}, new CountAggregateFunction(RoomDao.ATTR_NUMBER,"count"));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Error filter/grouping");
 		}
 		return result;
 	}
