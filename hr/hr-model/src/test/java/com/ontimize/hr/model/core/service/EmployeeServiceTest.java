@@ -676,12 +676,5 @@ class EmployeeServiceTest {
 
 		assertEquals("UNKNOWN ERROR",employeeService.employeeCreateUser(attrMap).getMessage());
 	}
-	
-	
-	
-	
-	
-	
-	
 
 }

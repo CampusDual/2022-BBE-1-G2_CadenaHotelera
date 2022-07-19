@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
@@ -46,6 +49,9 @@ class BookingServiceTest {
 	
 	@Mock
 	private RoomTypeDao roomtypeDao;
+	
+	@Mock
+	private ClientDao clientDao;
 	
 	@InjectMocks
 	private BookingService service;
@@ -360,6 +366,129 @@ class BookingServiceTest {
 		assertEquals(BookingService.TYPE_FORMAT,result.getMessage());
 	}
 	
+	@Test
+	@DisplayName("filter no name bookingSearchByClient")
+	void bookingSearchByClientFilterNoName() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		//filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+						
+		assertEquals("Client name is required.", service.bookingSearchByClient(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("filter no identification bookingSearchByClient")
+	void bookingSearchByClientFilterNoIdentification() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		//filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+				
+		assertEquals("Client identification is required.", service.bookingSearchByClient(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("filter no HotelId bookingSearchByClient")
+	void bookingSearchByClientFilterNoHotelId() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		//filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+				
+		assertEquals("Hotel id is required.", service.bookingSearchByClient(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("Client does not exist bookingSearchByClient")
+	void bookingSearchByClientClientNotExists() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+		
+		List<String> attrList = new ArrayList<>();
+		attrList.add(ClientDao.ATTR_ID);
+		
+		Map<String,Object> filterClient = new HashMap<String,Object>();
+		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		
+		when(daoHelper.query(clientDao, filterClient, attrList)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,"ok"));
+		
+		
+				
+		assertEquals("Client does not exist", service.bookingSearchByClient(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("bookingSearchByClient")
+	void bookingSearchByClient() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+		
+		List<String> attrList = new ArrayList<>();
+		attrList.add(ClientDao.ATTR_ID);
+		
+		Map<String,Object> filterClient = new HashMap<String,Object>();
+		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(ClientDao.ATTR_ID, 0);
+		result.addRecord(resultClient);
+		
+		when(daoHelper.query(clientDao, filterClient, attrList)).thenReturn(result);
+		  when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		
+		
+				
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.bookingSearchByClient(req).getCode());
+	}
+	
 		
 	public EntityResult createNohotelResult() {
 		return new EntityResultMapImpl(new ArrayList<>(Arrays.asList(HotelDao.ATTR_ID)));
@@ -421,6 +550,8 @@ class BookingServiceTest {
 			put(RoomDao.ATTR_NUMBER,roomNumber);}};
 		
 	}
+	
+	
 	
 	
 	
