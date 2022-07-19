@@ -235,7 +235,7 @@ public class RoomService implements IRoomService {
 		//comprobamos que la habitacion exista
 		
 		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)&&!data.containsKey(RoomDao.ATTR_STATUS_START)&&!data.containsKey(RoomDao.ATTR_STATUS_END)) {
-			Map<String,Object> dataNull = new HashMap<String, Object>();
+			Map<String,Object> dataNull = new HashMap<>();
 			
 			dataNull.put(RoomDao.ATTR_STATUS_ID, null);
 			dataNull.put(RoomDao.ATTR_STATUS_START, null);

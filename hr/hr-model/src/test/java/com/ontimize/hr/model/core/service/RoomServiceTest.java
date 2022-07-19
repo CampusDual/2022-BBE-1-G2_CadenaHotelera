@@ -126,7 +126,7 @@ class RoomServiceTest {
 		
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
+
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.STATUS_ID_MANDATORY, result.getMessage());
@@ -140,7 +140,6 @@ class RoomServiceTest {
 		Map<String, Object> filter= new HashMap<>();
 		Map<String, Object> data= new HashMap<>();
 		filter.put(RoomDao.ATTR_HTL_ID, 1);
-		//filter.put(RoomDao.ATTR_NUMBER, "101");		
 		data.put(RoomDao.ATTR_STATUS_START, "2022-07-29");
 		
 		req.put("filter",filter);
@@ -156,9 +155,6 @@ class RoomServiceTest {
 			put(RoomDao.ATTR_NUMBER,"101");
 			}});
 		
-		
-		//when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.ROOM_NUMBER_MANDATORY, result.getMessage());
@@ -174,7 +170,6 @@ class RoomServiceTest {
 		filter.put(RoomDao.ATTR_HTL_ID, 1);
 		filter.put(RoomDao.ATTR_NUMBER, "101");
 		data.put(RoomDao.ATTR_STATUS_ID, 1);
-		//data.put(RoomDao.ATTR_STATUS_START, "2022-07-29");
 		
 		req.put("filter",filter);
 		req.put("data", data);
@@ -229,7 +224,6 @@ class RoomServiceTest {
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.ROOM_OCUPIED, result.getMessage());
@@ -268,7 +262,6 @@ class RoomServiceTest {
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.ROOM_OCUPIED, result.getMessage());
@@ -300,9 +293,6 @@ class RoomServiceTest {
 			}});
 		
 		EntityResult bookingsResult = new EntityResultMapImpl(Arrays.asList(BookingDao.ATTR_ROM_NUMBER));
-//		bookingsResult.addRecord(new HashMap<String, Object>(){{
-//			put(BookingDao.ATTR_ROM_NUMBER,"101");
-//		}});
 		
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
@@ -338,14 +328,10 @@ class RoomServiceTest {
 			}});
 		
 		EntityResult bookingsResult = new EntityResultMapImpl(Arrays.asList(BookingDao.ATTR_ROM_NUMBER));
-//		bookingsResult.addRecord(new HashMap<String, Object>(){{
-//			put(BookingDao.ATTR_ROM_NUMBER,"101");
-//		}});
+
 		
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
-		//when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.END_DATE_BEFORE_START_DATE, result.getMessage());
@@ -377,14 +363,8 @@ class RoomServiceTest {
 			}});
 		
 		EntityResult bookingsResult = new EntityResultMapImpl(Arrays.asList(BookingDao.ATTR_ROM_NUMBER));
-//		bookingsResult.addRecord(new HashMap<String, Object>(){{
-//			put(BookingDao.ATTR_ROM_NUMBER,"101");
-//		}});
-		
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
-		//when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
-		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.DATE_FORMAT_INCORRECT, result.getMessage());
