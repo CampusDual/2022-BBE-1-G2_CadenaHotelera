@@ -27,6 +27,14 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class DetailsTypeService implements IDetailsTypeService {
 
+	public static final String DUPLICATE_CODE = "DUPLICATE_CODE";
+
+	public static final String MAX_LENGTH_CODE_IS_5 = "MAX_LENGTH_CODE_IS_5";
+
+	public static final String CODE_IS_BLANK = "CODE_IS_BLANK";
+
+	public static final String CODE_MANDATORY = "CODE_MANDATORY";
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -36,7 +44,7 @@ public class DetailsTypeService implements IDetailsTypeService {
 	/**
 	 * Details type query.
 	 *
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap   the WHERE conditions
 	 * @param attrList the SELECT conditions
 	 * @return the entity result with the query result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
@@ -60,23 +68,22 @@ public class DetailsTypeService implements IDetailsTypeService {
 	public EntityResult detailsTypeInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 
 		if (!attrMap.containsKey(DetailsTypeDao.ATTR_CODE)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Code is mandatory");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, CODE_MANDATORY);
 		}
 
 		try {
-			
-			if(Utils.stringIsNullOrBlank(attrMap.get(DetailsTypeDao.ATTR_CODE).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "CODE_IS_BLANK");
+
+			if (Utils.stringIsNullOrBlank(attrMap.get(DetailsTypeDao.ATTR_CODE).toString())) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, CODE_IS_BLANK);
 			}
-			
-			
+
 			if (attrMap.get(DetailsTypeDao.ATTR_CODE).toString().length() > 5) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MAX_LENGTH_CODE_IS_5");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MAX_LENGTH_CODE_IS_5);
 			}
 
 			return this.daoHelper.insert(this.detailsTypeDao, attrMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DUPLICATE_CODE");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_CODE);
 		}
 	}
 
@@ -84,7 +91,7 @@ public class DetailsTypeService implements IDetailsTypeService {
 	 * Details type update.
 	 *
 	 * @param attrMap the update query data
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap  the WHERE conditions
 	 * @return the entity result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
@@ -95,18 +102,18 @@ public class DetailsTypeService implements IDetailsTypeService {
 
 		try {
 			if (attrMap.containsKey(DetailsTypeDao.ATTR_CODE)) {
-				
-				if(Utils.stringIsNullOrBlank(attrMap.get(DetailsTypeDao.ATTR_CODE).toString())) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "CODE_IS_BLANK");
+
+				if (Utils.stringIsNullOrBlank(attrMap.get(DetailsTypeDao.ATTR_CODE).toString())) {
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, CODE_IS_BLANK);
 				}
-				
+
 				if (attrMap.get(DetailsTypeDao.ATTR_CODE).toString().length() > 5) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "MAX_LENGTH_CODE_IS_5");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MAX_LENGTH_CODE_IS_5);
 				}
 			}
 			return this.daoHelper.update(this.detailsTypeDao, attrMap, keyMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DUPLICATE_CODE");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_CODE);
 		}
 
 	}

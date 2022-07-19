@@ -30,7 +30,31 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class BookingDetailsService implements IBookingDetailsService {
 
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+	public static final String DETAILS_TYPE_NOT_EXISTS = "DETAILS_TYPE_NOT_EXISTS";
+
+	public static final String BOOKING_NOT_EXISTS = "BOOKING_NOT_EXISTS";
+
+	public static final String ERROR_DATE_MANDATORY = "ERROR_DATE_MANDATORY";
+
+	public static final String ERROR_PARSE_DATE = "ERROR_PARSE_DATE";
+
+	public static final String DETAILS_TYPE_FORMAT = "DETAILS_TYPE_FORMAT";
+
+	public static final String BOOKING_ID_FORMAT = "BOOKING_ID_FORMAT";
+
+	public static final String PRICE_FORMAT = "PRICE_FORMAT";
+
+	public static final String PAID_MANDATORY = "PAID_MANDATORY";
+
+	public static final String DATE_MANDATORY = "DATE_MANDATORY";
+
+	public static final String PRICE_MANDATORY = "PRICE_MANDATORY";
+
+	public static final String DETAILS_TYPE_MANDATORY = "DETAILS_TYPE_MANDATORY";
+
+	public static final String BOOKING_MANDATORY = "BOOKING_MANDATORY";
+
+	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Autowired
 	private BookingDetailsDao bookingDetailsDao;
@@ -64,59 +88,59 @@ public class BookingDetailsService implements IBookingDetailsService {
 	public EntityResult bookingDetailsInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_BOOKING_ID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BOOKING_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BOOKING_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_TYPE_DETAILS_ID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DETAILS_TYPE_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAILS_TYPE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PRICE_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PRICE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DATE_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PAID_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PAID_MANDATORY);
 		}
 
 		try {
 			Double price = Double.parseDouble(attrMap.get(BookingDetailsDao.ATTR_PRICE).toString());
 		} catch (NumberFormatException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PRICE_FORMAT");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PRICE_FORMAT);
 		}
 
 		try {
 			int bokID = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
 		} catch (NumberFormatException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BOOKING_ID_FORMAT");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BOOKING_ID_FORMAT);
 		}
 
 		try {
 			int typeId = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
 		} catch (NumberFormatException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DETAILS_TYPE_FORMAT");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAILS_TYPE_FORMAT);
 		}
 
 		try {
 			Date day = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 
 		} catch (ParseException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_DATE");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_DATE);
 		} catch (NullPointerException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_DATE_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_DATE_MANDATORY);
 		}
 
 		try {
 			return this.daoHelper.insert(this.bookingDetailsDao, attrMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage().contains("fk_bok_id")) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BOOKING_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BOOKING_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DETAILS_TYPE_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAILS_TYPE_NOT_EXISTS);
 			}
 		}
 	}
@@ -140,7 +164,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					int bokID = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
 				} catch (NumberFormatException ex) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BOOKING_ID_FORMAT");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BOOKING_ID_FORMAT);
 				}
 			}
 
@@ -148,7 +172,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					int typeId = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
 				} catch (NumberFormatException ex) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DETAILS_TYPE_FORMAT");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAILS_TYPE_FORMAT);
 				}
 			}
 
@@ -156,7 +180,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					Double price = Double.parseDouble(attrMap.get(BookingDetailsDao.ATTR_PRICE).toString());
 				} catch (NumberFormatException ex) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "PRICE_FORMAT");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PRICE_FORMAT);
 				}
 			}
 
@@ -166,18 +190,18 @@ public class BookingDetailsService implements IBookingDetailsService {
 							.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 
 				} catch (ParseException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_DATE");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_DATE);
 				} catch (NullPointerException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_DATE_MANDATORY");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_DATE_MANDATORY);
 				}
 			}
 
 			return this.daoHelper.update(this.bookingDetailsDao, attrMap, keyMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage().contains("fk_bok_id")) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BOOKING_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BOOKING_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DETAILS_TYPE_NOT_EXISTS");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAILS_TYPE_NOT_EXISTS);
 			}
 		}
 	}
