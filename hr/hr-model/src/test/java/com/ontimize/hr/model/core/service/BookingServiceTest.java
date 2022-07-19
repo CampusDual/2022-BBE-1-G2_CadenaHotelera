@@ -1,5 +1,29 @@
 package com.ontimize.hr.model.core.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.when;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.dao.HotelDao;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -22,39 +46,417 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.OffersDao;
+import com.ontimize.hr.model.core.dao.RoomTypeDao;
+import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.jee.common.dto.EntityResult;
+import com.ontimize.jee.common.dto.EntityResultMapImpl;
+import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
+
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
-import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
-import com.ontimize.jee.common.dto.EntityResult;
-import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.services.user.UserInformation;
-import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
+
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-	
+
+	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+
 	@Mock
 	private DefaultOntimizeDaoHelper daoHelper;
+
+	@Mock
+	private HotelDao hotelDao;
+
+	@Mock
+	private RoomTypeDao roomTypeDao;
+
+	@Mock
+	private OffersDao offersDao;
+
+	@Mock
+	private DatesSeasonDao datesSeasonDao;
+
+	@Mock
+	private SeasonDao seasonDao;
+
+	@InjectMocks
+	private BookingService service;
 	
 	@Mock
 	private CredentialUtils credential;
 	
 	@Mock
-	private HotelDao hotelDao;
-	
-	@Mock
 	private BookingDao bookingDao;
 	
-	@Mock
-	private RoomTypeDao roomtypeDao;
 	
 	@Mock
 	private ClientDao clientDao;
 	
-	@InjectMocks
-	private BookingService service;
+
+	@Test
+	@DisplayName("ID room type wrong format")
+	void testGetBudgetIncorrectFormatRoomType() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("INCORRECT_TYPE_ROOM_FORMAT");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap();
+		req.put("filter", filter);
+
+		filter.put(RoomTypeDao.ATTR_ID, "fail");
+
+		EntityResult er = service.getBudget(req);
+
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Id hotel wrong format")
+	void testGetBudgetIncorretFormatHotel() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("INCORRECT_HOTEL_ID_FORMAT");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap();
+		req.put("filter", filter);
+
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, "fail");
+
+		EntityResult er = service.getBudget(req);
+
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("The hotel doesn't exist")
+	void testGetBudgetHotelNotExists() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_HOTEL_NOT_EXISTS");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 200);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("The roomy type doesn't exist")
+	void testGetBudgetRoomTypeNotExists() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_ROOM_TYPE_NOT_EXISTS");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+
+	}
+
+	@Test
+	@DisplayName("Start day wrong format")
+	void testGetBudgetErrorParseStartDay() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_PARSE_START_DAY");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "13/07/2022");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+
+	}
+
+	@Test
+	@DisplayName("no start day entered")
+	void testBudgetErrorStartDayMandatory() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_START_DAY_MANDATORY");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("End day wrong format")
+	void testBudgetParseEndDay() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_PARSE_END_DAY");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "2022-07-01");
+		filter.put("end_day", "13/07/2022");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("no end day entered")
+	void testBudgetEndDayMandatory() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("ERROR_END_DAY_MANDATORY");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "2022-07-01");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("The dates are equals")
+	void testBudgetSameDates() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("SAME_DATES_ERROR");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "2022-07-01");
+		filter.put("end_day", "2022-07-01");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("The date of departure is prior to the date of entry")
+	void testBudgetLowerDepartureDate() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_WRONG);
+		result.setMessage("DEPARTURE_DATE_BEFORE_ENTRY_DATE");
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "2022-07-06");
+		filter.put("end_day", "2022-07-01");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("The total price of the budget is checked with the dates, hotel, type of room, seasons, and given offers.")
+	void getBudgetPriceBooking() {
+		EntityResult result = new EntityResultMapImpl();
+		result.setCode(EntityResult.OPERATION_SUCCESSFUL);
+		Map<String, Object> mapTotalPrice = new HashMap<>();
+		mapTotalPrice.put("TOTAL_PRICE", 8150.0);
+		result.addRecord(mapTotalPrice);
+
+		Map<String, Object> req = new HashMap<>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		req.put("filter", filter);
+		filter.put(RoomTypeDao.ATTR_ID, 1);
+		filter.put(HotelDao.ATTR_ID, 2);
+		filter.put("start_day", "2022-07-07");
+		filter.put("end_day", "2022-07-28");
+
+		EntityResult queryHotel = new EntityResultMapImpl();
+		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
+		resultQueryHotel.put(HotelDao.ATTR_NAME, "Hotel Name");
+		queryHotel.addRecord(resultQueryHotel);
+
+		when(daoHelper.query(isA(HotelDao.class), anyMap(), anyList())).thenReturn(queryHotel);
+
+		EntityResult queryRoomType = new EntityResultMapImpl();
+		Map<String, Object> resultRoomTypeQuery = new HashMap<>();
+		resultRoomTypeQuery.put(RoomTypeDao.ATTR_NAME, "Suite");
+		queryRoomType.addRecord(resultRoomTypeQuery);
+
+		EntityResult priceTypeRoomER = new EntityResultMapImpl();
+		Map<String, Object> mapMultiplier = new HashMap<>();
+		mapMultiplier.put(RoomTypeDao.ATTR_BASE_PRICE, 200.0);
+		priceTypeRoomER.addRecord(mapMultiplier);
+
+		when(daoHelper.query(isA(RoomTypeDao.class), anyMap(), anyList())).thenReturn(queryRoomType)
+				.thenReturn(priceTypeRoomER);
+
+		EntityResult offersER = new EntityResultMapImpl();
+		Map<String, Object> mapOffers = new HashMap<>();
+		try {
+			mapOffers.put(OffersDao.ATTR_DAY, new SimpleDateFormat(DATE_FORMAT_ISO).parse("2022-07-15"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		mapOffers.put(OffersDao.ATTR_NIGHT_PRICE, 150.0);
+		offersER.addRecord(mapOffers);
+
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList(), anyString())).thenReturn(offersER);
+
+		EntityResult seasonsER = new EntityResultMapImpl();
+		Map<String, Object> mapSeasons = new HashMap<>();
+		mapSeasons.put(DatesSeasonDao.ATTR_HTL_ID, 2);
+		try {
+			mapSeasons.put(DatesSeasonDao.ATTR_START_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).parse("2022-07-01"));
+			mapSeasons.put(DatesSeasonDao.ATTR_END_DATE, new SimpleDateFormat(DATE_FORMAT_ISO).parse("2022-08-31"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		mapSeasons.put(SeasonDao.ATTR_MULTIPLIER, 2);
+		seasonsER.addRecord(mapSeasons);
+
+		when(daoHelper.query(isA(DatesSeasonDao.class), any(), anyList(), anyString())).thenReturn(seasonsER);
+
+		EntityResult er = service.getBudget(req);
+		assertEquals(result.getCode(), er.getCode());
+		Double expectedAmount = Double.parseDouble(result.getRecordValues(0).get("TOTAL_PRICE").toString());
+		Double resultAmount = Double.parseDouble(result.getRecordValues(0).get("TOTAL_PRICE").toString());
+		assertEquals(expectedAmount, resultAmount);
+	}
+
+
+
 	
 	@Test
 	@DisplayName("No filter in bookingFreeByCityOrHotel")

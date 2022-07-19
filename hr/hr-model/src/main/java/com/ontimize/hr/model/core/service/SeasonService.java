@@ -18,7 +18,6 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
-
 /**
  * The Class SeasonService.
  */
@@ -26,18 +25,26 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class SeasonService implements ISeasonService {
 
-	
+	public static final String DUPLICATE_NAME = "DUPLICATE_NAME";
+
+	public static final String MULTIPLIER_BLANK_OR_NULL = "MULTIPLIER_BLANK_OR_NULL";
+
+	public static final String NAME_BLANK_OR_NULL = "NAME_BLANK_OR_NULL";
+
+	public static final String NAME_MANDATORY = "NAME_MANDATORY";
+
+	public static final String MULTIPLIER_MANDATORY = "MULTIPLIER_MANDATORY";
+
 	@Autowired
 	private SeasonDao seasonDao;
-	
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	/**
 	 * Season query.
 	 *
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap   the WHERE conditions
 	 * @param attrList the SELECT conditions
 	 * @return the entity result with the query result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
@@ -61,24 +68,24 @@ public class SeasonService implements ISeasonService {
 	public EntityResult seasonInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		try {
 			if (!attrMap.containsKey(SeasonDao.ATTR_NAME)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Name is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_MANDATORY);
 			}
 
 			if (Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_NAME).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Name is blank or null");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_BLANK_OR_NULL);
 			}
 
 			if (!attrMap.containsKey(SeasonDao.ATTR_MULTIPLIER)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Multiplier is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_MANDATORY);
 			}
 
 			if (Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_MULTIPLIER).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Multiplier is blank or null");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_BLANK_OR_NULL);
 			}
 
 			return this.daoHelper.insert(this.seasonDao, attrMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DUPLICATE_NAME");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_NAME);
 		}
 	}
 
@@ -86,7 +93,7 @@ public class SeasonService implements ISeasonService {
 	 * Season update.
 	 *
 	 * @param attrMap the update query data
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap  the WHERE conditions
 	 * @return the entity result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
@@ -95,9 +102,19 @@ public class SeasonService implements ISeasonService {
 	public EntityResult seasonUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 		try {
+			if (attrMap.containsKey(SeasonDao.ATTR_NAME)
+					&& Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_NAME).toString())) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_BLANK_OR_NULL);
+			}
+
+			if (attrMap.containsKey(SeasonDao.ATTR_MULTIPLIER)
+					&& Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_MULTIPLIER).toString())) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_BLANK_OR_NULL);
+			}
+
 			return this.daoHelper.update(this.seasonDao, attrMap, keyMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DUPLICATE_NAME");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_NAME);
 		}
 	}
 

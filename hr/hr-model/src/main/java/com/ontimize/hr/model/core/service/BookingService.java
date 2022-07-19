@@ -911,7 +911,8 @@ public class BookingService implements IBookingService {
 
 		List<String> attrListHotel = new ArrayList<>();
 		attrListHotel.add(HotelDao.ATTR_NAME);
-		EntityResult existsHotelER = hotelService.hotelQuery(filterHotel, attrListHotel);
+		EntityResult existsHotelER = this.daoHelper.query(this.hotelDao, filterHotel, attrListHotel);
+		
 		if (existsHotelER.calculateRecordNumber() == 0) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_HOTEL_NOT_EXISTS");
 		}
@@ -922,7 +923,7 @@ public class BookingService implements IBookingService {
 
 		List<String> attrListRoomType = new ArrayList<>();
 		attrListRoomType.add(RoomTypeDao.ATTR_NAME);
-		EntityResult existsTypeRoomER = roomTypeService.roomTypeQuery(filterTypeRoom, attrListRoomType);
+		EntityResult existsTypeRoomER = this.daoHelper.query(this.roomTypeDao, filterTypeRoom, attrListRoomType);
 		if (existsTypeRoomER.calculateRecordNumber() == 0) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_ROOM_TYPE_NOT_EXISTS");
 		}
@@ -955,10 +956,8 @@ public class BookingService implements IBookingService {
 
 		// comprobar fecha inicial superior a final
 		if (endDate.before(startDate)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY DATE");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY_DATE");
 		}
-
-		// long diffrenceDays = Utils.getNumberDays(startDate, endDate);
 
 		// obtengo ofertas entre las fechas dadas para ese hotel y ese tipo de
 		// habitacion
@@ -1001,7 +1000,7 @@ public class BookingService implements IBookingService {
 		EntityResult multiplierAndDatesByHotel = EntityResultTools.dofilter(multiplierAndDates,
 				EntityResultTools.keysvalues(DatesSeasonDao.ATTR_HTL_ID, hotelId));
 
-		Map<Date, Map<Date, Integer>> mapMultipliers = new HashMap<>();
+		
 		int nSeasons = multiplierAndDatesByHotel.calculateRecordNumber();
 
 		// creo la lista de temporadas con sus fechas y multi
