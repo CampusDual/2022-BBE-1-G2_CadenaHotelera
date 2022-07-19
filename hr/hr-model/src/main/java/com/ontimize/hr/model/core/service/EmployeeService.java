@@ -271,7 +271,7 @@ public class EmployeeService implements IEmployeeService {
 			if(daoHelper.update(employeeDao, attrMapEmployee, keyMapEmployee).getCode()!=0) throw new OntimizeJEERuntimeException();
 			return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,12);
 		} catch (Exception e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNKOWN ERROR");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "UNKNOWN ERROR");
 		}
 		
 	}
