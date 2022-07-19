@@ -65,13 +65,12 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 			throws OntimizeJEERuntimeException {
 
 		try {
-
-			if (!attrMap.containsKey(EmployeeTypeDao.ATTR_NAME))
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-						"missing " + EmployeeTypeDao.ATTR_NAME);
-			String name = attrMap.get(EmployeeTypeDao.ATTR_NAME).toString();
-			if (name.isBlank())
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "blank " + EmployeeTypeDao.ATTR_NAME);
+			String name;
+			if (attrMap.containsKey(EmployeeTypeDao.ATTR_NAME)) {
+				name = attrMap.get(EmployeeTypeDao.ATTR_NAME).toString();
+				if (name.isBlank())
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "blank " + EmployeeTypeDao.ATTR_NAME);
+			}
 			return this.daoHelper.update(this.employeeTypeDao, attrMap, keyMap);
 
 		} catch (DuplicateKeyException e) {
