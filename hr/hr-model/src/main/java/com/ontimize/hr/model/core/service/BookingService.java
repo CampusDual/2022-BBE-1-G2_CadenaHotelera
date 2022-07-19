@@ -1223,7 +1223,7 @@ public class BookingService implements IBookingService {
 		
 		
 		
-		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.EQUAL_OP, hotelList);
+		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.IN_OP, hotelList);
 		
 		BasicExpression where = BasicExpressionTools.combineExpressionOr(
 				searchBetweenWithYearNoHotel(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE,
