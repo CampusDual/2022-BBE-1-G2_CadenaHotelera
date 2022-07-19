@@ -430,23 +430,4 @@ class OffersServiceTest {
 
 	}
 	
-	/*try {
-	EntityResult query = daoHelper.query(offersDao, keyMap, Arrays.asList(OffersDao.ATTR_ID));
-	if (query.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
-		if (query.calculateRecordNumber() > 0) {
-			return this.daoHelper.delete(this.offersDao, keyMap);
-		} else {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_DATA_TO_DELETE);
-		}
-
-	} else {
-		return new EntityResultMapImpl() {
-			{
-				setCode(OPERATION_WRONG);
-			}
-		};
-	}
-} catch (BadSqlGrammarException e) {
-	return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
-}*/
 }
