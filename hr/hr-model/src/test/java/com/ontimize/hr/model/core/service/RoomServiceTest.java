@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
@@ -368,6 +369,43 @@ class RoomServiceTest {
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 		assertEquals(RoomService.DATE_FORMAT_INCORRECT, result.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("Status Only with no bookings filter roomUpdateStatus")
+	void CompleteStatusWithNoBookingsBadStatusRoomStatusUpdateTest() {
+		Map<String,Object> req = new HashMap<>();
+		Map<String, Object> filter= new HashMap<>();
+		Map<String, Object> data= new HashMap<>();
+		filter.put(RoomDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_NUMBER, "101");
+		data.put(RoomDao.ATTR_STATUS_ID, 500);
+		data.put(RoomDao.ATTR_STATUS_START, "2022-07-29");
+		data.put(RoomDao.ATTR_STATUS_END, "2022-07-30");
+		
+		req.put("filter",filter);
+		req.put("data", data);
+		
+		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
+		
+		when(daoHelper.getUser()).thenReturn(userInfo);
+		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
+		roomExistsResult.addRecord(new HashMap<String, Object>(){{
+			put(RoomDao.ATTR_HTL_ID, 1);
+			put(RoomDao.ATTR_NUMBER,"101");
+			}});
+		
+		EntityResult bookingsResult = new EntityResultMapImpl(Arrays.asList(BookingDao.ATTR_ROM_NUMBER));
+		
+		
+		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
+		when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenThrow(new DataIntegrityViolationException("fk_room_room_status"));
+		EntityResult result = service.roomUpdateStatus(req);
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+		assertEquals(RoomService.NO_SUCH_STATUS, result.getMessage());
 	}
 
 }
