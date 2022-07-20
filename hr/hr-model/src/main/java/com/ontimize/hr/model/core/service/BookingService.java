@@ -873,34 +873,22 @@ public class BookingService implements IBookingService {
 		return daoHelper.query(bookingDao, filterBooking, attrListBooking, BookingDao.QUERY_CHECKIN_TODAY);
 	}	
 	
-	
-	/**
-	 * Method to get a budget.
-	 * 
-	 * @param req Receives the request data. Which contains the FILTER, with
-	 *            rtyp_id, start_date,end_day,htl_id
-	 * @return the entity result with price_total
-	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
-	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult getBudget(Map<String, Object> req) throws OntimizeJEERuntimeException {
-
-		EntityResult budgetER = new EntityResultMapImpl();
-
+	public EntityResult getBudget(Map<String,Object> req) throws OntimizeJEERuntimeException{
 		Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
 
 		// Comprobamos htl_id y rtp_id
 		Integer roomTypeId;
 		Integer hotelId;
 		try {
-			roomTypeId = Integer.parseInt(filter.get(RoomTypeDao.ATTR_ID).toString());
+			roomTypeId = Integer.parseInt(filter.get(RoomDao.ATTR_TYPE_ID).toString());
 		} catch (NumberFormatException ex) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_TYPE_ROOM_FORMAT");
 		}
 
 		try {
-			hotelId = Integer.parseInt(filter.get(HotelDao.ATTR_ID).toString());
+			hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 		} catch (NumberFormatException ex) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_HOTEL_ID_FORMAT");
 		}
@@ -933,7 +921,7 @@ public class BookingService implements IBookingService {
 		Date endDate = null;
 
 		try {
-			startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get("start_day").toString());
+			startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 
 		} catch (ParseException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
@@ -942,7 +930,7 @@ public class BookingService implements IBookingService {
 		}
 
 		try {
-			endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get("end_day").toString());
+			endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (ParseException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
 		} catch (NullPointerException ex) {
@@ -958,7 +946,44 @@ public class BookingService implements IBookingService {
 		if (endDate.before(startDate)) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY_DATE");
 		}
-
+		
+		//comprobar disponibilidad
+		List<String> columns = new ArrayList<>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_TYPE_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		req.put(COLUMNS, columns);
+		
+		EntityResult er = bookingFreeByTypeQuery(req);
+		if(er.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+			if(er.calculateRecordNumber() == 0) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NO_FREE_ROOMS");				
+			}
+		} else {
+			return er;
+		}
+		
+		
+		// obtengo mapa precios/noche
+		Map<Date,Double> listPrices = priceByDay(hotelId,roomTypeId,startDate,endDate);
+		
+		EntityResult pricesByNightER = new EntityResultMapImpl();
+		pricesByNightER.setCode(EntityResult.OPERATION_SUCCESSFUL);
+		pricesByNightER.addRecord(listPrices);
+		
+		return pricesByNightER;
+	}
+	
+	
+	
+	/**
+	 * Method to get a budget.
+	 * 
+	 */
+	public Map<Date,Double> priceByDay (int hotelId,int roomTypeId, Date startDate, Date endDate) throws OntimizeJEERuntimeException {	
+		
+		Map<Date,Double> mapPrices = new HashMap<>();
+		
 		// obtengo ofertas entre las fechas dadas para ese hotel y ese tipo de
 		// habitacion
 		Map<String, Object> keyMap = new HashMap<>();
@@ -1016,14 +1041,15 @@ public class BookingService implements IBookingService {
 		// ahora tengo que iterar los días de la solicitud de presupuesto
 		long differenceDays = Utils.getNumberDays(startDate, endDate);
 
-		Double priceTotal = 0.0;
+		//Double priceTotal = 0.0;
 		Date day;
 
 		for (int i = 0; i < differenceDays; i++) {
 			day = Utils.sumarDiasAFecha(startDate, i);
 			// primero compruebo si hay oferta ese día
 			if (pricesOffer.containsKey(day)) {
-				priceTotal += pricesOffer.get(day);
+				//priceTotal += pricesOffer.get(day);
+				mapPrices.put(day, pricesOffer.get(day));
 			}
 			// si no hay oferta
 			else {
@@ -1033,21 +1059,25 @@ public class BookingService implements IBookingService {
 					Date dateFinal = season.getEndDate();
 					if ((day.compareTo(dateInicial) == 0 || day.compareTo(dateInicial) > 0)
 							&& (day.compareTo(dateFinal) == 0 || day.compareTo(dateFinal) < 0)) {
-						priceTotal += (basePrice * season.getMultiplier());
+					//	priceTotal += (basePrice * season.getMultiplier());
+						mapPrices.put(day, basePrice * season.getMultiplier());
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					priceTotal += basePrice;
+					// priceTotal += basePrice;
+					mapPrices.put(day, basePrice);
 				}
 			}
 		}
 
-		budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
-		budgetER.put("TOTAL_PRICE", priceTotal);
-		return budgetER;
+		//budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
+		//budgetER.put("TOTAL_PRICE", priceTotal);
+		//return budgetER;
+		return mapPrices;
 	}
+	
 	
 	/**
 	 * Search prices by night.
