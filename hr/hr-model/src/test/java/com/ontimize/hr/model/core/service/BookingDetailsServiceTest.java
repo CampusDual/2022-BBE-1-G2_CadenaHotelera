@@ -1,9 +1,14 @@
 package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
+import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -30,6 +37,19 @@ class BookingDetailsServiceTest {
 
 	@InjectMocks
 	private BookingDetailsService service;
+
+	@Test
+	@DisplayName("Fails when you put bad column name in filter query")
+	void testBookingQueryBadData() {
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDetailsDao.ATTR_ID + "wrong", 1);
+		List<String> columns = Arrays.asList(BookingDetailsDao.ATTR_ID);
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), anyList()))
+				.thenThrow(new BadSqlGrammarException(null, null, null));
+		EntityResult result = service.bookingDetailsQuery(filter, columns);
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+		assertEquals(BookingDetailsService.BAD_DATA, result.getMessage());
+	}
 
 	@Test
 	@DisplayName("Fails when you try insert without booking_id")
@@ -435,5 +455,54 @@ class BookingDetailsServiceTest {
 
 		assertEquals(result.getCode(), er.getCode());
 		assertEquals(result.getMessage(), er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when you put bad column name in filter query to delete")
+	void testBookingDetailsDeleteBadData() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_ID + "wrong", 1);
+
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), anyList()))
+				.thenThrow(new BadSqlGrammarException(null, null, null));
+		EntityResult result = service.bookingDetailsDelete(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+		assertEquals(BookingDetailsService.BAD_DATA, result.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when you check if Booking_details register exists")
+	void testBookingDetailsDeleteChekExiste() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_ID, 1);
+
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(OPERATION_WRONG);
+			}
+		});
+
+		EntityResult result = service.bookingDetailsDelete(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
+
+	}
+
+	@Test
+	@DisplayName("Fails when no data to delete")
+	void testBookingDetailsDeleteNoData() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_ID, 1);
+
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(OPERATION_SUCCESSFUL);
+			}
+		});
+
+		EntityResult er = service.bookingDetailsDelete(keyMap);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(BookingDetailsService.NO_DATA_TO_DELETE, er.getMessage());
+
 	}
 }

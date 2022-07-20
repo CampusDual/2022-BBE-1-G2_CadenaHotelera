@@ -2,6 +2,7 @@ package com.ontimize.hr.model.core.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,15 +57,19 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
+	public static final String BAD_DATA = "BAD DATA PLEASE CHECK VALUES AND COLUMN NAMES";
+
+	public static final String NO_DATA_TO_DELETE = "NO DATA TO DELETE";
+
 	@Autowired
 	private BookingDetailsDao bookingDetailsDao;
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
-	
+
 	/**
 	 * BookingDetails query.
 	 *
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap   the WHERE conditions
 	 * @param attrList the SELECT conditions
 	 * @return the entity result with the query result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
@@ -73,7 +78,11 @@ public class BookingDetailsService implements IBookingDetailsService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDetailsQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
-		return this.daoHelper.query(this.bookingDetailsDao, keyMap, attrList);
+		try {
+			return this.daoHelper.query(this.bookingDetailsDao, keyMap, attrList);
+		} catch (BadSqlGrammarException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
+		}
 	}
 
 	/**
@@ -144,12 +153,12 @@ public class BookingDetailsService implements IBookingDetailsService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Season update.
 	 *
 	 * @param attrMap the update query data
-	 * @param keyMap the WHERE conditions
+	 * @param keyMap  the WHERE conditions
 	 * @return the entity result
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
@@ -205,7 +214,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Season delete.
 	 *
@@ -216,7 +225,26 @@ public class BookingDetailsService implements IBookingDetailsService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDetailsDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		return this.daoHelper.delete(this.bookingDetailsDao, keyMap);
+
+		try {
+			EntityResult query = daoHelper.query(bookingDetailsDao, keyMap, Arrays.asList(BookingDetailsDao.ATTR_ID));
+			if (query.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+				if (query.calculateRecordNumber() > 0) {
+					return this.daoHelper.delete(this.bookingDetailsDao, keyMap);
+				} else {
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_DATA_TO_DELETE);
+				}
+			} else {
+				return new EntityResultMapImpl() {
+					{
+						setCode(OPERATION_WRONG);
+					}
+				};
+			}
+
+		} catch (BadSqlGrammarException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
+		}
 	}
 
 }
