@@ -18,5 +18,6 @@ public interface IHotelService {
 			throws OntimizeJEERuntimeException;
 
 	public EntityResult hotelDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
-
+	
+	public EntityResult getHotelByCoordinates(Map<String, Object> req) throws OntimizeJEERuntimeException;
 }

@@ -39,4 +39,38 @@ public class Utils {
 		return time.convert(diff, TimeUnit.MILLISECONDS);
 
 	}
+
+	public static boolean checkCoordinate(String coordinate) {
+		Pattern pat = Pattern.compile("\\-?[0-9]{1,3}\\.[0-9]{6,20}");
+
+		return pat.matcher(coordinate).matches();
+
+	}
+
+	public static double getDistance(String lat1s, String lon1s, String lat2s, String lon2s) {
+
+		Double lat1 = Double.parseDouble(lat1s);
+		Double lat2 = Double.parseDouble(lat2s);
+		Double lon1 = Double.parseDouble(lon1s);
+		Double lon2 = Double.parseDouble(lon2s);
+
+		double theta = lon1 - lon2;
+		double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2))
+				+ Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+		dist = Math.acos(dist);
+		dist = rad2deg(dist);
+		dist = dist * 60 * 1.1515 * 1.609344;
+
+		return (dist);
+	}
+
+	/* This function converts decimal degrees to radians */
+	private static double deg2rad(double deg) {
+		return (deg * Math.PI / 180.0);
+	}
+
+	/* This function converts radians to decimal degrees */
+	private static double rad2deg(double rad) {
+		return (rad * 180.0 / Math.PI);
+	}
 }
