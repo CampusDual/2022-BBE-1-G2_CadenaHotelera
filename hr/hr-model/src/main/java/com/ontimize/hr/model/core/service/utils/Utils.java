@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class Utils {
+	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 	private Utils() {
 
 	}
