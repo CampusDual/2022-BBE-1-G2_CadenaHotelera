@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
 
+import com.ontimice.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.jee.common.dto.EntityResult;
@@ -48,7 +49,7 @@ class BookingDetailsServiceTest {
 				.thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult result = service.bookingDetailsQuery(filter, columns);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingDetailsService.BAD_DATA, result.getMessage());
+		assertEquals(MsgLabels.BAD_DATA, result.getMessage());
 	}
 
 	@Test
@@ -56,7 +57,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertBookingMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.BOOKING_MANDATORY);
+		result.setMessage(MsgLabels.BOOKING_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
@@ -75,7 +76,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertDetailsTypeMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DETAILS_TYPE_MANDATORY);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -94,7 +95,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertPriceMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.PRICE_MANDATORY);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -113,7 +114,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertPaidMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.PAID_MANDATORY);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_PAID_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -132,7 +133,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertDateMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DATE_MANDATORY);
+		result.setMessage(MsgLabels.DATE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -151,7 +152,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertPriceErrorFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.PRICE_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -171,7 +172,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertBookingIdFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.BOOKING_ID_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_ID_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, "errorFormat");
@@ -191,7 +192,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertDetailsTypeFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DETAILS_TYPE_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -211,7 +212,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertParseDate() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.ERROR_PARSE_DATE);
+		result.setMessage(MsgLabels.ERROR_PARSE_DATE);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -232,7 +233,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertDateNull() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.ERROR_DATE_MANDATORY);
+		result.setMessage(MsgLabels.ERROR_DATE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -252,7 +253,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertBookingNotExists() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.BOOKING_NOT_EXISTS);
+		result.setMessage(MsgLabels.BOOKING_NOT_EXISTS);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -274,7 +275,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsInsertDetailsTypeNotExists() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DETAILS_TYPE_NOT_EXISTS);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -296,7 +297,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateBookingIdWrongFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.BOOKING_ID_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_ID_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, "wrongFormat");
@@ -319,7 +320,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateTypeDetailsIdWrongFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DETAILS_TYPE_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -342,7 +343,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdatePriceWrongFormat() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.PRICE_FORMAT);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -365,7 +366,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateErrorParseDate() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.ERROR_PARSE_DATE);
+		result.setMessage(MsgLabels.ERROR_PARSE_DATE);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -388,7 +389,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateDateNull() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.ERROR_DATE_MANDATORY);
+		result.setMessage(MsgLabels.ERROR_DATE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -411,7 +412,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateBookingNotExists() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.BOOKING_NOT_EXISTS);
+		result.setMessage(MsgLabels.BOOKING_NOT_EXISTS);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -437,7 +438,7 @@ class BookingDetailsServiceTest {
 	void testBookingDetailsUpdateDetailsTypeNotExists() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(BookingDetailsService.DETAILS_TYPE_NOT_EXISTS);
+		result.setMessage(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 1);
@@ -467,7 +468,7 @@ class BookingDetailsServiceTest {
 				.thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult result = service.bookingDetailsDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingDetailsService.BAD_DATA, result.getMessage());
+		assertEquals(MsgLabels.BAD_DATA, result.getMessage());
 	}
 
 	@Test
@@ -502,7 +503,7 @@ class BookingDetailsServiceTest {
 		EntityResult er = service.bookingDetailsDelete(keyMap);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingDetailsService.NO_DATA_TO_DELETE, er.getMessage());
+		assertEquals(MsgLabels.NO_DATA_TO_DELETE, er.getMessage());
 
 	}
 }
