@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -431,7 +432,7 @@ class BookingServiceTest {
 		EntityResult offersDayER = new EntityResultMapImpl(){{
 			setCode(EntityResult.OPERATION_SUCCESSFUL);
 			addRecord(new HashMap<String,Object>(){{
-				put(OffersDao.ATTR_DAY,new Date(122,6,3));
+				put(OffersDao.ATTR_DAY,new GregorianCalendar(2022,7,3).getTime());  
 				put(OffersDao.ATTR_NIGHT_PRICE, 5.00);
 			}});
 		}};
@@ -445,8 +446,8 @@ class BookingServiceTest {
 			setCode(EntityResult.OPERATION_SUCCESSFUL);
 			addRecord(new HashMap<String,Object>(){{
 				put(DatesSeasonDao.ATTR_HTL_ID,2);
-				put(DatesSeasonDao.ATTR_START_DATE, new Date(122, 5,15));
-				put(DatesSeasonDao.ATTR_END_DATE,new Date(122,8,15));
+				put(DatesSeasonDao.ATTR_START_DATE, new GregorianCalendar(2022, 6, 15).getTime());
+				put(DatesSeasonDao.ATTR_END_DATE, new GregorianCalendar(2022,9,15).getTime());           
 				put(seasonDao.ATTR_MULTIPLIER, 2);
 			}});
 		}};

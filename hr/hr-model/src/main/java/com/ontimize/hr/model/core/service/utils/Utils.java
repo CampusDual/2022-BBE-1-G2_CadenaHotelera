@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 public class Utils {
 	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+
 	private Utils() {
 
 	}
@@ -73,5 +74,9 @@ public class Utils {
 	/* This function converts radians to decimal degrees */
 	private static double rad2deg(double rad) {
 		return (rad * 180.0 / Math.PI);
+	}
+
+	public static int daysBetween(Date d1, Date d2) {
+		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 	}
 }
