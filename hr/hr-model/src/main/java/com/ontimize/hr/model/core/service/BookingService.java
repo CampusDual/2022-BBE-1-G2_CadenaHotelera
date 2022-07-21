@@ -51,6 +51,17 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class BookingService implements IBookingService {
 
+	public static final String NO_FREE_ROOMS = "NO_FREE_ROOMS";
+	public static final String DEPARTURE_DATE_BEFORE_ENTRY_DATE = "DEPARTURE_DATE_BEFORE_ENTRY_DATE";
+	public static final String SAME_DATES_ERROR = "SAME_DATES_ERROR";
+	public static final String ERROR_END_DAY_MANDATORY = "ERROR_END_DAY_MANDATORY";
+	public static final String ERROR_PARSE_END_DAY = "ERROR_PARSE_END_DAY";
+	public static final String ERROR_START_DAY_MANDATORY = "ERROR_START_DAY_MANDATORY";
+	public static final String ERROR_PARSE_START_DAY = "ERROR_PARSE_START_DAY";
+	public static final String ERROR_ROOM_TYPE_NOT_EXISTS = "ERROR_ROOM_TYPE_NOT_EXISTS";
+	public static final String ERROR_HOTEL_NOT_EXISTS = "ERROR_HOTEL_NOT_EXISTS";
+	public static final String INCORRECT_HOTEL_ID_FORMAT = "INCORRECT_HOTEL_ID_FORMAT";
+	public static final String INCORRECT_TYPE_ROOM_FORMAT = "INCORRECT_TYPE_ROOM_FORMAT";
 	public static final String ROOM_TYPE_NOT_EXIST = "ROOM TYPE DOES NOT EXIST";
 	public static final String TYPE_FORMAT = "INVALID TYPE FORMAT";
 	public static final String DATES_REVERSED = "START DATE AFTER END DATE";
@@ -62,9 +73,9 @@ public class BookingService implements IBookingService {
 	public static final String CITY_HOTEL_ID_EXCLUSIVE = "Cannot search by city and hotel at the same time";
 	public static final String NO_HOTELS_FOUND = "NO HOTELS FOUND";
 	public static final String REQUEST_NO_FILTER = "REQUEST CONTAINS NO FILTER";
-	private static final String COLUMNS = "columns";
-	private static final String FILTER = "filter";
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+	public static final String COLUMNS = "columns";
+	public static final String FILTER = "filter";
+	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	
 	@Autowired
@@ -929,13 +940,13 @@ public class BookingService implements IBookingService {
 		try {
 			roomTypeId = Integer.parseInt(filter.get(RoomDao.ATTR_TYPE_ID).toString());
 		} catch (NumberFormatException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_TYPE_ROOM_FORMAT");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, INCORRECT_TYPE_ROOM_FORMAT);
 		}
 
 		try {
 			hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 		} catch (NumberFormatException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "INCORRECT_HOTEL_ID_FORMAT");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, INCORRECT_HOTEL_ID_FORMAT);
 		}
 
 		// Compruebo hotel existe
@@ -947,7 +958,7 @@ public class BookingService implements IBookingService {
 		EntityResult existsHotelER = this.daoHelper.query(this.hotelDao, filterHotel, attrListHotel);
 		
 		if (existsHotelER.calculateRecordNumber() == 0) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_HOTEL_NOT_EXISTS");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_HOTEL_NOT_EXISTS);
 		}
 
 		// Compruebo tipo habitaci�n existe
@@ -958,7 +969,7 @@ public class BookingService implements IBookingService {
 		attrListRoomType.add(RoomTypeDao.ATTR_NAME);
 		EntityResult existsTypeRoomER = this.daoHelper.query(this.roomTypeDao, filterTypeRoom, attrListRoomType);
 		if (existsTypeRoomER.calculateRecordNumber() == 0) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_ROOM_TYPE_NOT_EXISTS");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_ROOM_TYPE_NOT_EXISTS);
 		}
 
 		// Comprobamos formato fechas
@@ -969,27 +980,27 @@ public class BookingService implements IBookingService {
 			startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 
 		} catch (ParseException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_START_DAY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_START_DAY);
 		} catch (NullPointerException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_START_DAY_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_START_DAY_MANDATORY);
 		}
 
 		try {
 			endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (ParseException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_PARSE_END_DAY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_PARSE_END_DAY);
 		} catch (NullPointerException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_END_DAY_MANDATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ERROR_END_DAY_MANDATORY);
 		}
 
 		// comprobar fechas no iguales
 		if (startDate.equals(endDate)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "SAME_DATES_ERROR");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, SAME_DATES_ERROR);
 		}
 
 		// comprobar fecha inicial superior a final
 		if (endDate.before(startDate)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "DEPARTURE_DATE_BEFORE_ENTRY_DATE");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DEPARTURE_DATE_BEFORE_ENTRY_DATE);
 		}
 		
 		//comprobar disponibilidad
@@ -1002,7 +1013,7 @@ public class BookingService implements IBookingService {
 		EntityResult er = bookingFreeByTypeQuery(req);
 		if(er.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 			if(er.calculateRecordNumber() == 0) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NO_FREE_ROOMS");				
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_FREE_ROOMS);				
 			}
 		} else {
 			return er;
@@ -1086,14 +1097,12 @@ public class BookingService implements IBookingService {
 		// ahora tengo que iterar los días de la solicitud de presupuesto
 		long differenceDays = Utils.getNumberDays(startDate, endDate);
 
-		//Double priceTotal = 0.0;
 		Date day;
 
 		for (int i = 0; i < differenceDays; i++) {
 			day = Utils.sumarDiasAFecha(startDate, i);
 			// primero compruebo si hay oferta ese día
 			if (pricesOffer.containsKey(day)) {
-				//priceTotal += pricesOffer.get(day);
 				mapPrices.put(day, pricesOffer.get(day));
 			}
 			// si no hay oferta
@@ -1104,22 +1113,17 @@ public class BookingService implements IBookingService {
 					Date dateFinal = season.getEndDate();
 					if ((day.compareTo(dateInicial) == 0 || day.compareTo(dateInicial) > 0)
 							&& (day.compareTo(dateFinal) == 0 || day.compareTo(dateFinal) < 0)) {
-					//	priceTotal += (basePrice * season.getMultiplier());
 						mapPrices.put(day, basePrice * season.getMultiplier());
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					// priceTotal += basePrice;
 					mapPrices.put(day, basePrice);
 				}
 			}
 		}
 
-		//budgetER.setCode(EntityResult.OPERATION_SUCCESSFUL);
-		//budgetER.put("TOTAL_PRICE", priceTotal);
-		//return budgetER;
 		return mapPrices;
 	}
 	

@@ -453,9 +453,9 @@ insert into details_type(det_code, det_description) values ('MNBAR','Minibar');
 
 /**************************************************************************/
 
-INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars,htl_latitude,htl_longitude) VALUES('Exceptions Hotel Las Vegas','Las vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5,'36.1196804136566','-115.17470388915481');
+INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars,htl_latitude,htl_longitude) VALUES('Exceptions Hotel Las Vegas','Las Vegas','3778 Las Vegas Blvd','NV 89109','lasvegas@exceptionshoteles.com','877.386.5497',5,'36.1196804136566','-115.17470388915481');
 INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars,htl_latitude,htl_longitude) VALUES('Exceptions Hotel Vigo','Vigo','Avda Castelao 67','36208','vigo@exceptionshoteles.com','986 50 48 67',2,'42.21847248367241', '-8.748586559209471');
-INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars,htl_latitude,htl_longitude) VALUES('Exceptions Hotel CoruÃ±a','CoruÃ±a','C\ Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3,'43.3685141433047', '-8.409046581369644');
+INSERT INTO hotel (htl_name,htl_city,htl_address,htl_zip_code,htl_email,htl_phone,htl_stars,htl_latitude,htl_longitude) VALUES('Exceptions Hotel A Coruña','A Coruña','Calle Riazor 20','52831','corunha@exceptionshoteles.com','983 96 45 12',3,'43.3685141433047', '-8.409046581369644');
 
 
 INSERT INTO room_type(rtyp_name,rtyp_bed_number,rtyp_base_price) VALUES('doble',2,200);
