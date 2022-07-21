@@ -149,12 +149,13 @@ INSERT INTO tserver_permission(permission_name) values ('com.ontimize.hr.api.cor
 INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonQuery');
 INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonInsert');
 INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonUpdate');
-INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonUpdate');
+INSERT INTO TSERVER_PERMISSION(PERMISSION_NAME) VALUES ('com.ontimize.hr.api.core.service.IDatesSeasonService/datesSeasonDelete');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerInsert');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerUpdate');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersService/offerDelete');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IOffersServiec/offersByDateRangeQuery');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeInsert');
@@ -243,6 +244,7 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,6
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,63);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,64);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,65);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,66);
 
 select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 from trole_server_permission t

@@ -2,10 +2,13 @@ package com.ontimize.hr.model.core.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,12 +21,19 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IOffersService;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
-import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
+import com.ontimize.jee.common.db.SQLStatementBuilder;
+import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
+import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
+import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.gui.SearchValue;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
+import com.ontimize.jee.common.tools.BasicExpressionTools;
+import com.ontimize.jee.common.tools.BasicExpressionTools.BetweenDateFilter;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 /**
@@ -61,6 +71,9 @@ public class OffersService implements IOffersService {
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
+	@Autowired
+	private EntityUtils entityUtils;
+	
 	/**
 	 * Offer query.
 	 *
@@ -124,7 +137,7 @@ public class OffersService implements IOffersService {
 			} else {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, ROOM_TYPE_NOT_EXISTS);
 			}
-		}catch (BadSqlGrammarException e) {
+		} catch (BadSqlGrammarException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
 		}
 	}
@@ -195,6 +208,92 @@ public class OffersService implements IOffersService {
 		} catch (BadSqlGrammarException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
 		}
+	}
+
+	
+	@Override
+	@Secured({PermissionsProviderSecured.SECURED})
+	public EntityResult offersByDateRangeQuery(Map<String, Object>keyMap,List<String>columns) {
+		if (keyMap==null || keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "EMPTY PARAMETERS");
+		
+		Date startDate = null;
+		if (!keyMap.containsKey("qry_start")) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "START DATE IS MADATORY");
+		}else {
+			try {
+				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_start").toString());				
+			} catch (ParseException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD DATE FORMAT qry_start");
+			}
+			catch (NullPointerException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NULL DATE qry_start");
+			}
+		}
+		
+		Date endDate = null;
+		if (!keyMap.containsKey("qry_end")) {
+			 return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "END DATE IS MADATORY");
+		}else {
+			try {
+				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_end").toString());
+			} catch (ParseException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD DATE FORMAT qrt_end");
+			}
+			catch (NullPointerException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NULL DATE qry_end");
+			}
+		}
+		
+		if (endDate.before(startDate)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"END DATE BEFORE START DATE");
+		Integer roomType = null;
+		if (keyMap.containsKey(OffersDao.ATTR_ROOM_TYPE_ID)) {
+			try {
+				roomType = Integer.valueOf(keyMap.get(OffersDao.ATTR_ROOM_TYPE_ID).toString());
+				
+			} catch (NumberFormatException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD TYPE FORMAT");
+			}
+	}
+		Integer hotelId =null;
+		if (keyMap.containsKey(OffersDao.ATTR_HTL_OFFER)) {
+			try {
+				hotelId = Integer.valueOf(keyMap.get(OffersDao.ATTR_HTL_OFFER).toString());
+			} catch (NumberFormatException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD HOTEL ID FORMAT");
+			}
+		}		
+		
+		Map<String, Object> keyMapQuery = new HashMap<>();
+		
+			 ArrayList<Date> dateVector = new ArrayList<>(Arrays.asList(startDate,endDate));
+	 			 
+			 BasicExpression queryExpression = null;
+			 BasicExpression betweenDatesExpression = new BasicExpression(
+					new BasicField(OffersDao.ATTR_DAY),new SearchValue(
+								SearchValue.BETWEEN, dateVector),false);
+			 queryExpression= betweenDatesExpression;
+			if(roomType!=null) {
+				BasicExpression typeExpression = new BasicExpression(new BasicField(OffersDao.ATTR_ROOM_TYPE_ID),BasicOperator.EQUAL_OP,roomType);
+				 queryExpression= BasicExpressionTools.combineExpression(queryExpression,typeExpression);
+			}
+				
+			if(hotelId!=null) {
+				BasicExpression hotelExpression = new BasicExpression(new BasicField(OffersDao.ATTR_HTL_OFFER),BasicOperator.EQUAL_OP,hotelId);
+				 queryExpression= BasicExpressionTools.combineExpression(queryExpression,hotelExpression);
+			}
+			keyMapQuery.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, queryExpression);
+		try {
+			EntityResult res = daoHelper.query(offersDao, keyMapQuery, columns);
+			if (res.getCode()==EntityResult.OPERATION_SUCCESSFUL && res.calculateRecordNumber()==0)
+			{
+				if (hotelId!=null && !entityUtils.hotelExists(hotelId)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"HOTEL DOES NOT EXIST");
+				if (roomType!=null && !entityUtils.roomTypeExists(roomType)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"ROOM TYPE DOES NOT EXIST");
+			}
+			return res;			
+		}catch (BadSqlGrammarException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, BAD_DATA);
+		}
+		
 	}
 
 }
