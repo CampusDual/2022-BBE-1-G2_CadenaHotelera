@@ -17,6 +17,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
+import com.ontimice.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
@@ -219,42 +220,86 @@ public class BookingService implements IBookingService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingOcupiedQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
-		try {
-			List<String> columns = (List<String>) req.get(COLUMNS);
-			Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
-			int hotelId; 
-			Date startDate,endDate;
+		int hotelId; 
+		Date startDate,endDate;
+		
+		List<String> columns = new ArrayList<String>();
+		Map<String, Object> filter = new HashMap<String, Object>();
 			
+		if(!req.containsKey(COLUMNS)) 
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_MANDATORY);
+		columns = (List<String>) req.get(COLUMNS);
+		if(!columns.contains(RoomDao.ATTR_HTL_ID))
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_HOTEL_ID_MANDATORY);
+		
+		if(!req.containsKey(FILTER)) 
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
+		filter = (Map<String, Object>) req.get(FILTER);
+		
+		try {			
 			if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
 				hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
 			}else {
 				if(!filter.containsKey(BookingDao.ATTR_HTL_ID))
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"Hotel ID is mandatory");
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.HOTEL_ID_MANDATORY);
 				hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
-			}			
+			}
+			
 			if(!filter.containsKey(BookingDao.ATTR_ENTRY_DATE))
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"Entry date is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ENTRY_DATE_MANDATORY);
+
+			String startDateS = filter.get(BookingDao.ATTR_ENTRY_DATE).toString();
+			if(startDateS.isBlank())
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ENTRY_DATE_BLANK);
+			
 			startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
+
+		
 			if(!filter.containsKey(BookingDao.ATTR_DEPARTURE_DATE))
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"Departure date is mandatory");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DEPARTURE_DATE_MANDATORY);
+
+			String endDateS = filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString();
+			if(endDateS.isBlank())
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DEPARTURE_DATE_BLANK);
+			
 			endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+			
+			if(startDate.after(endDate))
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DATE_BEFORE);
+
 			
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
 					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,
-							startDate, endDate, hotelId));
+					startDate, endDate, hotelId));
 
-			EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);
-			return EntityResultTools.dofilter(res, EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
+			EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);			
+			EntityResult resFilter = EntityResultTools.dofilter(res, EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
+			
+			if(resFilter.calculateRecordNumber()==0) {
+ 				Map<String,Object> keyMapHotel = new HashMap<String,Object>();
+ 				keyMapHotel.put(HotelDao.ATTR_ID, hotelId);
+ 				List<String> columnsHotel = new ArrayList<String>();
+ 				columnsHotel.add(HotelDao.ATTR_NAME);
+				EntityResult resHotel = this.daoHelper.query(this.hotelDao, keyMapHotel, columnsHotel);
+				
+				if(resHotel.calculateRecordNumber()==0) 
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.HOTEL_NOT_EXIST);
+				}
+			return resFilter;			
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			EntityResult res = new EntityResultMapImpl();
-			res.setCode(EntityResult.OPERATION_WRONG);
-			return res;
-		}
+			}catch(ParseException e) {
+				e.printStackTrace(); 
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DATE_FORMAT);
+			}catch(NumberFormatException e) {
+				e.printStackTrace(); 
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.HOTEL_ID_FORMAT);
+			}catch (Exception e) {
+				e.printStackTrace();
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ERROR);
+			}
 
-	}
+}
 
 	/**
 	 * Search between with year.
@@ -1284,6 +1329,69 @@ public class BookingService implements IBookingService {
 		}
 		return result;
 	}
+	
+	/**
+	 * Booking ocupied query.
+	 *
+	 * @param req come the data of the rooms to consult, columns and conditions
+	 * @return the entity result return a list of ocupied rooms
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult bookingOcupiedCleanQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {			
+			int hotelId=0;
+			Date startDate;
+			Date endDate;
+			
+			if(!req.containsKey(FILTER)&&credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+				hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			}
+			if(!req.containsKey(FILTER)&&!credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.HOTEL_ID_MANDATORY);
+			}
+			if(req.containsKey(FILTER)){
+				Map<String, Object> filter = (Map<String, Object>) req.get(FILTER);
+			
+				if(filter.containsKey(BookingDao.ATTR_HTL_ID)&&credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())){
+					hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
+					int hotelIdEmp = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+					
+					if(hotelId!=hotelIdEmp) { 
+						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.NO_ACCESS_TO_HOTEL);
+					}else {
+						hotelId=hotelIdEmp;
+					}
+					
+				}
+				if(!filter.containsKey(BookingDao.ATTR_HTL_ID)&&credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+					hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+				}
+				
+				if(filter.containsKey(BookingDao.ATTR_HTL_ID)&&!credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+					hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
+				}
+				
+				if(!filter.containsKey(BookingDao.ATTR_HTL_ID)&&!credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.HOTEL_ID_MANDATORY);
+				}
+			}
+						
+			startDate = new Date();
+			endDate = new Date();
+			
+			Map<String, Object> keyMap = new HashMap<>();
+			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
+					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,
+					startDate, endDate, hotelId));
+			List<String> columns = new ArrayList<String>();
+			columns.add(RoomDao.ATTR_HTL_ID);
+			columns.add(RoomDao.ATTR_NUMBER);
 
+			EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);
+			return EntityResultTools.dofilter(res, EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
 
+		 
+	}
+	
 }

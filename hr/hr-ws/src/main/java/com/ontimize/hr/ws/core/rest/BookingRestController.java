@@ -157,4 +157,16 @@ public class BookingRestController extends ORestController<IBookingService> {
 	public EntityResult bookingFreeByCityOrHotel(@RequestBody Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 			return this.bookingService.bookingFreeByCityOrHotel(keyMap);		
 	}
+	
+	@PostMapping(value = "bookingOcupiedClean/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingOcupadoLimpiezaSearch(@RequestBody Map<String, Object> req) {
+		try {
+			return this.bookingService.bookingOcupiedCleanQuery(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+	}
 }

@@ -45,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.ontimice.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
@@ -856,6 +857,119 @@ class BookingServiceTest {
 	
 	@Test
 	@DisplayName("bookingSearchByClient")
+	void bookingSearchByClientNoEmployeeAndNoHotelID() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		//filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
+		
+		
+		List<String> attrList = new ArrayList<>();
+		attrList.add(ClientDao.ATTR_ID);
+		
+		Map<String,Object> filterClient = new HashMap<String,Object>();
+		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(ClientDao.ATTR_ID, 0);
+		result.addRecord(resultClient);
+		
+//		when(daoHelper.query(clientDao, filterClient, attrList)).thenReturn(result);
+//		  .thenReturn(result);
+		
+		
+				
+		assertEquals("Hotel id is required.", service.bookingSearchByClient(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("bookingSearchByClient")
+	void bookingSearchByClientNoEmployeeButHotelID() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
+		
+		
+		List<String> attrList = new ArrayList<>();
+		attrList.add(ClientDao.ATTR_ID);
+		
+		Map<String,Object> filterClient = new HashMap<String,Object>();
+		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(ClientDao.ATTR_ID, 0);
+		result.addRecord(resultClient);
+		
+		when(daoHelper.query(clientDao, filterClient, attrList)).thenReturn(result);
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+			.thenReturn(result);
+		
+		
+				
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.bookingSearchByClient(req).getCode());
+	}
+	
+	@Test
+	@DisplayName("bookingSearchByClient")
+	void bookingSearchByClientEmployeeAndHotelID() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		
+		filter.put(ClientDao.ATTR_NAME,"name");
+		filter.put(ClientDao.ATTR_IDENTIFICATION,"12345678A");
+		filter.put(BookingDao.ATTR_HTL_ID,1);
+		req.put("filter",filter);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+		
+		List<String> attrList = new ArrayList<>();
+		attrList.add(ClientDao.ATTR_ID);
+		
+		Map<String,Object> filterClient = new HashMap<String,Object>();
+		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(ClientDao.ATTR_ID, 0);
+		result.addRecord(resultClient);
+		
+		when(daoHelper.query(clientDao, filterClient, attrList)).thenReturn(result);
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+			.thenReturn(result);
+		
+		
+				
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.bookingSearchByClient(req).getCode());
+	}
+	
+	@Test
+	@DisplayName("bookingSearchByClient")
 	void bookingSearchByClient() {
 		Map<String, Object> req = new HashMap<String, Object>();
 		Map<String, Object> filter = new HashMap<String, Object>();
@@ -891,7 +1005,183 @@ class BookingServiceTest {
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.bookingSearchByClient(req).getCode());
 	}
 	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning")
+	void bookingOcupiedCleanQueryOk() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, "1");
 		
+		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning getting idHotel from user")
+	void bookingOcupiedCleanQueryNoFilterIdHoteUser() {
+		Map<String, Object> req = new HashMap<String, Object>();
+//		Map<String, Object> filter = new HashMap<String, Object>();
+//		filter.put(BookingDao.ATTR_HTL_ID, "1");
+//		
+//		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		 .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning")
+	void bookingOcupiedCleanQueryFilterNoIdUserId() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+//		filter.put(BookingDao.ATTR_HTL_ID, "1");
+		
+		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning with no filter")
+	void bookingOcupiedCleanQueryFilterAndUserSame() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, "1");
+		
+		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning with no filter")
+	void bookingOcupiedCleanQueryFilterAndUserNotSame() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, "2");
+		
+		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(MsgLabels.NO_ACCESS_TO_HOTEL, resultFinal.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning with no filter")
+	void bookingOcupiedCleanQueryNoFilter() {
+		Map<String, Object> req = new HashMap<String, Object>();
+//		Map<String, Object> filter = new HashMap<String, Object>();
+//		filter.put(BookingDao.ATTR_HTL_ID, "1");
+//		
+//		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+//		when(credential.getHotelFromUser("Mister X")).thenReturn(1);
+		
+//		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+//		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, resultFinal.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Booking ocupied rooms for cleanning with no filter")
+	void bookingOcupiedCleanQueryNoFilterAndUser() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+//		filter.put(BookingDao.ATTR_HTL_ID, "2");
+//		
+		req.put("filter", filter);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		result.addRecord(resultClient);
+		
+		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(userinfo);
+//		when(credential.getHotelFromUser("Mister X")).thenReturn(-1);
+		
+//		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+//		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingOcupiedCleanQuery(req);
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, resultFinal.getMessage());
+	}
+	
+	
+	
+			
 	public EntityResult createNohotelResult() {
 		return new EntityResultMapImpl(new ArrayList<>(Arrays.asList(HotelDao.ATTR_ID)));
 	}
