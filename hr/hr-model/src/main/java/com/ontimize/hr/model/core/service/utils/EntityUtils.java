@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
+import com.ontimize.hr.model.core.dao.DetailsTypeDao;
 import com.ontimize.hr.model.core.dao.EmployeeDao;
 import com.ontimize.hr.model.core.dao.EmployeeTypeDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
@@ -27,6 +28,9 @@ public class EntityUtils {
 	
 	@Autowired
 	private HotelDao hotelDao;
+	
+	@Autowired
+	private DetailsTypeDao detailsTypeDao;
 	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -86,6 +90,37 @@ public class EntityUtils {
 		if (res.getCode()== EntityResult.OPERATION_SUCCESSFUL)
 		{
 			return res.calculateRecordNumber()==1;
+		}
+		else
+		{
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	public boolean detailTypeExists(Integer detailId) {
+		Map<String, Object>keyMap = new HashMap<>();
+		keyMap.put(DetailsTypeDao.ATTR_ID, detailId);
+		EntityResult res = daoHelper.query(detailsTypeDao, keyMap, Arrays.asList(DetailsTypeDao.ATTR_ID));
+		if (res.getCode()== EntityResult.OPERATION_SUCCESSFUL)
+		{
+			return res.calculateRecordNumber()==1;
+		}
+		else
+		{
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	/**
+	 * Checks if the filter conditions returns results. Useful to chek if updates or deletes are going to affect records 
+	 * @param filter
+	 * @return
+	 */
+	public boolean detailsTypeExists(Map<String, Object> filter) {
+		EntityResult res = daoHelper.query(detailsTypeDao, filter, Arrays.asList(DetailsTypeDao.ATTR_ID));
+		if (res.getCode()== EntityResult.OPERATION_SUCCESSFUL)
+		{
+			return res.calculateRecordNumber()>=1;
 		}
 		else
 		{

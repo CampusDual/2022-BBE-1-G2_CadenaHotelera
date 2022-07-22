@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import com.ontimize.hr.api.core.service.IDetailsTypeService;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.DetailsTypeDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -24,8 +27,23 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
  * The Class DetailsTypeService.
  */
 @Service("DetailsTypeService")
-@Lazy
 public class DetailsTypeService implements IDetailsTypeService {
+
+	public static final String COLUMN_LIST_EMPTY = "COLUMN LIST EMPTY";
+
+	public static final String BAD_DATA = "BAD DATA PLEASE CHECK VALUES AND COLUMN NAMES";
+
+	public static final String NO_FILTER_OR_EMPTY = "NO FILTER OR EMPTY";
+
+	public static final String FETCHING_ERROR = "ERROR WHILE CHECKING FOR RECORDS";
+
+	public static final String BAD_FILTER = "BAD FILTER PLEASE CHECK VALUES AND COLUMN NAMES";
+
+	public static final String NO_RECORDS_TO_DELETE = "THERE ARE NO RECORDS TO DELETE";
+
+	public static final String DATA_INTEGRITY_ERROR = "DATA INTEGRITY ERROR";
+
+	public static final String DETAIL_IN_USE = "THE DETAIL TYPE IS IN USE";
 
 	public static final String DUPLICATE_CODE = "DUPLICATE_CODE";
 
@@ -41,6 +59,9 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Autowired
 	private DetailsTypeDao detailsTypeDao;
 
+	@Autowired
+	private EntityUtils entityUtils;
+
 	/**
 	 * Details type query.
 	 *
@@ -53,7 +74,13 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult detailsTypeQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
-		return this.daoHelper.query(this.detailsTypeDao, keyMap, attrList);
+		if (keyMap==null || keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,NO_FILTER_OR_EMPTY);
+		if (attrList==null || attrList.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,COLUMN_LIST_EMPTY);
+		try {
+			return this.daoHelper.query(this.detailsTypeDao, keyMap, attrList);			
+		}catch (BadSqlGrammarException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_FILTER); 
+		}
 	}
 
 	/**
@@ -99,7 +126,7 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult detailsTypeUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
-
+	
 		try {
 			if (attrMap.containsKey(DetailsTypeDao.ATTR_CODE)) {
 
@@ -112,10 +139,14 @@ public class DetailsTypeService implements IDetailsTypeService {
 				}
 			}
 			return this.daoHelper.update(this.detailsTypeDao, attrMap, keyMap);
+		}
+		catch(BadSqlGrammarException ex) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,BAD_DATA);
+		
 		} catch (DuplicateKeyException ex) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_CODE);
 		}
-
+		
 	}
 
 	/**
@@ -128,7 +159,29 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult detailsTypeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		return this.daoHelper.delete(this.detailsTypeDao, keyMap);
+		if (keyMap == null || keyMap.isEmpty())
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_FILTER_OR_EMPTY);
+		boolean thereAreRecords = false;
+		try {
+			thereAreRecords = entityUtils.detailsTypeExists(keyMap);
+		} catch (BadSqlGrammarException e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_FILTER);
+		} catch (Exception e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, FETCHING_ERROR);
+		}
+		try {
+			if (thereAreRecords) {
+				return this.daoHelper.delete(this.detailsTypeDao, keyMap);
+			} else {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_RECORDS_TO_DELETE);
+			}
+		} catch (DataIntegrityViolationException e) {
+			if (e.getMessage() != null && e.getMessage().contains("fk_details_type")) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DETAIL_IN_USE);
+			} else {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATA_INTEGRITY_ERROR);
+			}
+		}
 	}
 
 }
