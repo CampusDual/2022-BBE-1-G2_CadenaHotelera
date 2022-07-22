@@ -7,6 +7,9 @@ public class MsgLabels {
 	public static final String CLIENT_ID_MANDATORY = "CLIENT_ID_IS MANDATORY";
 	public static final String CLIENT_NAME_MANDATORY = "CLIENT_NAME_IS MANDATORY";
 	public static final String CLIENT_ID_FORMAT = "WRONG_CLIENT_ID_FORMAT";
+	public static final String CLIENT_MAIL_FORMAT = "WRONG_CLIENT_MAIL_FORMAT";
+	public static final String CLIENT_MAIL_EXISTS = "CLIENT_MAIL_ALREADY_EXISTS";
+	public static final String CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND";
 	
 	//ROOM
 	public static final String ROOM_NOT_EXIST = "ROOM_DOES_NOT_EXIST";

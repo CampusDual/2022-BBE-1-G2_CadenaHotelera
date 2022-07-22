@@ -66,9 +66,6 @@ public class BookingService implements IBookingService {
 	@Autowired  
 	private DatesSeasonDao datesSeasonDao;
 	
-	//@Autowired
-	private Season season;
-	
 	@Autowired
 	private RoomDao roomDao;
 	
@@ -77,12 +74,6 @@ public class BookingService implements IBookingService {
 
 	@Autowired
 	private CredentialUtils credentialUtils;
-
-	@Autowired
-	private HotelService hotelService;
-	
-	@Autowired
-	private RoomTypeService roomTypeService;
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
