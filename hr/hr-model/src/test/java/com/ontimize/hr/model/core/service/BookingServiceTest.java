@@ -333,7 +333,7 @@ class BookingServiceTest {
 	void testBudgetLowerDepartureDate() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage("DEPARTURE_DATE_BEFORE_ENTRY_DATE");
+		result.setMessage(MsgLabels.DATE_BEFORE);
 
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
@@ -774,7 +774,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(MsgLabels.ROOM_NOT_EXIST,result.getMessage());
+		assertEquals(MsgLabels.ROOM_TYPE_FORMAT,result.getMessage());
 	}
 	
 	@Test
@@ -792,7 +792,7 @@ class BookingServiceTest {
 //		when(credential.isUserEmployee("Mister X")).thenReturn(false);
 //		when(daoHelper.getUser()).thenReturn(userinfo);
 						
-		assertEquals("Client name is required.", service.bookingSearchByClient(req).getMessage());
+		assertEquals(MsgLabels.CLIENT_NAME_MANDATORY, service.bookingSearchByClient(req).getMessage());
 	}
 	
 	@Test
@@ -811,7 +811,7 @@ class BookingServiceTest {
 //		when(daoHelper.getUser()).thenReturn(userinfo);
 		
 				
-		assertEquals("Client identification is required.", service.bookingSearchByClient(req).getMessage());
+		assertEquals(MsgLabels.CLIENT_ID_MANDATORY, service.bookingSearchByClient(req).getMessage());
 	}
 	
 	@Test
@@ -830,7 +830,7 @@ class BookingServiceTest {
 		when(daoHelper.getUser()).thenReturn(userinfo);
 		
 				
-		assertEquals("Hotel id is required.", service.bookingSearchByClient(req).getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, service.bookingSearchByClient(req).getMessage());
 	}
 	
 	@Test
@@ -860,7 +860,7 @@ class BookingServiceTest {
 		
 		
 				
-		assertEquals("Client does not exist", service.bookingSearchByClient(req).getMessage());
+		assertEquals(MsgLabels.CLIENT_NOT_EXISTS, service.bookingSearchByClient(req).getMessage());
 	}
 	
 	@Test
@@ -897,7 +897,7 @@ class BookingServiceTest {
 		
 		
 				
-		assertEquals("Hotel id is required.", service.bookingSearchByClient(req).getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, service.bookingSearchByClient(req).getMessage());
 	}
 	
 	@Test
