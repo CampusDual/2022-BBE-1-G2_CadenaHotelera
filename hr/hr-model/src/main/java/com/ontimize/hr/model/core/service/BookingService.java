@@ -68,9 +68,6 @@ public class BookingService implements IBookingService {
 	@Autowired  
 	private DatesSeasonDao datesSeasonDao;
 	
-	//@Autowired
-	private Season season;
-	
 	@Autowired
 	private RoomDao roomDao;
 	
@@ -623,9 +620,12 @@ public class BookingService implements IBookingService {
 			Date endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 
 			Map<String, Object> keyMap = new HashMap<>();
-			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
-					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,
-					startDate, endDate, idHotel));
+			BasicExpression bexp = new BasicExpression(
+					searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,startDate, endDate, idHotel),
+					BasicOperator.OR_OP,
+					searchBetweenStatus(RoomDao.ATTR_STATUS_START,RoomDao.ATTR_STATUS_END,RoomDao.ATTR_STATUS_ID,startDate ,endDate));
+
+			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,bexp);
 
 			EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_FREE_ROOMS);
 
