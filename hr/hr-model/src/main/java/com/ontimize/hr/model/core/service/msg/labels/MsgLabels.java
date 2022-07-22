@@ -1,6 +1,10 @@
-package com.ontimice.hr.model.core.service.msg.labels;
+package com.ontimize.hr.model.core.service.msg.labels;
 
 public class MsgLabels {
+	
+	//ROOM
+	public static final String COLUMNS_HOTEL_ID_MANDATORY = "COLUMN_ROM_HTL_ID_IS_MANDATORY";
+	public static final String COLUMNS_ROOM_NUMBER_MANDATORY = "COLUMN_ROM_NUMBER_IS_MANDATORY";
 	
 	//ROOM_TYPE
 	public static final String ROOM_TYPE_NOT_EXIST = "ROOM_ TYPE_DOES_NOT_EXIST";
@@ -27,8 +31,6 @@ public class MsgLabels {
 	public static final String HOTEL_ID_FORMAT = "WRONG_HOTEL_ID_FORMAT";
 	
 	public static final String NO_ACCESS_TO_HOTEL = "NO_ACCES_TO_REQUEST_HOTEL";
-	
-	public static final String COLUMNS_HOTEL_ID_MANDATORY = "COLUMN_HOTEL_ID_IS_MANDATORY";
 	
 	public static final String HOTEL_NOT_EXIST = "HOTEL_NOT_EXIST";
 	

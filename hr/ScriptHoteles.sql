@@ -86,6 +86,8 @@ CONSTRAINT FK_TSERVER_PERMISSION FOREIGN KEY(ID_SERVER_PERMISSION) REFERENCES PU
 INSERT INTO TUSER VALUES('god','password','name','surname',NULL,'44460713B',NULL,NULL,NULL);
 INSERT INTO TROLE VALUES(0,'admin','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 INSERT INTO TUSER_ROLE(id_rolename,user_) VALUES(0,'god');
+
+
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.jee.common.services.user.IUserInformationService/getUserInformation');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IUserService/userQuery');
@@ -617,6 +619,8 @@ values(10,'2022-06-29',1,350,true),
 insert into trole(rolename,xmlclientpermission) values('recepcionista','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 insert into trole(rolename,xmlclientpermission) values('botones','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 
+
+
 insert into tuser (user_,password,name,surname,email,nif) values('juan','password','juan','Perico','juan-perioc@examlpe.com','11223344J');
 insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
 
@@ -631,7 +635,8 @@ values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','ju
 insert into tuser_role(id_rolename,user_) values(1,'juan');
 insert into tuser_role(id_rolename,user_) values(2,'Mario');
 
-insert into trole_server_permission(id_rolename,id_server_permission) values(1,14);
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeQuery'));
 
 
 
