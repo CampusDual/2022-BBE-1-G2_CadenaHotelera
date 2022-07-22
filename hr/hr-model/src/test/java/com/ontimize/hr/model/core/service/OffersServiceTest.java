@@ -6,10 +6,14 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
 
 import com.ontimize.hr.model.core.dao.OffersDao;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -32,6 +37,9 @@ class OffersServiceTest {
 	
 	@Mock
 	private OffersDao offersDao;
+	
+	@Mock
+	private EntityUtils entityUtils;
 	
 	@InjectMocks
 	private OffersService service;
@@ -429,5 +437,238 @@ class OffersServiceTest {
 		assertEquals(OffersService.BAD_DATA, result.getMessage());
 
 	}
+	
+	@Test
+	@DisplayName("No filter date range query")
+	void OffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.EMPTY_PARAMETERS, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("No start date range query")
+	void NoStartDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		
+		keyMap.put("qry_end", "2022-07-21");
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.START_DATE_MANDATORY, res.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("Bad start date range query")
+	void badDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "adsflokasd");
+		keyMap.put("qry_end", "2022-07-21");
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.BAD_START_DATE_FORMAT, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("No end date range query")
+	void noEndDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.END_DATE_MANDATORY, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("bad end date range query")
+	void badEndDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "asdfasdf");
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.BAD_END_DATE_FORMAT, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("null start date range query")
+	void nullStartDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", null);
+		keyMap.put("qry_end", null);
+		
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.NULL_DATE_QRY_START, res.getMessage());
+	}
+
+	@Test
+	@DisplayName("null end date range query")
+	void nullEndDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", null);
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.NULL_DATE_QRY_END, res.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("end before start date range query")
+	void endBeforeStartDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-20");
+				
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.END_BEFORE_START, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("bad room type start date range query")
+	void badRoomTypeDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_ROOM_TYPE_ID, "a");
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.BAD_TYPE_FORMAT, res.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("bad Hotel id start date range query")
+	void badHotelDateOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_HTL_OFFER, "a");
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.BAD_HOTEL_ID_FORMAT, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("fake good query no results start date range query")
+	void fakeGoodOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+		assertEquals(0, res.calculateRecordNumber());
+	}
+	
+	@Test
+	@DisplayName("fake good query no results date range query")
+	void fakeGoodHotelGoodOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+		when(entityUtils.hotelExists(1)).thenReturn(true);
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+		assertEquals(0, res.calculateRecordNumber());
+	}
+	
+	@Test
+	@DisplayName("fake good query with results date range query")
+	void fakeGoodWithResultsOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
+		EntityResult fakeResults = new EntityResultMapImpl(attrList);
+		fakeResults.addRecord(new HashMap<String, Object>()
+		{{
+			put(OffersDao.ATTR_ID,1);
+			put(OffersDao.ATTR_HTL_OFFER,1);
+			Calendar c = Calendar.getInstance();
+			c.set(2022,07,21);
+			Date date = c.getTime();
+			put(OffersDao.ATTR_DAY,date);
+			put(OffersDao.ATTR_ROOM_TYPE_ID,1);
+			put(OffersDao.ATTR_NIGHT_PRICE,125D);
+		}});
+		
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(fakeResults);
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+		assertEquals(1, res.calculateRecordNumber());
+	}
+	
+	@Test
+	@DisplayName("Inexistent hotel date range query")
+	void inexistentHotelOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+		when(entityUtils.hotelExists(1)).thenReturn(false);
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.HOTEL_NOT_EXIST, res.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("Inexistent room type date range query")
+	void inexistentRoomTypeOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
+		keyMap.put(OffersDao.ATTR_ROOM_TYPE_ID, 1);
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+		when(entityUtils.hotelExists(1)).thenReturn(true);
+		when(entityUtils.roomTypeExists(1)).thenReturn(false);
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.ROOM_TYPE_NOT_EXIST, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Inexistent room type date range query")
+	void inexistentColumnOffersByDateRangeQueryTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID,OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
+		keyMap.put("qry_start", "2022-07-21");
+		keyMap.put("qry_end", "2022-07-23");
+		keyMap.put("made_up_column", "blerg");
+		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenThrow(new BadSqlGrammarException(null, null, null));
+		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(OffersService.BAD_DATA, res.getMessage());
+	}
+	
 	
 }

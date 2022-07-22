@@ -36,10 +36,11 @@ public class OffersRestController extends ORestController<IOffersService> {
 		List<String> attrList=new ArrayList<>(Arrays.asList(OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID,OffersDao.ATTR_DAY));
 		
 		try {
-			keyMap = (Map<String, Object>)req.get("filter");
+			if (req.containsKey("filter"))
+				keyMap = (Map<String, Object>)req.get("filter");
 			
 		} catch (Exception e){
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"No filter");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"UNKNOWN ERROR");
 		}
 		return this.offersService.offersByDateRangeQuery(keyMap	,attrList);				
 	}

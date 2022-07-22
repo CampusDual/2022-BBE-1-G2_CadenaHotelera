@@ -34,6 +34,7 @@ import com.ontimize.jee.common.gui.SearchValue;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.common.tools.BasicExpressionTools;
 import com.ontimize.jee.common.tools.BasicExpressionTools.BetweenDateFilter;
+import com.ontimize.jee.common.tools.EntityResultTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 /**
@@ -42,6 +43,30 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("OffersService")
 @Lazy
 public class OffersService implements IOffersService {
+
+	public static final String EMPTY_PARAMETERS = "EMPTY PARAMETERS";
+
+	public static final String START_DATE_MANDATORY = "START DATE IS MANDATORY";
+
+	public static final String BAD_START_DATE_FORMAT = "BAD DATE FORMAT qry_start";
+
+	public static final String NULL_DATE_QRY_START = "NULL DATE qry_start";
+
+	public static final String END_DATE_MANDATORY = "END DATE IS MANDATORY";
+
+	public static final String BAD_END_DATE_FORMAT = "BAD DATE FORMAT qry_end";
+
+	public static final String NULL_DATE_QRY_END = "NULL DATE qry_end";
+
+	public static final String END_BEFORE_START = "END DATE BEFORE START DATE";
+
+	public static final String BAD_TYPE_FORMAT = "BAD TYPE FORMAT";
+
+	public static final String BAD_HOTEL_ID_FORMAT = "BAD HOTEL ID FORMAT";
+
+	public static final String ROOM_TYPE_NOT_EXIST = "ROOM TYPE DOES NOT EXIST";
+
+	public static final String HOTEL_NOT_EXIST = "HOTEL DOES NOT EXIST";
 
 	public static final String NIGHT_PRICE_MANDATORY = "Night price is mandatory";
 
@@ -214,44 +239,44 @@ public class OffersService implements IOffersService {
 	@Override
 	@Secured({PermissionsProviderSecured.SECURED})
 	public EntityResult offersByDateRangeQuery(Map<String, Object>keyMap,List<String>columns) {
-		if (keyMap==null || keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "EMPTY PARAMETERS");
+		if (keyMap==null || keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, EMPTY_PARAMETERS);
 		
 		Date startDate = null;
 		if (!keyMap.containsKey("qry_start")) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "START DATE IS MADATORY");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, START_DATE_MANDATORY);
 		}else {
 			try {
 				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_start").toString());				
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD DATE FORMAT qry_start");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_START_DATE_FORMAT);
 			}
 			catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NULL DATE qry_start");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NULL_DATE_QRY_START);
 			}
 		}
 		
 		Date endDate = null;
 		if (!keyMap.containsKey("qry_end")) {
-			 return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "END DATE IS MADATORY");
+			 return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, END_DATE_MANDATORY);
 		}else {
 			try {
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_end").toString());
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD DATE FORMAT qrt_end");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_END_DATE_FORMAT);
 			}
 			catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "NULL DATE qry_end");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NULL_DATE_QRY_END);
 			}
 		}
 		
-		if (endDate.before(startDate)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"END DATE BEFORE START DATE");
+		if (endDate.before(startDate)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,END_BEFORE_START);
 		Integer roomType = null;
 		if (keyMap.containsKey(OffersDao.ATTR_ROOM_TYPE_ID)) {
 			try {
 				roomType = Integer.valueOf(keyMap.get(OffersDao.ATTR_ROOM_TYPE_ID).toString());
 				
 			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD TYPE FORMAT");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_TYPE_FORMAT);
 			}
 	}
 		Integer hotelId =null;
@@ -259,7 +284,7 @@ public class OffersService implements IOffersService {
 			try {
 				hotelId = Integer.valueOf(keyMap.get(OffersDao.ATTR_HTL_OFFER).toString());
 			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "BAD HOTEL ID FORMAT");
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_HOTEL_ID_FORMAT);
 			}
 		}		
 		
@@ -282,12 +307,13 @@ public class OffersService implements IOffersService {
 				 queryExpression= BasicExpressionTools.combineExpression(queryExpression,hotelExpression);
 			}
 			keyMapQuery.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, queryExpression);
+			
 		try {
 			EntityResult res = daoHelper.query(offersDao, keyMapQuery, columns);
 			if (res.getCode()==EntityResult.OPERATION_SUCCESSFUL && res.calculateRecordNumber()==0)
 			{
-				if (hotelId!=null && !entityUtils.hotelExists(hotelId)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"HOTEL DOES NOT EXIST");
-				if (roomType!=null && !entityUtils.roomTypeExists(roomType)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"ROOM TYPE DOES NOT EXIST");
+				if (hotelId!=null && !entityUtils.hotelExists(hotelId)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,HOTEL_NOT_EXIST);
+				if (roomType!=null && !entityUtils.roomTypeExists(roomType)) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,ROOM_TYPE_NOT_EXIST);
 			}
 			return res;			
 		}catch (BadSqlGrammarException e) {
