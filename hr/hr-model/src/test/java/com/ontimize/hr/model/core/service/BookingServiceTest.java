@@ -1773,6 +1773,207 @@ class BookingServiceTest {
 		assertEquals(MsgLabels.ERROR, resultFinal.getMessage());
 	}
 	
+	@Test
+	@DisplayName("Booking free rooms by type OK")
+	void bookingFreeRoomsByTypeQueryOk() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-06-18");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		req.put("filter", filter);
+		req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking free rooms by type no columns")
+	void bookingFreeRoomsByTypeQueryNoCOlumns() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-06-18");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		req.put("filter", filter);
+		//req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+//		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+//		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(MsgLabels.COLUMNS_MANDATORY, resultFinal.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Booking free rooms by type no filter")
+	void bookingFreeRoomsByTypeQueryNoFilter() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-06-18");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		//req.put("filter", filter);
+		req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+//		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
+//		  .thenReturn(result);
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(MsgLabels.FILTER_MANDATORY, resultFinal.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Booking free rooms by type no filter")
+	void bookingFreeRoomsByTypeQueryNumberFormatException() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, "a");
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-06-18");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		req.put("filter", filter);
+		req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+//		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(EntityResult.OPERATION_WRONG, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking free rooms by type no filter")
+	void bookingFreeRoomsByTypeQueryParseException() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "a");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		req.put("filter", filter);
+		req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+//		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(EntityResult.OPERATION_WRONG, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("Booking free rooms by type no filter")
+	void bookingFreeRoomsByTypeException() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_HTL_ID, 1);
+		filter.put(RoomDao.ATTR_TYPE_ID, 1);
+		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-06-18");
+		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-06-22");
+		
+		List<String> columns = new ArrayList<String>();
+		columns.add(RoomDao.ATTR_HTL_ID);
+		columns.add(RoomDao.ATTR_NUMBER);
+		
+		
+		req.put("filter", filter);
+		req.put("columns", columns);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> resultClient = new HashMap<String,Object>();
+		resultClient.put(RoomDao.ATTR_HTL_ID, 1);
+		resultClient.put(RoomDao.ATTR_TYPE_ID, 1);
+		result.addRecord(resultClient);
+		
+//		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+//		when(credential.isUserEmployee("Mister X")).thenReturn(false);
+//		when(daoHelper.getUser()).thenReturn(userinfo);
+		
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString())).thenThrow(new RuntimeException());
+		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
+		assertEquals(EntityResult.OPERATION_WRONG, resultFinal.getCode());
+	}
+	
 	
 	
 			
