@@ -62,6 +62,7 @@ import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.services.user.UserInformation;
 
 
@@ -100,6 +101,9 @@ class BookingServiceTest {
 	@Mock
 	private ClientDao clientDao;
 	
+	@Mock
+	private Utils utils;
+	
 
 	@Test
 	@DisplayName("ID room type wrong format")
@@ -113,7 +117,7 @@ class BookingServiceTest {
 		EntityResult er = service.getBudget(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.INCORRECT_TYPE_ROOM_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.ROOM_TYPE_FORMAT, er.getMessage());
 	}
 
 	@Test
@@ -129,7 +133,7 @@ class BookingServiceTest {
 		EntityResult er = service.getBudget(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.INCORRECT_HOTEL_ID_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_FORMAT, er.getMessage());
 	}
 
 	@Test
@@ -137,7 +141,7 @@ class BookingServiceTest {
 	void testGetBudgetHotelNotExists() {
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 200);
 
@@ -145,7 +149,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_HOTEL_NOT_EXISTS, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
 	}
 
 	@Test
@@ -154,7 +158,7 @@ class BookingServiceTest {
 	
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 
@@ -169,7 +173,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_ROOM_TYPE_NOT_EXISTS, er.getMessage());
+		assertEquals(MsgLabels.ROOM_TYPE_NOT_EXIST, er.getMessage());
 
 	}
 
@@ -179,7 +183,7 @@ class BookingServiceTest {
 		
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "13/07/2022");
@@ -200,7 +204,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_PARSE_START_DAY, er.getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT, er.getMessage());
 
 	}
 
@@ -210,7 +214,7 @@ class BookingServiceTest {
 
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 
@@ -230,7 +234,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_START_DAY_MANDATORY, er.getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_MANDATORY, er.getMessage());
 	}
 
 	@Test
@@ -239,7 +243,7 @@ class BookingServiceTest {
 	
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
@@ -261,7 +265,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_PARSE_END_DAY, er.getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT, er.getMessage());
 	}
 
 	@Test
@@ -269,7 +273,7 @@ class BookingServiceTest {
 	void testBudgetEndDayMandatory() {
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
@@ -290,7 +294,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.ERROR_END_DAY_MANDATORY, er.getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_MANDATORY, er.getMessage());
 	}
 
 	@Test
@@ -299,7 +303,7 @@ class BookingServiceTest {
 
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
@@ -321,7 +325,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.SAME_DATES_ERROR, er.getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE, er.getMessage());
 	}
 
 	@Test
@@ -333,7 +337,7 @@ class BookingServiceTest {
 
 		Map<String, Object> req = new HashMap<>();
 		Map<String, Object> filter = new HashMap<String, Object>();
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-06");
@@ -368,7 +372,7 @@ class BookingServiceTest {
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
 		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-05");
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 
 		EntityResult queryHotel = new EntityResultMapImpl();
 		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
@@ -392,7 +396,7 @@ class BookingServiceTest {
 		
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(BookingService.NO_FREE_ROOMS, er.getMessage());
+		assertEquals(MsgLabels.NO_FREE_ROOMS, er.getMessage());
 	}
 
 	
@@ -405,7 +409,7 @@ class BookingServiceTest {
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
 		filter.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-01");
 		filter.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-05");
-		req.put(BookingService.FILTER, filter);
+		req.put(Utils.FILTER, filter);
 
 		EntityResult queryHotel = new EntityResultMapImpl();
 		Map<String, Object> resultQueryHotel = new HashMap<String, Object>();
@@ -470,7 +474,7 @@ class BookingServiceTest {
 		
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.REQUEST_NO_FILTER, result.getMessage());
+		assertEquals(MsgLabels.FILTER_MANDATORY, result.getMessage());
 	}
 	
 	
@@ -488,7 +492,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.CITY_HOTEL_ID_EXCLUSIVE, result.getMessage());
+		assertEquals(MsgLabels.CITY_HOTEL_ID_EXCLUSIVE, result.getMessage());
 	}
 	
 	@Test
@@ -508,7 +512,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.ERROR_HOTELS, result.getMessage());
+		assertEquals(MsgLabels.HOTEL_QUERY_ERROR, result.getMessage());
 	}
 	
 	@Test
@@ -528,7 +532,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.NO_HOTELS_FOUND, result.getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_FOUND, result.getMessage());
 	}
 	
 	@Test
@@ -547,7 +551,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.NO_START_DATE, result.getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_MANDATORY, result.getMessage());
 	}
 	
 	
@@ -570,7 +574,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.START_DATE_FORMAT, result.getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT, result.getMessage());
 	}
 	
 	@Test
@@ -592,7 +596,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.NO_END_DATE, result.getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_MANDATORY, result.getMessage());
 	}
 	
 	@Test
@@ -615,7 +619,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.END_DATE_FORMAT, result.getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT, result.getMessage());
 	}
 	
 	
@@ -638,7 +642,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.DATES_REVERSED, result.getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE, result.getMessage());
 	}
 	
 	
@@ -746,7 +750,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.ROOM_TYPE_NOT_EXIST,result.getMessage());
+		assertEquals(MsgLabels.ROOM_TYPE_NOT_EXIST,result.getMessage());
 	}
 	
 	
@@ -770,7 +774,7 @@ class BookingServiceTest {
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(BookingService.TYPE_FORMAT,result.getMessage());
+		assertEquals(MsgLabels.ROOM_NOT_EXIST,result.getMessage());
 	}
 	
 	@Test

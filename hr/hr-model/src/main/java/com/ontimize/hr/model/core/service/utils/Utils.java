@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
 
 public class Utils {
 	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
+	public static final String DATA = "data";
+	public static final String COLUMNS = "columns";
+	public static final String FILTER = "filter";
 
 	private Utils() {
 
