@@ -16,9 +16,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
@@ -76,6 +78,9 @@ public class BookingService implements IBookingService {
 	private ClientDao clientDao;
 
 	@Autowired
+	private BookingDetailsDao bookingDetailsDao;
+	
+	@Autowired
 	private CredentialUtils credentialUtils;
 
 	@Autowired
@@ -83,6 +88,7 @@ public class BookingService implements IBookingService {
 	
 	@Autowired
 	private RoomTypeService roomTypeService;
+
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -458,6 +464,7 @@ public class BookingService implements IBookingService {
 	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
+	@Transactional(rollbackFor = Exception.class)
 	public EntityResult bookingByType(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		if (!req.containsKey(Utils.DATA))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,MsgLabels.DATA_MANDATORY);
@@ -484,12 +491,6 @@ public class BookingService implements IBookingService {
 		if (departureDate.before(entryDate))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_BEFORE);
 
-		if (!departureDate.equals(entryDate)) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(departureDate);
-			cal.add(Calendar.DAY_OF_YEAR, -1);
-			departureDate = new java.sql.Date(cal.getTimeInMillis());
-		}
 
 		Integer hotelId;
 
@@ -565,6 +566,18 @@ public class BookingService implements IBookingService {
 		try {
 			EntityResult result = this.bookingInsert(insert);
 			result.put(BookingDao.ATTR_ROM_NUMBER, roomid);
+			if (result.getCode()== EntityResult.OPERATION_SUCCESSFUL)
+			{
+				Map<Date, Double> prices = priceByDay(auxHotelID, roomType, entryDate, departureDate);
+				prices.forEach((day,price)->{
+					daoHelper.insert(bookingDao, new HashMap<String, Object>(){{
+						put(BookingDetailsDao.ATTR_BOOKING_ID, result.get(BookingDao.ATTR_ID));
+						put(BookingDetailsDao.ATTR_DATE,day);
+						put(bookingDetailsDao.ATTR_PRICE,price);
+					}});
+				});
+			
+			}
 			return result;
 		} catch (DuplicateKeyException e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_DUPLICATE);
