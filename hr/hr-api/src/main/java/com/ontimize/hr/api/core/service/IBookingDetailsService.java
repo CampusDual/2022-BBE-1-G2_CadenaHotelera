@@ -17,4 +17,6 @@ public interface IBookingDetailsService {
 				throws OntimizeJEERuntimeException;
 
 		public EntityResult bookingDetailsDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+			
+		public EntityResult bookingDetailsAdd(Map<String, Object>keyMap) throws OntimizeJEERuntimeException;
 }

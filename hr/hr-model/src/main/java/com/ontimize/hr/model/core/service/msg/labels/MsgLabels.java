@@ -35,13 +35,20 @@ public class MsgLabels {
 	public static final String BOOKING_STARTED = "BOOKING_ALREADY_STARTED";
 	public static final String BOOKING_NO_CHANGES = "UNABLE_TO_CHANGE_BOOKING";
 	
+	public static final String BOOKING_NOT_ACTIVE = "BOOKING NOT ACTIVE";
+	
 	//BOOKING_DETAILS
+	public static final String BOOKING_DETAILS_BOOKING_ID_MANDATORY = "BOK_DET_BOK_ID_MANDATORY ";
+	public static final String BOOKING_DETAILS_BOOKING_ID_FORMAT = "BOK_DET_BOK_ID_BAD_FORMAT ";
 	public static final String BOOKING_DETAILS_TYPE_MANDATORY = "DETAILS_TYPE_ID_MANDATORY";
 	public static final String BOOKING_DETAILS_PRICE_MANDATORY = "PRICE_MANDATORY";
+	public static final String BOOKING_DETAILS_PRICE_NEGATIVE = "PRICE_NEGATIVE";
 	public static final String BOOKING_DETAILS_PAID_MANDATORY = "PAID_MANDATORY";
-	
+	public static final String BOOKING_DETAILS_DATE_TODAY= "ONLY TODAY ALLOWED";
 	public static final String BOOKING_DETAILS_PRICE_FORMAT = "PRICE_FORMAT";
 	public static final String BOOKING_DETAILS_TYPE_FORMAT = "DETAILS_TYPE_FORMAT";
+	
+	
 	
 	public static final String BOOKING_DETAILS_TYPE_NOT_EXISTS = "DETAILS_TYPE_NOT_EXISTS";
 	

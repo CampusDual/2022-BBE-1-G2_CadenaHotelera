@@ -168,6 +168,7 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsInsert');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsUpdate');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsAdd');
 
 
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
@@ -247,6 +248,7 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,6
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,64);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,65);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,66);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,67);
 
 select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 from trole_server_permission t
