@@ -37,4 +37,16 @@ public class ClientRestController extends ORestController<IClientService> {
 			return res;
 		}
 	}
+	
+	@PostMapping(value = "sendMailClients", produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult sendMailClients(@RequestBody Map<String, Object> req) {
+		try {
+			return this.clientService.sendMailClients(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+	}
 }

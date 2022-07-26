@@ -1,11 +1,16 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -33,6 +38,16 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class ClientService implements IClientService {
 
+	public static final String DATE_MANDATORY = "DATE_MANDATORY";
+
+	public static final String PARSE_DATE = "PARSE_DATE";
+
+	public static final String WRONG_HOTEL_FORMAT = "WRONG_HOTEL_FORMAT";
+
+	public static final String DATE_REQUIRED = "DATE_REQUIRED";
+
+	public static final String HOTEL_REQUIRED = "HOTEL_REQUIRED";
+
 	public static final String ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL = "ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL";
 
 	public static final String MAIL_ALREADY_EXISTS_IN_OUR_DATABASE = "MAIL_ALREADY_EXISTS_IN_OUR_DATABASE";
@@ -41,7 +56,7 @@ public class ClientService implements IClientService {
 
 	@Autowired
 	private ClientDao clientDao;
-	
+
 	@Autowired
 	private HotelDao hotelDao;
 
@@ -101,8 +116,14 @@ public class ClientService implements IClientService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientsInDateQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
+
+		return getClientsDate(req);
+	}
+
+	public EntityResult getClientsDate(Map<String, Object> req) {
+		
 		List<String> columns = new ArrayList<String>();
-		Map<String, Object> filter = new HashMap<String,Object>();		
+		Map<String, Object> filter = new HashMap<String,Object>();
 		
 		try {
 			if(!req.containsKey(Utils.COLUMNS)) 
@@ -111,15 +132,40 @@ public class ClientService implements IClientService {
 			if(!req.containsKey(Utils.FILTER)) 
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
 			filter = (Map<String, Object>) req.get(Utils.FILTER);
+			Date date = null;
+			int hotelId;
 
-			int hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
+			if (!filter.containsKey(BookingDao.ATTR_HTL_ID)) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_REQUIRED);
 
+			}
+
+			if (!filter.containsKey("qry_date")) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATE_REQUIRED);
+
+			}
+			try {
+				hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
+			} catch (NumberFormatException ex) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_HOTEL_FORMAT);
+
+			}
+
+			// check date
+			try {
+				date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
+			} catch (ParseException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PARSE_DATE);
+			} catch (NullPointerException e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATE_MANDATORY);
+
+			}
 			// Check exists hotel
 			Map<String, Object> keyMapHotel = new HashMap<>();
 			keyMapHotel.put(HotelDao.ATTR_ID, hotelId);
 			List<String> attrList = new ArrayList<>();
 			attrList.add(HotelDao.ATTR_NAME);
-			EntityResult existsHotel =  daoHelper.query(hotelDao, keyMapHotel, attrList);
+			EntityResult existsHotel = daoHelper.query(hotelDao, keyMapHotel, attrList);
 			if (existsHotel.calculateRecordNumber() == 0) {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.HOTEL_NOT_EXIST);
 			}
@@ -128,9 +174,8 @@ public class ClientService implements IClientService {
 			Date fechaPasada = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
 
 			Map<String, Object> keyMap = new HashMap<>();
-			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
-					searchClientInDate(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE,
-							BookingDao.ATTR_HTL_ID, fechaPasada, hotelId));
+			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, searchClientInDate(
+					BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, BookingDao.ATTR_HTL_ID, date, hotelId));
 
 			EntityResult res = daoHelper.query(this.clientDao, keyMap, columns, ClientDao.QUERY_CLIENTS_DATE);
 
@@ -144,11 +189,37 @@ public class ClientService implements IClientService {
 		} catch (Exception e) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,"");
 		}
-
 	}
 
-	BasicExpression searchClientInDate(String entryDate, String departureDate, String hotelIdS,
-			Date fechaPasada, int hotelId) {
+	@Override
+	// secure
+	public EntityResult sendMailClients(Map<String, Object> req) {
+		req.put("columns", Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,
+				ClientDao.ATTR_IDENTIFICATION, ClientDao.ATTR_PHONE, BookingDao.ATTR_ROM_NUMBER));
+
+		EntityResult er = getClientsDate(req);
+
+		if (er.getCode() == EntityResult.OPERATION_WRONG) {
+			return er;
+		}
+
+		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
+		String date = (String) filter.get("qry_date");
+		String nameJSON = "Exceptions-Hotels_clients_" + date + "_.json";
+
+		Utils.createJSONClients(er, nameJSON);
+
+		try {
+			Utils.sendMail(date, nameJSON);
+		} catch (Exception ex) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_SENDING_MAIL");
+		}
+
+		return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 12, "EMAIL_SENT");
+	}
+
+	BasicExpression searchClientInDate(String entryDate, String departureDate, String hotelIdS, Date fechaPasada,
+			int hotelId) {
 
 		BasicField entry = new BasicField(entryDate);
 		BasicField departure = new BasicField(departureDate);

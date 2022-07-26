@@ -23,7 +23,12 @@ public class CredentialUtils {
 	
 	@Autowired
 	private EmployeeTypeDao employeeTypeDao;
+	
+	public static final String sender = "exceptions.hotels@gmail.com";
 
+	public static final String password = "zyzvvhjmvkembeqh";
+
+	public static final String receiver = "mario1plaza@gmail.com";
 	
 	public int getHotelFromUser(String user) {
 		List<String> columns = new ArrayList<>();

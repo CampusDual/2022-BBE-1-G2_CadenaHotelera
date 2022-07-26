@@ -1,11 +1,42 @@
 package com.ontimize.hr.model.core.service.utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.ClientDao;
+import com.ontimize.hr.model.core.service.utils.entitys.Client;
+import com.ontimize.jee.common.dto.EntityResult;
+
+import java.util.Properties;
 
 public class Utils {
+
+	@Autowired
+	private CredentialUtils credentialsUtils;
+
 	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 	public static final String DATA = "data";
 	public static final String COLUMNS = "columns";
@@ -81,5 +112,84 @@ public class Utils {
 
 	public static int daysBetween(Date d1, Date d2) {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+	}
+
+	public static void sendMail(String date, String nameJSON) throws MessagingException,AddressException {
+		
+		Properties props = new Properties();
+
+		props.put("mail.smtp.host", "smtp.gmail.com");
+
+		props.put("mail.smtp.socketFactory.port", "465");
+
+		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+		props.put("mail.smtp.auth", "true");
+
+		props.put("mail.smtp.port", "465");
+
+		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(CredentialUtils.sender, CredentialUtils.password);
+			}
+		});
+
+	
+
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(CredentialUtils.sender));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(CredentialUtils.receiver));
+
+			message.setSubject("Exceptions Hotels customer relationship");
+
+			BodyPart messageBodyPart = new MimeBodyPart();
+
+			messageBodyPart.setText(
+					"In the following email we attach in a json file the list of clients requested for the date " + date
+							+ "\n" + "\n" + "\n"
+							+ " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ");
+
+			Multipart multipart = new MimeMultipart();
+			multipart.addBodyPart(messageBodyPart);
+
+			messageBodyPart = new MimeBodyPart();
+
+			DataSource source = new FileDataSource(nameJSON);
+			messageBodyPart.setDataHandler(new DataHandler(source));
+			messageBodyPart.setFileName(nameJSON);
+			multipart.addBodyPart(messageBodyPart);
+
+			message.setContent(multipart);
+
+			Transport.send(message);
+	}
+
+	public static void createJSONClients(EntityResult er, String nameJSON) {
+		List<Client> listaClientes = new ArrayList<>();
+
+		int nClientes = er.calculateRecordNumber();
+
+		for (int i = 0; i < nClientes; i++) {
+			String name = er.getRecordValues(i).get(ClientDao.ATTR_NAME).toString();
+			String surname = er.getRecordValues(i).get(ClientDao.ATTR_SURNAME1).toString();
+			String surname2 = er.getRecordValues(i).get(ClientDao.ATTR_SURNAME2).toString();
+			String identification = er.getRecordValues(i).get(ClientDao.ATTR_IDENTIFICATION).toString();
+			String phone = er.getRecordValues(i).get(ClientDao.ATTR_PHONE).toString();
+			String room = er.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).toString();
+			listaClientes.add(new Client(name, surname, surname2, identification, phone, room));
+		}
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String json = gson.toJson(listaClientes);
+
+		try (FileWriter file = new FileWriter(nameJSON)) {
+			file.write(json);
+			file.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

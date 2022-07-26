@@ -21,4 +21,6 @@ public interface IClientService {
 	
 	public EntityResult clientsInDateQuery(Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException;
+
+	EntityResult sendMailClients(Map<String, Object> req) throws OntimizeJEERuntimeException;
 }
