@@ -6,8 +6,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -16,9 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 
 import org.junit.jupiter.api.DisplayName;
@@ -33,8 +29,8 @@ import org.springframework.dao.DuplicateKeyException;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
-import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -56,7 +52,6 @@ class ClientServiceTest {
 	@Mock
 	private Utils utils;
 
-	private ClientService clientService;
 	
 	@Test
 	@DisplayName("Query client")
@@ -67,7 +62,7 @@ class ClientServiceTest {
 		List<String> attrList = new ArrayList<String>();
 		attrList.add(ClientDao.ATTR_IDENTIFICATION);
 		when(daoHelper.query(isA(ClientDao.class), anyMap(), any())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,clientService.clientQuery(keyMap, attrList).getCode());
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientQuery(keyMap, attrList).getCode());
 	}
 	
 	@Test
@@ -77,7 +72,7 @@ class ClientServiceTest {
 		keyMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
 		
 		when(daoHelper.delete(isA(ClientDao.class), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,clientService.clientDelete(keyMap).getCode());
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientDelete(keyMap).getCode());
 	}
 	
 	@Test
@@ -90,7 +85,7 @@ class ClientServiceTest {
 		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
 		
 		when(daoHelper.insert(clientDao, attrMap)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,clientService.clientInsert(attrMap).getCode());
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientInsert(attrMap).getCode());
 	}
 	
 	@Test
@@ -103,7 +98,9 @@ class ClientServiceTest {
 		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
 
 		when(daoHelper.insert(clientDao, attrMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,clientService.clientInsert(attrMap).getMessage());
+		//doThrow(new DuplicateKeyException(" ")).when(daoHelper).insert(clientDao,attrMap);
+		EntityResult er = service.clientInsert(attrMap);
+		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,er.getMessage());
 	}
 
 	@Test
@@ -116,7 +113,7 @@ class ClientServiceTest {
 		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail");
 		
 		//when(daoHelper.insert(clientDao, attrMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,clientService.clientInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,service.clientInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -129,7 +126,7 @@ class ClientServiceTest {
 		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
 		
 		when(daoHelper.update(clientDao, attrMap,keyMap)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,clientService.clientUpdate(attrMap,keyMap).getCode());
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientUpdate(attrMap,keyMap).getCode());
 	}
 	
 	@Test
@@ -142,7 +139,7 @@ class ClientServiceTest {
 		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
 		
 		when(daoHelper.update(clientDao, attrMap,keyMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,clientService.clientUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,service.clientUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -155,7 +152,7 @@ class ClientServiceTest {
 		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
 		
 		//when(daoHelper.update(clientDao, attrMap,keyMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,clientService.clientUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,service.clientUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	
@@ -282,7 +279,7 @@ class ClientServiceTest {
 				
 		//when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new RuntimeException("Exception"));
 		
-		assertEquals(result.getMessage(),clientService.clientsInDateQuery(req).getMessage());
+		assertEquals(result.getMessage(),service.clientsInDateQuery(req).getMessage());
 	}
 	
 	@Test
@@ -312,7 +309,7 @@ class ClientServiceTest {
 				
 		//when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new RuntimeException("Exception"));
 		
-		assertEquals(result.getMessage(),clientService.clientsInDateQuery(req).getMessage());
+		assertEquals(result.getMessage(),service.clientsInDateQuery(req).getMessage());
 	}
 
 	@Test
@@ -549,7 +546,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.THE_HOTEL_DOES_NOT_EXIST, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
 	}
 
 	@Test
@@ -590,7 +587,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL, er.getMessage());
+		assertEquals(MsgLabels.CLIENT_NOT_FOUND, er.getMessage());
 	}
 
 	@Test
