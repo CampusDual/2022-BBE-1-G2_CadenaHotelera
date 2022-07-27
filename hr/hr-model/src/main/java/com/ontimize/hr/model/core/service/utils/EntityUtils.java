@@ -45,6 +45,9 @@ public class EntityUtils {
 	private BookingDao bookingDao;
 	
 	@Autowired
+	private EmployeeDao employeeDao;
+	
+	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 	
 	
@@ -148,6 +151,21 @@ public class EntityUtils {
 		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
 			return res.calculateRecordNumber()==1;
 		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	public boolean employeeExists(Integer employeeId)
+	{
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(EmployeeDao.ATTR_ID, employeeId);
+		EntityResult res = daoHelper.query(employeeDao,keyMap,Arrays.asList(EmployeeDao.ATTR_ID));
+		if (res.getCode()== EntityResult.OPERATION_SUCCESSFUL)
+		{
+			return res.calculateRecordNumber()==1;
+		}
+		else
+		{
 			throw new OntimizeJEERuntimeException();
 		}
 	}

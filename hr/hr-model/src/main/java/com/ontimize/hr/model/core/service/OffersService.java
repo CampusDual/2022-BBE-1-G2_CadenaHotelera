@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IOffersService;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
@@ -114,7 +115,7 @@ public class OffersService implements IOffersService {
 		try {
 			return this.daoHelper.query(this.offersDao, keyMap, attrList);
 		} catch (BadSqlGrammarException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
 	}
 
