@@ -318,9 +318,9 @@ public class BookingService implements IBookingService {
 					EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
 
 			if (resFilter.calculateRecordNumber() == 0) {
-				Map<String, Object> keyMapHotel = new HashMap<String, Object>();
+				Map<String, Object> keyMapHotel = new HashMap<>();
 				keyMapHotel.put(HotelDao.ATTR_ID, hotelId);
-				List<String> columnsHotel = new ArrayList<String>();
+				List<String> columnsHotel = new ArrayList<>();
 				columnsHotel.add(HotelDao.ATTR_NAME);
 				EntityResult resHotel = this.daoHelper.query(this.hotelDao, keyMapHotel, columnsHotel);
 
@@ -364,8 +364,8 @@ public class BookingService implements IBookingService {
 		BasicField hotelIdB = new BasicField(hotelIdS);
 		BasicExpression bexp = new BasicExpression(hotelIdB, BasicOperator.EQUAL_OP, hotelId);
 		BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, endDate);
-		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, startDate);
+		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, endDate);
+		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, startDate);
 		BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
@@ -398,8 +398,8 @@ public class BookingService implements IBookingService {
 		BasicField entry = new BasicField(entryDate);
 		BasicField departure = new BasicField(departureDate);
 		BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, endDate);
-		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, startDate);
+		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, endDate);
+		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, startDate);
 		BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
@@ -409,9 +409,9 @@ public class BookingService implements IBookingService {
 		BasicExpression bexp9 = new BasicExpression(bexp5, BasicOperator.AND_OP, bexp6);
 
 		BasicExpression bexp10 = new BasicExpression(bexp7, BasicOperator.OR_OP, bexp8);
-		BasicExpression bexp11 = new BasicExpression(bexp9, BasicOperator.OR_OP, bexp10);
+		return new BasicExpression(bexp9, BasicOperator.OR_OP, bexp10);
 
-		return bexp11;
+		
 	}
 
 	/**
@@ -989,7 +989,7 @@ public class BookingService implements IBookingService {
 		// hasta aqui hacemos comprobacion de datos y si el que hace la peticion es un
 		// empleado usamos la id de su hotel
 
-		Map<String, Object> filterClient = new HashMap<String, Object>();
+		Map<String, Object> filterClient = new HashMap<>();
 		filterClient.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
 		filterClient.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
 
@@ -1000,7 +1000,7 @@ public class BookingService implements IBookingService {
 
 		Integer clientId = (Integer) resultClient.getRecordValues(0).get(ClientDao.ATTR_ID);
 
-		Map<String, Object> filterBooking = new HashMap<String, Object>();
+		Map<String, Object> filterBooking = new HashMap<>();
 		filterBooking.put(BookingDao.ATTR_CLI_ID, clientId);
 		filterBooking.put(BookingDao.ATTR_HTL_ID, hotelId);
 
@@ -1250,10 +1250,10 @@ public class BookingService implements IBookingService {
 		if (!req.containsKey(Utils.FILTER))
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.FILTER_MANDATORY);
 		Map<String, Object> keyMap = (Map<String, Object>) req.get(Utils.FILTER);
-		Map<String, Object> attrMap = new HashMap<String, Object>();
+		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDao.ATTR_BOK_STATUS_CODE, "F");
 
-		List<String> attrListBooking = new ArrayList<String>();
+		List<String> attrListBooking = new ArrayList<>();
 		attrListBooking.add(BookingDao.ATTR_ENTRY_DATE);
 		attrListBooking.add(BookingDao.ATTR_DEPARTURE_DATE);
 
@@ -1471,7 +1471,7 @@ public class BookingService implements IBookingService {
 		keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
 				searchBetweenWithYear(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, RoomDao.ATTR_HTL_ID,
 						startDate, endDate, hotelId));
-		List<String> columns = new ArrayList<String>();
+		List<String> columns = new ArrayList<>();
 		columns.add(RoomDao.ATTR_HTL_ID);
 		columns.add(RoomDao.ATTR_NUMBER);
 

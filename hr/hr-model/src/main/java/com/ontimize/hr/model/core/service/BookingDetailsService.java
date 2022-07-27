@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IBookingDetailsService;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
-import com.ontimize.hr.model.core.dao.DatesSeasonDao;
-import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
@@ -36,15 +37,18 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("BookingDetailsService")
 @Lazy
 public class BookingDetailsService implements IBookingDetailsService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BookingDetailsService.class);
+
 	@Autowired
 	private BookingDetailsDao bookingDetailsDao;
-	
+
 	@Autowired
 	private EntityUtils entityUtils;
-	
+
 	@Autowired
 	private CredentialUtils credentialUtils;
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -63,6 +67,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 		try {
 			return this.daoHelper.query(this.bookingDetailsDao, keyMap, attrList);
 		} catch (BadSqlGrammarException e) {
+			LOG.info(MsgLabels.BAD_DATA);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
 	}
@@ -79,49 +84,60 @@ public class BookingDetailsService implements IBookingDetailsService {
 	public EntityResult bookingDetailsInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_BOOKING_ID)) {
+			LOG.info(MsgLabels.BOOKING_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_TYPE_DETAILS_ID)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
+			LOG.info(MsgLabels.DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_MANDATORY);
 		}
 
 		if (!attrMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_PAID_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PAID_MANDATORY);
 		}
 
 		try {
 			Double price = Double.parseDouble(attrMap.get(BookingDetailsDao.ATTR_PRICE).toString());
 		} catch (NumberFormatException ex) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 		}
 
 		try {
 			int bokID = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
 		} catch (NumberFormatException ex) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_BOOKING_ID_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_ID_FORMAT);
 		}
 
 		try {
 			int typeId = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
 		} catch (NumberFormatException ex) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 		}
 
 		try {
-			Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
+			Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+					.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 
 		} catch (ParseException e) {
+			LOG.info(MsgLabels.ERROR_PARSE_DATE);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_PARSE_DATE);
 		} catch (NullPointerException e) {
+			LOG.info(MsgLabels.ERROR_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_DATE_MANDATORY);
 		}
 
@@ -129,9 +145,12 @@ public class BookingDetailsService implements IBookingDetailsService {
 			return this.daoHelper.insert(this.bookingDetailsDao, attrMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage().contains("fk_bok_id")) {
+				LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
+				LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 			}
 		}
 	}
@@ -155,6 +174,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					int bokID = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
 				} catch (NumberFormatException ex) {
+					LOG.info(MsgLabels.BOOKING_ID_FORMAT);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_ID_FORMAT);
 				}
 			}
@@ -163,7 +183,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					int typeId = Integer.parseInt(attrMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
 				} catch (NumberFormatException ex) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
+					LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+							MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 				}
 			}
 
@@ -171,7 +193,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 				try {
 					Double price = Double.parseDouble(attrMap.get(BookingDetailsDao.ATTR_PRICE).toString());
 				} catch (NumberFormatException ex) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
+					LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+							MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 				}
 			}
 
@@ -181,8 +205,10 @@ public class BookingDetailsService implements IBookingDetailsService {
 							.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 
 				} catch (ParseException e) {
+					LOG.info(MsgLabels.ERROR_PARSE_DATE);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_PARSE_DATE);
 				} catch (NullPointerException e) {
+					LOG.info(MsgLabels.ERROR_DATE_MANDATORY);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_DATE_MANDATORY);
 				}
 			}
@@ -190,9 +216,12 @@ public class BookingDetailsService implements IBookingDetailsService {
 			return this.daoHelper.update(this.bookingDetailsDao, attrMap, keyMap);
 		} catch (DataIntegrityViolationException ex) {
 			if (ex.getMessage().contains("fk_bok_id")) {
+				LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
+				LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 			}
 		}
 	}
@@ -214,129 +243,148 @@ public class BookingDetailsService implements IBookingDetailsService {
 				if (query.calculateRecordNumber() > 0) {
 					return this.daoHelper.delete(this.bookingDetailsDao, keyMap);
 				} else {
+					LOG.info(MsgLabels.NO_DATA_TO_DELETE);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_DATA_TO_DELETE);
 				}
 			} else {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12);
+				LOG.info(MsgLabels.ERROR);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12);
 			}
 
 		} catch (BadSqlGrammarException e) {
+			LOG.info(MsgLabels.BAD_DATA);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
 	}
 
 	@Override
-	@Secured({PermissionsProviderSecured.SECURED})
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDetailsAdd(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		if (keyMap==null||keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DATA_MANDATORY);
+		if (keyMap == null || keyMap.isEmpty()) {
+			LOG.info(MsgLabels.DATA_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
+		}
 		Integer bookingId = null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_BOOKING_ID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.BOOKING_DETAILS_BOOKING_ID_MANDATORY);
-		}else {
+		if (!keyMap.containsKey(BookingDetailsDao.ATTR_BOOKING_ID)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_BOOKING_ID_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+					MsgLabels.BOOKING_DETAILS_BOOKING_ID_MANDATORY);
+		} else {
 			try {
 				bookingId = Integer.valueOf(keyMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
 			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_BOOKING_ID_FORMAT);
+				LOG.info(MsgLabels.BOOKING_DETAILS_BOOKING_ID_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.BOOKING_DETAILS_BOOKING_ID_FORMAT);
 			}
 		}
-		Calendar c =Calendar.getInstance();
-		c.set(Calendar.HOUR_OF_DAY,0);
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND,0);
+		c.set(Calendar.MILLISECOND, 0);
 		Date date = c.getTime();
-		if(keyMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
-				if (keyMap.get(BookingDetailsDao.ATTR_DATE) instanceof Date) {
-					date = (Date)keyMap.get(BookingDetailsDao.ATTR_DATE);
+		if (keyMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
+			if (keyMap.get(BookingDetailsDao.ATTR_DATE) instanceof Date) {
+				date = (Date) keyMap.get(BookingDetailsDao.ATTR_DATE);
+			} else {
+				try {
+					date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+							.parse(keyMap.get(BookingDetailsDao.ATTR_DATE).toString());
+				} catch (ParseException e) {
+					LOG.info(MsgLabels.DATE_FORMAT);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
 				}
-				else {
-					try {
-						date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get(BookingDetailsDao.ATTR_DATE).toString());						
-					} catch (ParseException e) {
-						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
-					}					
-				}
-				
-				
-				Calendar d = Calendar.getInstance();
-				d.setTime(date);
-				d.set(Calendar.HOUR_OF_DAY,0);
-				d.set(Calendar.MINUTE, 0);
-				d.set(Calendar.SECOND, 0);
-				d.set(Calendar.MILLISECOND,0);
-				
-				
-				if (c.compareTo(d)!=0)
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_DATE_TODAY);			
+			}
+
+			Calendar d = Calendar.getInstance();
+			d.setTime(date);
+			d.set(Calendar.HOUR_OF_DAY, 0);
+			d.set(Calendar.MINUTE, 0);
+			d.set(Calendar.SECOND, 0);
+			d.set(Calendar.MILLISECOND, 0);
+
+			if (c.compareTo(d) != 0) {
+				LOG.info(MsgLabels.BOOKING_DETAILS_DATE_TODAY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_DATE_TODAY);
+			}
 		}
-		Integer detailsType= null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_TYPE_DETAILS_ID)) {
+		Integer detailsType = null;
+		if (!keyMap.containsKey(BookingDetailsDao.ATTR_TYPE_DETAILS_ID)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
-		}else {
+		} else {
 			try {
-				detailsType =  Integer.parseInt(keyMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
+				detailsType = Integer.parseInt(keyMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
 			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT); 
+				LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 			}
 		}
 		Double price = null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
+		if (!keyMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
-		}
-		else {
-			if(keyMap.get(BookingDetailsDao.ATTR_PRICE) instanceof Double)
-				price =(Double) keyMap.get(BookingDetailsDao.ATTR_PRICE);
-			else
-			{
+		} else {
+			if (keyMap.get(BookingDetailsDao.ATTR_PRICE) instanceof Double)
+				price = (Double) keyMap.get(BookingDetailsDao.ATTR_PRICE);
+			else {
 				try {
-					price=Double.parseDouble(keyMap.get(BookingDetailsDao.ATTR_PRICE).toString());
-					if (price<0) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_NEGATIVE);
-				}catch (NumberFormatException | NullPointerException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
+					price = Double.parseDouble(keyMap.get(BookingDetailsDao.ATTR_PRICE).toString());
+					if (price < 0) {
+						LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_NEGATIVE);
+						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+								MsgLabels.BOOKING_DETAILS_PRICE_NEGATIVE);
+					}
+				} catch (NumberFormatException | NullPointerException e) {
+					LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+							MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
 				}
 
 			}
 		}
-		Boolean paid= false;
-		if(keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
+		Boolean paid = false;
+		if (keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
 			if (keyMap.get(BookingDetailsDao.ATTR_PAID) instanceof Boolean) {
-				paid= (Boolean)keyMap.get(BookingDetailsDao.ATTR_PAID);
-			}
-			else {
+				paid = (Boolean) keyMap.get(BookingDetailsDao.ATTR_PAID);
+			} else {
 				paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
 			}
 		}
-		
-		if(!entityUtils.bookingExists(bookingId)) {
+
+		if (!entityUtils.bookingExists(bookingId)) {
+			LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 		}
-		if(!entityUtils.isBookinActive(bookingId)) {
+		if (!entityUtils.isBookinActive(bookingId)) {
+			LOG.info(MsgLabels.BOOKING_NOT_ACTIVE);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_ACTIVE);
 		}
-		
+
 		if (!entityUtils.detailTypeExists(detailsType)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 		}
 		Integer hotelid = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-		if (hotelid !=-1 && !entityUtils.isBookingFromHotel(bookingId, hotelid))
-		{
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
+		if (hotelid != -1 && !entityUtils.isBookingFromHotel(bookingId, hotelid)) {
+			LOG.info(MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
 		}
-		
+
 		Map<String, Object> keyMapInsert = new HashMap<>();
-			keyMapInsert.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
-			keyMapInsert.put(BookingDetailsDao.ATTR_DATE, date);
-			keyMapInsert.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, detailsType);
-			keyMapInsert.put(BookingDetailsDao.ATTR_PAID, paid);
-			keyMapInsert.put(BookingDetailsDao.ATTR_PRICE, price);
+		keyMapInsert.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
+		keyMapInsert.put(BookingDetailsDao.ATTR_DATE, date);
+		keyMapInsert.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, detailsType);
+		keyMapInsert.put(BookingDetailsDao.ATTR_PAID, paid);
+		keyMapInsert.put(BookingDetailsDao.ATTR_PRICE, price);
 		try {
 			return daoHelper.insert(bookingDetailsDao, keyMapInsert);
 		} catch (BadSqlGrammarException e) {
+			LOG.info(MsgLabels.BAD_DATA);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
-		
+
 	}
-	
-	
 
 }
