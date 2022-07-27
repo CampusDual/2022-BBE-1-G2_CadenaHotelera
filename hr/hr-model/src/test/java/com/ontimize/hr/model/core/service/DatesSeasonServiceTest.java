@@ -22,6 +22,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -39,15 +40,14 @@ class DatesSeasonServiceTest {
 	private DatesSeasonService datesSeasonService;
 	
 	@Test
-	@DisplayName("Inserting name missing")
+	@DisplayName("Inserting hotel missing")
 	void InsertDatesSeasonNoName() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_HTL_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,1);
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.HOTEL_IS_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -55,11 +55,10 @@ class DatesSeasonServiceTest {
 	void InsertDatesSeasonNoSeason() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_HTL_ID,1);
-		//attrMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,1);
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.SEASON_IS_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.SEASON_ID_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -68,10 +67,9 @@ class DatesSeasonServiceTest {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_HTL_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,1);
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.START_DATE_IS_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.SEASON_START_DATE_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -81,9 +79,8 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_HTL_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,1);
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.END_DATE_IS_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.SEASON_END_DATE_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -95,7 +92,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,1);
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_START_DAY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -107,7 +104,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,null);
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.ERROR_START_DAY_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_BLANK,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -119,7 +116,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-19");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_END_DAY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -131,7 +128,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-19");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,null);
 		
-		assertEquals(DatesSeasonService.ERROR_END_DAY_MANDATORY,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_BLANK,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -143,7 +140,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-19");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-19");
 		
-		assertEquals(DatesSeasonService.SAME_DATES_ERROR,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -155,7 +152,7 @@ class DatesSeasonServiceTest {
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-19");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-18");
 		
-		assertEquals(DatesSeasonService.END_BEFORE_START,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -169,7 +166,7 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.insert(datesSeasonDao, attrMap)).thenThrow(new DataIntegrityViolationException("fk_htl_season"));
 		
-		assertEquals(DatesSeasonService.HOTEL_NOT_EXISTS,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -183,7 +180,7 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.insert(datesSeasonDao, attrMap)).thenThrow(new DataIntegrityViolationException(""));
 		
-		assertEquals(DatesSeasonService.SEASON_NOT_EXISTS,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.SEASON_NOT_EXIST,datesSeasonService.datesSeasonInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -210,11 +207,11 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_START_DAY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
-	@DisplayName("Updating datesSeason no start date")
+	@DisplayName("Updating datesSeason null start date")
 	void UpdateDatesSeasonNoStartDate() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,null);
@@ -223,7 +220,7 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_START_DAY_MANDATORY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_BLANK,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -236,11 +233,11 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_END_DAY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
-	@DisplayName("Updating datesSeason no end date")
+	@DisplayName("Updating datesSeason null end date")
 	void UpdateDatesSeasonNoEndDate() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-17");
@@ -249,7 +246,7 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_END_DAY_MANDATORY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_BLANK,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -262,7 +259,7 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.SAME_DATES_ERROR,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -275,7 +272,7 @@ class DatesSeasonServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.DEPARTURE_DATE_BEFORE_ENTRY_DATE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -283,12 +280,11 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndWrongStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"a");
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_START_DAY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -296,12 +292,11 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndNullStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,null);
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_START_DAY_MANDATORY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_BLANK,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -309,7 +304,6 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndOkStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
@@ -336,7 +330,6 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndOkStartBadDbEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
@@ -351,11 +344,8 @@ class DatesSeasonServiceTest {
 		result.addRecord(endData);
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
-		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
-		
-		assertEquals("Date parse exception",datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+				
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -363,7 +353,6 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndOkStartSameDbEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
@@ -379,10 +368,8 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
 		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		assertEquals(DatesSeasonService.SAME_DATES_ERROR,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -390,7 +377,6 @@ class DatesSeasonServiceTest {
 	void UpdateDatesSeasonNoEndOkStartEarlyDbEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
-		//attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
@@ -405,44 +391,38 @@ class DatesSeasonServiceTest {
 		result.addRecord(endData);
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
-		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
-		
-		assertEquals(DatesSeasonService.DEPARTURE_DATE_BEFORE_ENTRY_DATE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+				
+		assertEquals(MsgLabels.DATE_BEFORE,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date wrong")
 	void UpdateDatesSeasonNoStartWrongEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"a");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_PARSE_END_DAY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date null")
 	void UpdateDatesSeasonNoStartNullEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,null);
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(DatesSeasonDao.ATTR_SEASON_ID,1);
 		
-		assertEquals(DatesSeasonService.ERROR_END_DAY_MANDATORY,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_BLANK,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date ok")
 	void UpdateDatesSeasonNoStartOkEnd() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -469,7 +449,6 @@ class DatesSeasonServiceTest {
 	@DisplayName("Updating datesSeason no start date, end date ok, startDate from dataBase bad")
 	void UpdateDatesSeasonNoStartOkEndBadDbStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -485,18 +464,14 @@ class DatesSeasonServiceTest {
 		result.addRecord(startData);
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
-		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
-		
-		assertEquals("Date parse exception",datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+				
+		assertEquals(MsgLabels.ENTRY_DATE_FORMAT,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date ok, startDate from dataBase is the same")
 	void UpdateDatesSeasonNoStartOkEndSameDbStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -513,17 +488,13 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
 		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
-		
-		assertEquals(DatesSeasonService.SAME_DATES_ERROR ,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE ,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date ok, startDate from dataBase is the later")
 	void UpdateDatesSeasonNoStartOkEndlaterDbStart() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -540,17 +511,14 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.query(datesSeasonDao, keyMap,attrList)).thenReturn(result);
 		
-//		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
-//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		assertEquals(DatesSeasonService.DEPARTURE_DATE_BEFORE_ENTRY_DATE ,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE ,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date ok, bad HotelId")
 	void UpdateDatesSeasonNoStartOkEndBadHotelId() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -569,16 +537,14 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
 		.thenThrow(new DataIntegrityViolationException("fk_htl_season"));
-		//.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		assertEquals(DatesSeasonService.HOTEL_NOT_EXISTS,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
 	@DisplayName("Updating datesSeason no start date, end date ok, Bad Season")
 	void UpdateDatesSeasonNoStartOkEndBadSeason() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(DatesSeasonDao.ATTR_START_DATE,"2022-07-15");
 		attrMap.put(DatesSeasonDao.ATTR_END_DATE,"2022-07-16");
 		
 		Map<String, Object> keyMap = new HashMap<String, Object>();
@@ -597,9 +563,8 @@ class DatesSeasonServiceTest {
 		
 		when(daoHelper.update(isA(DatesSeasonDao.class), anyMap(), anyMap()))
 		.thenThrow(new DataIntegrityViolationException(""));
-		//.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		assertEquals(DatesSeasonService.SEASON_NOT_EXISTS,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.SEASON_NOT_EXIST,datesSeasonService.datesSeasonUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	
