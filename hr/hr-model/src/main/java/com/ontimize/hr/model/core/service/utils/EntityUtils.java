@@ -215,4 +215,24 @@ public class EntityUtils {
 			throw new OntimizeJEERuntimeException();
 		}
 	}
+	
+	/**
+	 * Checks if the booking is from a concrete hotel
+	 * @param bookingId id of the booking
+	 * @param hotelId id of the hotel
+	 * @return true if the booking is from the specified hotel false otherwise including nonexisting hotels and bookings
+	 */
+	
+	public boolean isBookingFromHotel(Integer bookingId,Integer hotelId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		keyMap.put(BookingDao.ATTR_HTL_ID, hotelId);
+		EntityResult res = daoHelper.query(bookingDao, keyMap, Arrays.asList(BookingDao.ATTR_ID));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			return res.calculateRecordNumber()==1;
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
 }
