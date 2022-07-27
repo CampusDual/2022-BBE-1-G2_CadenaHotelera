@@ -37,6 +37,8 @@ public class MsgLabels {
 	
 	public static final String BOOKING_NOT_ACTIVE = "BOOKING NOT ACTIVE";
 	
+	public static final String BOOKING_NOT_FROM_YOUR_HOTEL= "BOOKING NOT FROM YOUR HOTEL";
+	
 	//BOOKING_DETAILS
 	public static final String BOOKING_DETAILS_BOOKING_ID_MANDATORY = "BOK_DET_BOK_ID_MANDATORY ";
 	public static final String BOOKING_DETAILS_BOOKING_ID_FORMAT = "BOK_DET_BOK_ID_BAD_FORMAT ";

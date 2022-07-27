@@ -21,6 +21,7 @@ import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
@@ -40,6 +41,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 	
 	@Autowired
 	private EntityUtils entityUtils;
+	
+	@Autowired
+	private CredentialUtils credentialUtils;
 	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -312,6 +316,11 @@ public class BookingDetailsService implements IBookingDetailsService {
 		
 		if (!entityUtils.detailTypeExists(detailsType)) {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
+		}
+		Integer hotelid = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+		if (hotelid !=-1 && !entityUtils.isBookingFromHotel(bookingId, hotelid))
+		{
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
 		}
 		
 		Map<String, Object> keyMapInsert = new HashMap<>();

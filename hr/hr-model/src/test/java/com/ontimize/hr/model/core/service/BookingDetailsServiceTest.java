@@ -1,11 +1,17 @@
 package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
+<<<<<<< HEAD
+=======
+import java.util.ArrayList;
+>>>>>>> 877d1a8e6c8414b61cd041a00a4ff5af8aa6b36f
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,12 +25,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
+import com.ontimize.jee.common.services.user.UserInformation;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +45,9 @@ class BookingDetailsServiceTest {
 	@Mock
 	private BookingDetailsDao bookingDetailsDao;
 
+	@Mock
+	private CredentialUtils credentialUtils;
+	
 	@Mock
 	private EntityUtils entityUtils;
 	
@@ -648,6 +660,28 @@ class BookingDetailsServiceTest {
 		assertEquals(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS, res.getMessage());
 	}
 	
+	
+	@Test
+	@DisplayName("Fails to add charge when the booking is from another hotel")
+	void testBookingDetailsAddDetailNotFromHotel() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 17);
+		keyMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 55);
+		keyMap.put(BookingDetailsDao.ATTR_PRICE, 35);
+		when(entityUtils.bookingExists(17)).thenReturn(true);
+		when(entityUtils.isBookinActive(17)).thenReturn(true);
+		when(entityUtils.detailTypeExists(55)).thenReturn(true);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
+		EntityResult res = service.bookingDetailsAdd(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL, res.getMessage());
+	}
+	
+	
+	
+	
 	@Test
 	@DisplayName("Fail fake Insert charge")
 	void testBookingDetailsAddDetailBadInsert() {
@@ -658,6 +692,9 @@ class BookingDetailsServiceTest {
 		when(entityUtils.bookingExists(17)).thenReturn(true);
 		when(entityUtils.isBookinActive(17)).thenReturn(true);
 		when(entityUtils.detailTypeExists(55)).thenReturn(true);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);		
+		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
 		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult res = service.bookingDetailsAdd(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
@@ -675,112 +712,12 @@ class BookingDetailsServiceTest {
 		when(entityUtils.bookingExists(17)).thenReturn(true);
 		when(entityUtils.isBookinActive(17)).thenReturn(true);
 		when(entityUtils.detailTypeExists(55)).thenReturn(true);
-		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,12));
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);		
+		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
+		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult res = service.bookingDetailsAdd(keyMap);
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());		
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 	}
 	
-	/*
-	 	if (keyMap==null||keyMap.isEmpty()) return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.DATA_MANDATORY);
-		Integer bookingId = null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_BOOKING_ID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.BOOKING_DETAILS_BOOKING_ID_MANDATORY);
-		}else {
-			try {
-				bookingId = Integer.valueOf(keyMap.get(BookingDetailsDao.ATTR_BOOKING_ID).toString());
-			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_BOOKING_ID_FORMAT);
-			}
-		}
-		Calendar c =Calendar.getInstance();
-		c.set(Calendar.HOUR_OF_DAY,0);
-		c.set(Calendar.MINUTE, 0);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND,0);
-		Date date = c.getTime();
-		if(keyMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
-				if (keyMap.get(BookingDetailsDao.ATTR_DATE) instanceof Date) {
-					date = (Date)keyMap.get(BookingDetailsDao.ATTR_DATE);
-				}
-				else {
-					try {
-						date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get(BookingDetailsDao.ATTR_DATE).toString());						
-					} catch (ParseException e) {
-						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
-					}					
-				}
-				
-				
-				Calendar d = Calendar.getInstance();
-				d.setTime(date);
-				d.set(Calendar.HOUR_OF_DAY,0);
-				d.set(Calendar.MINUTE, 0);
-				d.set(Calendar.SECOND, 0);
-				d.set(Calendar.MILLISECOND,0);
-				
-				
-				if (c.compareTo(d)!=0)
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_DATE_TODAY);			
-		}
-		Integer detailsType= null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_TYPE_DETAILS_ID)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_MANDATORY);
-		}else {
-			try {
-				detailsType =  Integer.parseInt(keyMap.get(BookingDetailsDao.ATTR_TYPE_DETAILS_ID).toString());
-			} catch (NumberFormatException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT); 
-			}
-		}
-		Double price = null;
-		if(!keyMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
-		}
-		else {
-			if(keyMap.get(BookingDetailsDao.ATTR_PRICE) instanceof Double)
-				price =(Double) keyMap.get(BookingDetailsDao.ATTR_PRICE);
-			else
-			{
-				try {
-					price=Double.parseDouble(keyMap.get(BookingDetailsDao.ATTR_PRICE).toString());
-				}catch (NumberFormatException | NullPointerException e) {
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_PRICE_FORMAT);
-				}
-
-			}
-		}
-		Boolean paid= false;
-		if(keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
-			if (keyMap.get(BookingDetailsDao.ATTR_PAID) instanceof Boolean) {
-				paid= (Boolean)keyMap.get(BookingDetailsDao.ATTR_PAID);
-			}
-			else {
-				paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
-			}
-		}
-		
-		if(!entityUtils.bookingExists(bookingId)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
-		}
-		if(!entityUtils.isBookinActive(bookingId)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_ACTIVE);
-		}
-		
-		if (!entityUtils.detailTypeExists(detailsType)) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
-		}
-		
-		Map<String, Object> keyMapInsert = new HashMap<>();
-			keyMapInsert.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
-			keyMapInsert.put(BookingDetailsDao.ATTR_DATE, date);
-			keyMapInsert.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, detailsType);
-			keyMapInsert.put(BookingDetailsDao.ATTR_PAID, paid);
-			keyMapInsert.put(BookingDetailsDao.ATTR_PRICE, price);
-		try {
-			return daoHelper.insert(bookingDetailsDao, keyMapInsert);
-		} catch (BadSqlGrammarException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
-		}
-		*/
-	 
 }
