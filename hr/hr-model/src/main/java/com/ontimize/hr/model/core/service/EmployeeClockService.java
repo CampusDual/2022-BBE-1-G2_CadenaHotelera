@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IEmployeeClockService;
@@ -21,6 +22,7 @@ import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @Service("EmployeeClockService")
@@ -44,6 +46,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockQuery(Map<String, Object> keyMap, List<String> attrList) throws OntimizeJEERuntimeException {
 		try {
 			return this.daoHelper.query(this.employeeClockDao, keyMap, attrList);
@@ -59,6 +62,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		
 		if(!attrMap.containsKey(EmployeeClockDao.ATTR_EMPLOYEE_ID))
@@ -87,6 +91,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 				
 		if((!attrMap.containsKey(EmployeeClockDao.ATTR_CLOCK_IN))&&(!attrMap.containsKey(EmployeeClockDao.ATTR_CLOCK_OUT)))
@@ -109,6 +114,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		try{
 			return this.daoHelper.delete(this.employeeClockDao, keyMap);
@@ -119,6 +125,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockIn(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		Map<String,Object> data = new HashMap<String,Object>();
 		
@@ -159,6 +166,7 @@ public class EmployeeClockService implements IEmployeeClockService{
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockOut(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		Map<String,Object> data = new HashMap<String,Object>();
 		
