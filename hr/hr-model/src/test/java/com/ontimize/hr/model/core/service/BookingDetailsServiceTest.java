@@ -8,10 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
-<<<<<<< HEAD
-=======
 import java.util.ArrayList;
->>>>>>> 877d1a8e6c8414b61cd041a00a4ff5af8aa6b36f
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
