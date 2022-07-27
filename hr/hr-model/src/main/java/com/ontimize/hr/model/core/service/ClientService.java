@@ -9,9 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
@@ -37,7 +36,9 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("ClientService")
 @Lazy
 public class ClientService implements IClientService {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ClientService.class);	
+	
 	public static final String DATE_MANDATORY = "DATE_MANDATORY";
 
 	public static final String PARSE_DATE = "PARSE_DATE";
@@ -121,13 +122,13 @@ public class ClientService implements IClientService {
 	}
 
 	public EntityResult getClientsDate(Map<String, Object> req) {
-		
 		List<String> columns = new ArrayList<String>();
 		Map<String, Object> filter = new HashMap<String,Object>();
-		
 		try {
-			if(!req.containsKey(Utils.COLUMNS)) 
+			if(!req.containsKey(Utils.COLUMNS)) {
+				LOG.info(MsgLabels.COLUMNS_MANDATORY);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_MANDATORY);
+			}
 			columns = (List<String>) req.get(Utils.COLUMNS);
 			if(!req.containsKey(Utils.FILTER)) 
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
