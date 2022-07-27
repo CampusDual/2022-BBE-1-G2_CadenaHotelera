@@ -82,12 +82,15 @@ public class MsgLabels {
 	
 	public static final String HOTEL_QUERY_ERROR = "ERROR_WHILE_QUERYING_HOTELS";
 	
+	
+	
 	//DATES
 	public static final String ENTRY_DATE_MANDATORY = "ENTRY_DATE_IS_MANDATORY";
 	public static final String DEPARTURE_DATE_MANDATORY = "DEPARTURE_DATE_IS_MANDATORY";
-	
+	public static final String QRY_DATE_REQUIRED = "qry_date REQUIRED";
 
 	public static final String DATE_MANDATORY = "DATE_MANDATORY";
+	public static final String DATE_BLANK = "DATE_IS_EMPTY";
 	
 	public static final String ENTRY_DATE_FORMAT = "WRONG_ENTRY_DATE_FORMAT";
 	public static final String DEPARTURE_DATE_FORMAT = "WRONG_DEPARTURE_DATE_FORMAT";
@@ -117,6 +120,8 @@ public class MsgLabels {
 	public static final String CITY_HOTEL_ID_EXCLUSIVE = "CANNOT_SEARCH_BY_CITY_AND_HOTEL_AT_THE_SAME_TIME";	
 	
 	public static final String ERROR = "ERROR";
+	
+	public static final String ERROR_SENDING_MAIL = "ERROR_SENDING_MAIL";
 	
 	
 }

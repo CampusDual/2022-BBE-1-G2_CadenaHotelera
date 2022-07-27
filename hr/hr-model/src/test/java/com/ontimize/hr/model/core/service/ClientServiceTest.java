@@ -331,7 +331,7 @@ class ClientServiceTest {
 		EntityResult er = service.getClientsDate(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.HOTEL_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, er.getMessage());
 	}
 
 	@Test
@@ -353,7 +353,7 @@ class ClientServiceTest {
 		EntityResult er = service.getClientsDate(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.DATE_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.QRY_DATE_REQUIRED, er.getMessage());
 	}
 
 	@Test
@@ -377,7 +377,7 @@ class ClientServiceTest {
 		EntityResult er = service.getClientsDate(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.WRONG_HOTEL_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_FORMAT, er.getMessage());
 	}
 
 	@Test
@@ -401,7 +401,7 @@ class ClientServiceTest {
 		EntityResult er = service.getClientsDate(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.PARSE_DATE, er.getMessage());
+		assertEquals(MsgLabels.ERROR_PARSE_DATE, er.getMessage());
 	}
 
 	@Test
@@ -425,7 +425,7 @@ class ClientServiceTest {
 		EntityResult er = service.getClientsDate(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.DATE_MANDATORY, er.getMessage());
+		assertEquals(MsgLabels.DATE_BLANK, er.getMessage());
 	}
 
 	@Test
@@ -448,7 +448,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.HOTEL_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, er.getMessage());
 	}
 
 	@Test
@@ -471,7 +471,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.DATE_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.QRY_DATE_REQUIRED, er.getMessage());
 	}
 
 	@Test
@@ -494,7 +494,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.PARSE_DATE, er.getMessage());
+		assertEquals(MsgLabels.ERROR_PARSE_DATE, er.getMessage());
 	}
 
 	@Test
@@ -517,7 +517,7 @@ class ClientServiceTest {
 		EntityResult er = service.sendMailClients(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(ClientService.WRONG_HOTEL_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_ID_FORMAT, er.getMessage());
 	}
 
 	@Test
@@ -692,6 +692,6 @@ class ClientServiceTest {
 		}
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals("ERROR_SENDING_MAIL", er.getMessage());
+		assertEquals(MsgLabels.ERROR_SENDING_MAIL, er.getMessage());
 	}
 }

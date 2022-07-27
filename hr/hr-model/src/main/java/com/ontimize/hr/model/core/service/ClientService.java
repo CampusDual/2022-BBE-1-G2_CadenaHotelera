@@ -75,11 +75,15 @@ public class ClientService implements IClientService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString()))
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_FORMAT);
+		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
+			LOG.info(MsgLabels.CLIENT_MAIL_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_MAIL_FORMAT);
+			
+		}
 		try {
 			return this.daoHelper.insert(this.clientDao, attrMap);
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.CLIENT_MAIL_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_EXISTS);
 		}
 
@@ -88,12 +92,15 @@ public class ClientService implements IClientService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString()))
+		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
+			LOG.info(MsgLabels.CLIENT_MAIL_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_FORMAT);
+		}
 		try {
 			return this.daoHelper.update(this.clientDao, attrMap, keyMap);
 
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.CLIENT_MAIL_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_EXISTS);
 		}
 
@@ -130,25 +137,30 @@ public class ClientService implements IClientService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_MANDATORY);
 			}
 			columns = (List<String>) req.get(Utils.COLUMNS);
-			if(!req.containsKey(Utils.FILTER)) 
+			if(!req.containsKey(Utils.FILTER)) {
+				LOG.info(MsgLabels.FILTER_MANDATORY);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
+			}
 			filter = (Map<String, Object>) req.get(Utils.FILTER);
 			Date date = null;
 			int hotelId;
 
 			if (!filter.containsKey(BookingDao.ATTR_HTL_ID)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_REQUIRED);
+				LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
 
 			}
 
 			if (!filter.containsKey("qry_date")) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATE_REQUIRED);
+				LOG.info(MsgLabels.QRY_DATE_REQUIRED);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.QRY_DATE_REQUIRED);
 
 			}
 			try {
 				hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 			} catch (NumberFormatException ex) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_HOTEL_FORMAT);
+				LOG.info(MsgLabels.HOTEL_ID_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
 
 			}
 
@@ -156,9 +168,11 @@ public class ClientService implements IClientService {
 			try {
 				date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
 			} catch (ParseException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, PARSE_DATE);
+				LOG.info(MsgLabels.ERROR_PARSE_DATE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_PARSE_DATE);
 			} catch (NullPointerException e) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DATE_MANDATORY);
+				LOG.info(MsgLabels.DATE_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_BLANK);
 
 			}
 			// Check exists hotel
@@ -168,6 +182,7 @@ public class ClientService implements IClientService {
 			attrList.add(HotelDao.ATTR_NAME);
 			EntityResult existsHotel = daoHelper.query(hotelDao, keyMapHotel, attrList);
 			if (existsHotel.calculateRecordNumber() == 0) {
+				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.HOTEL_NOT_EXIST);
 			}
 
@@ -181,6 +196,7 @@ public class ClientService implements IClientService {
 			EntityResult res = daoHelper.query(this.clientDao, keyMap, columns, ClientDao.QUERY_CLIENTS_DATE);
 
 			if (res.calculateRecordNumber() == 0) {
+				LOG.info(MsgLabels.CLIENT_NOT_FOUND);
 				res.setCode(EntityResult.OPERATION_WRONG);
 				res.setMessage(MsgLabels.CLIENT_NOT_FOUND);
 			}
@@ -188,12 +204,13 @@ public class ClientService implements IClientService {
 			return res;
 
 		} catch (Exception e) {
+			LOG.error(MsgLabels.ERROR);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,"");
 		}
 	}
 
 	@Override
-	// secure
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult sendMailClients(Map<String, Object> req) {
 		req.put("columns", Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,
 				ClientDao.ATTR_IDENTIFICATION, ClientDao.ATTR_PHONE, BookingDao.ATTR_ROM_NUMBER));
@@ -201,6 +218,7 @@ public class ClientService implements IClientService {
 		EntityResult er = getClientsDate(req);
 
 		if (er.getCode() == EntityResult.OPERATION_WRONG) {
+			LOG.error(MsgLabels.ERROR);
 			return er;
 		}
 
@@ -213,7 +231,8 @@ public class ClientService implements IClientService {
 		try {
 			Utils.sendMail(date, nameJSON);
 		} catch (Exception ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "ERROR_SENDING_MAIL");
+			LOG.error(MsgLabels.ERROR_SENDING_MAIL);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_SENDING_MAIL);
 		}
 
 		return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 12, "EMAIL_SENT");

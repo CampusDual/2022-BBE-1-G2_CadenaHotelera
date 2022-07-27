@@ -234,7 +234,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(MsgLabels.ENTRY_DATE_MANDATORY, er.getMessage());
+		assertEquals(MsgLabels.ENTRY_DATE_BLANK, er.getMessage());
 	}
 
 	@Test
@@ -294,7 +294,7 @@ class BookingServiceTest {
 
 		EntityResult er = service.getBudget(req);
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(MsgLabels.DEPARTURE_DATE_MANDATORY, er.getMessage());
+		assertEquals(MsgLabels.DEPARTURE_DATE_BLANK, er.getMessage());
 	}
 
 	@Test
