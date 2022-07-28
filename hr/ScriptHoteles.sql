@@ -540,6 +540,7 @@ INSERT INTO room(rom_htl_id,rom_number,rom_typ_id) VALUES (2,'1003',3);
 
 insert into room_status(rsts_status,rsts_description) values ('mantenimiento','habitacion cerrada por mantenimiento');
 insert into room_status(rsts_status,rsts_description) values ('reforma','habitacion cerrada por reformas');
+insert into room_status(rsts_status,rsts_description) values ('sucia','habitacion cerrada por necesidad de limpieza profunda');
 
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('CARLOS', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'PÃREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');

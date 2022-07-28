@@ -33,9 +33,9 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("RoomService")
 @Lazy
 public class RoomService implements IRoomService {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(RoomService.class);
-	
+
 	public static final String HOTEL_ID_MANDATORY = "HOTEL ID MANDATORY";
 
 	public static final String NO_SUCH_STATUS = "NO SUCH STATUS";
@@ -56,19 +56,18 @@ public class RoomService implements IRoomService {
 
 	@Autowired
 	private RoomDao roomDao;
-	
+
 	@Autowired
 	private BookingDao bookingDao;
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
-	
+
 	@Autowired
 	private EmployeeService employeeService;
-	
+
 	@Autowired
 	private CredentialUtils credentialUtils;
-	
 
 	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
@@ -83,35 +82,30 @@ public class RoomService implements IRoomService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomInsert(Map<String, Object> attrMap) {
-			EntityResult result = null;
-			try
-			{		
-				result = this.daoHelper.insert(this.roomDao, attrMap);
-				return result;				
+		EntityResult result = null;
+		try {
+			result = this.daoHelper.insert(this.roomDao, attrMap);
+			return result;
+		} catch (DuplicateKeyException e) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
+			return result;
+		} catch (DataIntegrityViolationException e) {
+			result = new EntityResultMapImpl();
+			result.setCode(EntityResult.OPERATION_WRONG);
+			if (e.getMessage() != null && e.getMessage().contains("fk_type_room")) {
+				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);
+			} else if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
+				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
-			catch (DuplicateKeyException e) {
-				result = new EntityResultMapImpl();
-				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
-				return result;
+			if (e.getMessage() != null && e.getMessage().contains("ck_room_type_typ_name")) {
+				result.setMessage(MsgLabels.ROOM_NUMBER_BLANK);
 			}
-			catch (DataIntegrityViolationException e)
-			{
-				result = new EntityResultMapImpl();
-				result.setCode(EntityResult.OPERATION_WRONG);
-				if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
-					result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);					
-				} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-					result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
-				}
-				if(e.getMessage()!=null &&e.getMessage().contains("ck_room_type_typ_name")) {
-					result.setMessage(MsgLabels.ROOM_NUMBER_BLANK);
-				}
-				return result;
-			}
-			catch (Exception e) {
-				throw e;
-			}
+			return result;
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 
 	@Override
@@ -120,16 +114,17 @@ public class RoomService implements IRoomService {
 			throws OntimizeJEERuntimeException {
 		EntityResult result = null;
 		Date startDate = null;
-		Date endDate=null;
+		Date endDate = null;
 		int hotelId;
-		if(attrMap.containsKey(RoomDao.ATTR_STATUS_START)&&attrMap.containsKey(RoomDao.ATTR_STATUS_END)) {
+		if (attrMap.containsKey(RoomDao.ATTR_STATUS_START) && attrMap.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(RoomDao.ATTR_STATUS_START).toString());
+				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+						.parse(attrMap.get(RoomDao.ATTR_STATUS_START).toString());
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(RoomDao.ATTR_STATUS_END).toString());
-				
+
 				attrMap.remove(RoomDao.ATTR_STATUS_START);
 				attrMap.remove(RoomDao.ATTR_STATUS_END);
-				
+
 				attrMap.put(RoomDao.ATTR_STATUS_START, startDate);
 				attrMap.put(RoomDao.ATTR_STATUS_END, endDate);
 			} catch (ParseException e) {
@@ -139,40 +134,36 @@ public class RoomService implements IRoomService {
 				return result;
 			}
 		}
-		//hasta aqui comprobamos que se le meta una fecha al estado de la habitación
-		
-		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+		// hasta aqui comprobamos que se le meta una fecha al estado de la habitación
+
+		if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
 			hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			
+
 			attrMap.remove(RoomDao.ATTR_HTL_ID);
-			
+
 			attrMap.put(RoomDao.ATTR_HTL_ID, hotelId);
 		}
-		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
-		
-		try
-		{					
-			result = this.daoHelper.update(this.roomDao, attrMap,keyMap);
-			return result;				
-		}
-		catch (DuplicateKeyException e) {
+		// hasta aqui comprobamos que idHotel tiene el usuario si es que este es un
+		// empleado
+
+		try {
+			result = this.daoHelper.update(this.roomDao, attrMap, keyMap);
+			return result;
+		} catch (DuplicateKeyException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
 			return result;
-		}
-		catch (DataIntegrityViolationException e)
-		{
+		} catch (DataIntegrityViolationException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
-				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);					
-			} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
+			if (e.getMessage() != null && e.getMessage().contains("fk_type_room")) {
+				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);
+			} else if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
 				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
 			return result;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw e;
 		}
 	}
@@ -182,13 +173,13 @@ public class RoomService implements IRoomService {
 	public EntityResult roomDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.roomDao, keyMap);
 	}
-	
+
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomUpdateStatus(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		return roomUpdtateStatusInternal(req);
 	}
-	
+
 	private EntityResult roomUpdtateStatusInternal(Map<String, Object> req) {
 		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
 		Map<String, Object> data = (Map<String, Object>) req.get("data");
@@ -196,102 +187,100 @@ public class RoomService implements IRoomService {
 		Date startDate = null;
 		Date endDate = null;
 		int hotelId;
-		
-		if(data.containsKey(RoomDao.ATTR_HTL_ID))
+
+		if (data.containsKey(RoomDao.ATTR_HTL_ID))
 			data.remove(RoomDao.ATTR_HTL_ID);
-		if(data.containsKey(RoomDao.ATTR_NUMBER))
+		if (data.containsKey(RoomDao.ATTR_NUMBER))
 			data.remove(RoomDao.ATTR_NUMBER);
-		if(data.containsKey(RoomDao.ATTR_TYPE_ID))
+		if (data.containsKey(RoomDao.ATTR_TYPE_ID))
 			data.remove(RoomDao.ATTR_TYPE_ID);
-		
-		//eliminamos cualquier intento de modificar otro campo de la tabla rooms
-		
+
+		// eliminamos cualquier intento de modificar otro campo de la tabla rooms
+
 		Integer auxHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-		if(!filter.containsKey(RoomDao.ATTR_HTL_ID)){
-				if(auxHotelId==-1)
-				{
-					LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
-				}
-				else {
-					hotelId= auxHotelId;
-				}
+		if (!filter.containsKey(RoomDao.ATTR_HTL_ID)) {
+			if (auxHotelId == -1) {
+				LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+			} else {
+				hotelId = auxHotelId;
+			}
 		} else {
 			try {
-				hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);			
+				hotelId = (Integer) filter.get(RoomDao.ATTR_HTL_ID);
 			} catch (Exception e) {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
 			}
-			if(auxHotelId!=-1 && hotelId != auxHotelId) {
+			if (auxHotelId != -1 && hotelId != auxHotelId) {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
 			}
 		}
-			
-		
-		
-		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
-		
-		if(!filter.containsKey(RoomDao.ATTR_NUMBER)) {
+
+		// hasta aqui comprobamos que idHotel tiene el usuario si es que este es un
+		// empleado
+
+		if (!filter.containsKey(RoomDao.ATTR_NUMBER)) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_NUMBER_MANDATORY);
 			return result;
 		}
-		
+
 		Map<String, Object> keyMapRoom = new HashMap<>();
 		List<String> attrListRoom = new ArrayList<>();
-		
+
+		keyMapRoom.put(RoomDao.ATTR_HTL_ID, hotelId);
 		keyMapRoom.put(RoomDao.ATTR_NUMBER, filter.get(RoomDao.ATTR_NUMBER).toString());
-		
+
 		attrListRoom.add(RoomDao.ATTR_NUMBER);
-		
+
 		EntityResult rooms = daoHelper.query(this.roomDao, keyMapRoom, attrListRoom);
-		
-		if(rooms.calculateRecordNumber()==0) {
+
+		if (rooms.calculateRecordNumber() == 0) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_NOT_EXIST);
 			return result;
 		}
-		
-		//comprobamos que la habitacion exista
-		
-		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)&&!data.containsKey(RoomDao.ATTR_STATUS_START)&&!data.containsKey(RoomDao.ATTR_STATUS_END)) {
-			Map<String,Object> dataNull = new HashMap<>();
-			
+
+		// comprobamos que la habitacion exista
+
+		if (!data.containsKey(RoomDao.ATTR_STATUS_ID) && !data.containsKey(RoomDao.ATTR_STATUS_START)
+				&& !data.containsKey(RoomDao.ATTR_STATUS_END)) {
+			Map<String, Object> dataNull = new HashMap<>();
+
 			dataNull.put(RoomDao.ATTR_STATUS_ID, null);
 			dataNull.put(RoomDao.ATTR_STATUS_START, null);
 			dataNull.put(RoomDao.ATTR_STATUS_END, null);
-			
-			result = this.daoHelper.update(this.roomDao, dataNull,filter);
+
+			result = this.daoHelper.update(this.roomDao, dataNull, filter);
 			return result;
 		}
-		
-		//si no enviamos datos ponemos los campos de status a null
-			
-		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
+
+		// si no enviamos datos ponemos los campos de status a null
+
+		if (!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_STATUS_MANDATORY);
 			return result;
 		}
-		
-					
-		if(data.containsKey(RoomDao.ATTR_STATUS_START)&&data.containsKey(RoomDao.ATTR_STATUS_END)) {
+
+		if (data.containsKey(RoomDao.ATTR_STATUS_START) && data.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
 				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
-				
-				if(startDate.after(endDate)) {
+
+				if (startDate.after(endDate)) {
 					result = new EntityResultMapImpl();
 					result.setCode(EntityResult.OPERATION_WRONG);
 					result.setMessage(MsgLabels.DATE_BEFORE_GENERIC);
 					return result;
 				}
-				
+
 				data.remove(RoomDao.ATTR_STATUS_START);
 				data.remove(RoomDao.ATTR_STATUS_END);
-				
+
 				data.put(RoomDao.ATTR_STATUS_START, startDate);
 				data.put(RoomDao.ATTR_STATUS_END, endDate);
 			} catch (ParseException e) {
@@ -301,89 +290,81 @@ public class RoomService implements IRoomService {
 				return result;
 			}
 		}
-		//hasta aqui comprobamos que se le meta una fecha al estado de la habitación
-		
-				
+		// hasta aqui comprobamos que se le meta una fecha al estado de la habitación
+
 		Map<String, Object> keyMapBooking = new HashMap<>();
 		List<String> attrListBooking = new ArrayList<>();
-		
+
 		keyMapBooking.put(BookingDao.ATTR_HTL_ID, hotelId);
 		keyMapBooking.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
-		
+
 		attrListBooking.add(BookingDao.ATTR_ROM_NUMBER);
-		
+
 		EntityResult bookings = daoHelper.query(this.bookingDao, keyMapBooking, attrListBooking);
-		
+
 		int c = bookings.calculateRecordNumber();
-		
-		for(int i=0;i<c;i++) {
-			if(bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
+
+		for (int i = 0; i < c; i++) {
+			if (bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
 				result.setMessage(MsgLabels.ROOM_OCUPIED);
 				return result;
 			}
 		}
-		//hasta aqui cpmprobamos que la habitacion no este ocupada o tenga reservas a futuro
-		
-		
-		try
-		{					
-			result = this.daoHelper.update(this.roomDao, data,filter);
-			return result;				
-		}
-		catch (DataIntegrityViolationException e)
-		{
+		// hasta aqui cpmprobamos que la habitacion no este ocupada o tenga reservas a
+		// futuro
+
+		try {
+			result = this.daoHelper.update(this.roomDao, data, filter);
+			return result;
+		} catch (DataIntegrityViolationException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
+			if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
 				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
-			}
-			else if(e.getMessage()!=null && e.getMessage().contains("fk_room_room_status")) {
+			} else if (e.getMessage() != null && e.getMessage().contains("fk_room_room_status")) {
 				result.setMessage(MsgLabels.ROOM_STATUS_NOT_EXISTS);
 			}
 			return result;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error(MsgLabels.ERROR);
 			throw e;
 		}
 	}
 
-
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomMarkDirty(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		if (keyMap==null || keyMap.isEmpty()) {
+		if (keyMap == null || keyMap.isEmpty() || !keyMap.containsKey("data")) {
 			LOG.info(MsgLabels.DATA_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
 		}
-		
-		Map<String, Object> filter= new HashMap<>();
+
+		Map<String, Object> filter = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		
+		keyMap = (Map<String, Object>) keyMap.get("data");
+
 		if (keyMap.containsKey(RoomDao.ATTR_HTL_ID)) {
 			filter.put(RoomDao.ATTR_HTL_ID, keyMap.get(RoomDao.ATTR_HTL_ID));
 		}
-		if(keyMap.containsKey(RoomDao.ATTR_NUMBER)) {
+		if (keyMap.containsKey(RoomDao.ATTR_NUMBER)) {
 			filter.put(RoomDao.ATTR_NUMBER, keyMap.get(RoomDao.ATTR_NUMBER));
 		}
-		
-		data.put(RoomDao.ATTR_STATUS_ID,RoomStatus.DIRTY);
-		
-		if(keyMap.containsKey(RoomDao.ATTR_STATUS_START)) {
+
+			data.put(RoomDao.ATTR_STATUS_ID, RoomStatus.DIRTY);
+
+		if (keyMap.containsKey(RoomDao.ATTR_STATUS_START)) {
 			data.put(RoomDao.ATTR_STATUS_START, keyMap.get(RoomDao.ATTR_STATUS_START));
 		}
-		if(keyMap.containsKey(RoomDao.ATTR_STATUS_END)) {
+		if (keyMap.containsKey(RoomDao.ATTR_STATUS_END)) {
 			data.put(RoomDao.ATTR_STATUS_END, keyMap.get(RoomDao.ATTR_STATUS_END));
 		}
-		
+
 		Map<String, Object> req = new HashMap<>();
 		req.put("filter", filter);
 		req.put("data", data);
 		return roomUpdtateStatusInternal(req);
 	}
-	
-	
 
 }
