@@ -28,22 +28,23 @@ public class MsgLabels {
 	public static final String EMPLOYEE_NOT_EXIST_OR_IS_IN_ANOTHER_HOTEL = "EMPLOYEE_NOT_EXIST_OR_IS_IN_ANOTHER_HOTEL";
 	public static final String EMPLOYEE_ALREADY_HAS_USER = "EMPLOYEE_ALREADY_HAS_USER";
 	public static final String EMPLOYEE_NO_CHECK_HAS_USER = "UNABLE_TO_CHECK_IF_EMPLOYEE_HAS_USER";
+	
 
-	//EMPLOYEE TYPE
+	// EMPLOYEE TYPE
 	public static final String EMPLOYEE_TYPE_NAME_MANDATORY = "EMPLOYEE_TYPE_NAME_MANDATORY";
 	public static final String EMPLOYEE_TYPE_NAME_BLANK = "EMPLOYEE_TYPE_NAME_IS_BLANK";
 	public static final String EMPLOYEE_TYPE_NAME_OCCUPIED = "EMPLOYEE_TYPE_NAME_ALREADY_EXISTS";
-	
-	//USER ROLE
+
+	// USER ROLE
 	public static final String ROLE_NOT_EXIST = "ROLE_NOT_EXIST";
-	
-	//USER
+
+	// USER
 	public static final String USER_NICKNAME_MANDATORY = "USER_NICKNAME_MANDATORY";
 	public static final String USER_PASSWORD_MANDATORY = "USER_PASSWORD_MANDATORY";
 	public static final String USER_PASSWORD_BLANK = "USER_PASSWORD_IS_BLANK";
 	public static final String USER_ROLE_NOT_FOUND = "USER_ROLE_NOT_FOUND";
 	public static final String USER_NICKNAME_OCCUPIED = "USER_NICKNAM_ALREADY_IN_USE";
-	
+
 	// EMPLOYEE-CLOCK
 	public static final String EMPLOYEE_CLOCK_DATE = "EMPLOYEE_CLOCK_DATE_IN_OR_OUT_MANDATORY";
 
@@ -72,6 +73,9 @@ public class MsgLabels {
 	public static final String ROOM_TYPE_MANDATORY = "ROOM_TYPE_IS_MANDATORY";
 	public static final String ROOM_TYPE_NOT_EXIST = "ROOM_TYPE_DOES_NOT_EXIST";
 	public static final String NO_FREE_ROOMS_TYPE = "THERE_ARE_NO_FREE_ROOMS_OF_THIS_TYPE";
+	public static final String ROOM_TYPE_NAME_DUPLICATED = "ROOM_TYPE_NAME_DUPLICATED";
+	public static final String ROOM_TYPE_NAME_BLANK = "ROOM_TYPE_NAME_IS_BLANK";
+	public static final String ROOM_TYPE_IN_USE = "ROOM_TYPE_IN_USE";
 
 	// BOOKING
 	public static final String BOOKING_MANDATORY = "BOOKING_ID_MANDATORY";
@@ -93,8 +97,9 @@ public class MsgLabels {
 	public static final String BOOKING_DETAILS_PRICE_FORMAT = "PRICE_FORMAT";
 	public static final String BOOKING_DETAILS_TYPE_FORMAT = "DETAILS_TYPE_FORMAT";
 	public static final String BOOKING_DETAILS_TYPE_NOT_EXISTS = "DETAILS_TYPE_NOT_EXISTS";
+	
 
-	//BOOKING_DETAILS_TYPE
+	// BOOKING_DETAILS_TYPE
 	public static final String DETAILS_TYPE_CODE_MANDATORY = "DETAILS_TYPE_CODE_MANDATORY";
 	public static final String DETAILS_TYPE_CODE_BLANK = "DETAILS_TYPE_CODE_BLANK";
 	public static final String DETAILS_TYPE_CODE_MAX_LENGTH = "DETAILS_TYPE_CODE_MAX_LENGTH_IS_5";
@@ -108,6 +113,24 @@ public class MsgLabels {
 	public static final String HOTEL_NOT_EXIST = "HOTEL_NOT_EXIST";
 	public static final String HOTEL_NOT_FOUND = "HOTELS_NOT_FOUND";
 	public static final String HOTEL_QUERY_ERROR = "ERROR_WHILE_QUERYING_HOTELS";
+	public static final String HOTEL_WRONG_STARS = "ONLY_STARS_BETWEEN_1_AND_5_ALLOWED";
+	public static final String HOTEL_FORMAT_MAIL = "WRONG_HOTEL_MAIL_FORMAT";
+	public static final String HOTEL_FORMAT_LATITUDE = "WRONG_HOTEL_LATITUDE_FORMAT";
+	public static final String HOTEL_FORMAT_LONGITUDE = "WRONG_HOTEL_LONGITUDE_FORMAT";
+	public static final String HOTEL_MAIL_DUPLICATED = "HOTEL_MAIL_DUPLICATED";
+	public static final String HOTEL_NAME_BLANK = "HOTEL_NAME_IS_BLANK";
+	public static final String HOTEL_LATITUDE_MANDATORY = "HOTEL_LATITUDE_MANDATORY";
+	public static final String HOTEL_LONGITUDE_MANDATORY = "HOTEL_LONGITUDE_MANDATORY";
+	public static final String WRONG_RADIUS_FORMAT = "WRONG_RADIUS_FORMAT";
+	public static final String NO_HOTELS_IN_RADIUS = "NO_HOTELS_IN_RADIUS";
+	public static final String LOCATION_LATITUDE_MANDATORY = "LOCATION_LATITUDE_MANDATORY";
+	public static final String LOCATION_LATITUDE_FORMAT = "WRONG_LOCATION_LATITUDE_FORMAT";
+	public static final String LOCATION_LONGITUDE_MANDATORY = "LOCATION_LONGITUDE_MANDATORY";
+	public static final String LOCATION_LONGITUDE_FORMAT = "WRONG_LOCATION_LONGITUDE_FORMAT";
+
+	// OFFERS
+	public static final String OFFERS_DAY_MANDATORY = "OFFERS_DAY_MANDATORY";
+	public static final String OFFERS_PRICE_NIGHT_MANDATORY = "OFFERS_PRICE_NIGHT_MANDATORY";
 
 	// DATES
 	public static final String ENTRY_DATE_MANDATORY = "ENTRY_DATE_IS_MANDATORY";
@@ -129,14 +152,20 @@ public class MsgLabels {
 	public static final String SEASON_ID_MANDATORY = "SEASON_ID_MANDATORY";
 	public static final String SEASON_START_DATE_MANDATORY = "SEASON_START_DATE_MANDATORY";
 	public static final String SEASON_END_DATE_MANDATORY = "SEASON_END_DATE_MANDATORY";
-	
-	//SEASON
+
+	// SEASON
 	public static final String SEASON_NOT_EXIST = "SEASON_NOT_EXIST";
-	
+	public static final String SEASON_NAME_MANDATORY = "SEASON_NAME_MANDATORY";
+	public static final String SEASON_NAME_BLANK = "SEASON_NAME_IS_BLANK";
+	public static final String SEASON_MULTIPLIER_MANDATORY = "SEASON_MULTIPLIER_MANDATORY";
+	public static final String SEASON_MULTIPLIER_BLANK = "SEASON_MULTIPLIER_IS_BLANK";
+	public static final String SEASON_DUPLICATE_NAME = "SEASON_NAME_DUPLICATED";
+
 	// FILTERS,COLUMNS,DATA
 	public static final String FILTER_MANDATORY = "FILTER_IS_MANDATORY";
 	public static final String COLUMNS_MANDATORY = "COLUMNS_IS_MANDATORY";
 	public static final String DATA_MANDATORY = "DATA_IS_MANDATORY";
+	public static final String EMPTY_FILTER = "EMPTY_FILTER";
 
 	// GENERAL ERRORS
 	public static final String BAD_DATA = "BAD_DATA_PLEASE_CHECK_VALUES_AND_COLUMN_NAMES";

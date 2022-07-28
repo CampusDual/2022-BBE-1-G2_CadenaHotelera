@@ -3,6 +3,8 @@ package com.ontimize.hr.model.core.service;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.ISeasonService;
 import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -25,15 +28,7 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class SeasonService implements ISeasonService {
 
-	public static final String DUPLICATE_NAME = "DUPLICATE_NAME";
-
-	public static final String MULTIPLIER_BLANK_OR_NULL = "MULTIPLIER_BLANK_OR_NULL";
-
-	public static final String NAME_BLANK_OR_NULL = "NAME_BLANK_OR_NULL";
-
-	public static final String NAME_MANDATORY = "NAME_MANDATORY";
-
-	public static final String MULTIPLIER_MANDATORY = "MULTIPLIER_MANDATORY";
+	private static final Logger LOG = LoggerFactory.getLogger(SeasonService.class);
 
 	@Autowired
 	private SeasonDao seasonDao;
@@ -68,24 +63,29 @@ public class SeasonService implements ISeasonService {
 	public EntityResult seasonInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		try {
 			if (!attrMap.containsKey(SeasonDao.ATTR_NAME)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_MANDATORY);
+				LOG.info(MsgLabels.SEASON_NAME_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_NAME_MANDATORY);
 			}
 
 			if (Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_NAME).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_BLANK_OR_NULL);
+				LOG.info(MsgLabels.SEASON_NAME_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_NAME_BLANK);
 			}
 
 			if (!attrMap.containsKey(SeasonDao.ATTR_MULTIPLIER)) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_MANDATORY);
+				LOG.info(MsgLabels.SEASON_MULTIPLIER_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_MULTIPLIER_MANDATORY);
 			}
 
 			if (Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_MULTIPLIER).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_BLANK_OR_NULL);
+				LOG.info(MsgLabels.SEASON_MULTIPLIER_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_MULTIPLIER_BLANK);
 			}
 
 			return this.daoHelper.insert(this.seasonDao, attrMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_NAME);
+			LOG.info(MsgLabels.SEASON_DUPLICATE_NAME);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_DUPLICATE_NAME);
 		}
 	}
 
@@ -104,17 +104,20 @@ public class SeasonService implements ISeasonService {
 		try {
 			if (attrMap.containsKey(SeasonDao.ATTR_NAME)
 					&& Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_NAME).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NAME_BLANK_OR_NULL);
+				LOG.info(MsgLabels.SEASON_NAME_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_NAME_BLANK);
 			}
 
 			if (attrMap.containsKey(SeasonDao.ATTR_MULTIPLIER)
 					&& Utils.stringIsNullOrBlank(attrMap.get(SeasonDao.ATTR_MULTIPLIER).toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MULTIPLIER_BLANK_OR_NULL);
+				LOG.info(MsgLabels.SEASON_MULTIPLIER_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_MULTIPLIER_BLANK);
 			}
 
 			return this.daoHelper.update(this.seasonDao, attrMap, keyMap);
 		} catch (DuplicateKeyException ex) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, DUPLICATE_NAME);
+			LOG.info(MsgLabels.SEASON_DUPLICATE_NAME);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SEASON_DUPLICATE_NAME);
 		}
 	}
 

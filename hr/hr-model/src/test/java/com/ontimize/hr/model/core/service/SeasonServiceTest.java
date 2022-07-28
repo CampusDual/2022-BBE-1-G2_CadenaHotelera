@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 
 import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -38,7 +39,7 @@ class SeasonServiceTest {
 	void testSeasonInsertNameMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.NAME_MANDATORY);
+		result.setMessage(MsgLabels.SEASON_NAME_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_MULTIPLIER, 2);
@@ -54,7 +55,7 @@ class SeasonServiceTest {
 	void testSeasonInsertNameBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.NAME_BLANK_OR_NULL);
+		result.setMessage(MsgLabels.SEASON_NAME_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, " ");
@@ -71,7 +72,7 @@ class SeasonServiceTest {
 	void testSeasonInsertMultiplierMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.MULTIPLIER_MANDATORY);
+		result.setMessage(MsgLabels.SEASON_MULTIPLIER_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, "HIGH");
@@ -87,7 +88,7 @@ class SeasonServiceTest {
 	void testSeasonInsertMultiplierBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.MULTIPLIER_BLANK_OR_NULL);
+		result.setMessage(MsgLabels.SEASON_MULTIPLIER_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, "HIGH");
@@ -104,7 +105,7 @@ class SeasonServiceTest {
 	void testSeasonInsertNameDuplicated() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.DUPLICATE_NAME);
+		result.setMessage(MsgLabels.SEASON_DUPLICATE_NAME);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, "Name");
@@ -123,7 +124,7 @@ class SeasonServiceTest {
 	void testSeasonUpdateNameBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.NAME_BLANK_OR_NULL);
+		result.setMessage(MsgLabels.SEASON_NAME_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, " ");
@@ -145,7 +146,7 @@ class SeasonServiceTest {
 	void testSeasonUpdateMultiplierBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.MULTIPLIER_BLANK_OR_NULL);
+		result.setMessage(MsgLabels.SEASON_MULTIPLIER_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, "Name");
@@ -165,7 +166,7 @@ class SeasonServiceTest {
 	void testSeasonUpdateNameDuplicated() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(SeasonService.DUPLICATE_NAME);
+		result.setMessage(MsgLabels.SEASON_DUPLICATE_NAME);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(SeasonDao.ATTR_NAME, "Name");

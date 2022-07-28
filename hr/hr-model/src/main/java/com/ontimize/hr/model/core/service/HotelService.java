@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IHotelService;
 import com.ontimize.hr.model.core.dao.HotelDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
@@ -28,30 +31,8 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Lazy
 public class HotelService implements IHotelService {
 
-	public static final String NO_HOTELS_IN_RADIUS = "NO_HOTELS_IN_RADIUS";
-
-	public static final String NO_HOTELS_IN_DATABASE = "NO_HOTELS_IN_DATABASE";
-
-	public static final String INCORRECT_RADIUS_FORMAT = "INCORRECT_RADIUS_FORMAT";
-
-	public static final String LONGITUDE_REQUIRED = "LONGITUDE_REQUIRED";
-
-	public static final String LATITUDE_REQUIRED = "LATITUDE_REQUIRED";
-
-	public static final String WRONG_FORMAT_EMAIL = "WRONG_FORMAT_EMAIL";
-
-	public static final String WRONG_FORMAT_LONGITUDE = "WRONG_FORMAT_LONGITUDE";
-
-	public static final String WRONG_FORMAT_LATITUDE = "WRONG_FORMAT_LATITUDE";
-
-	public static final String WRONG_DATA_INPUT = "WRONG DATA INPUT";
-
-	public static final String WRONG_STARS = "ONLY STARS BETWEEN 1 AND 5 ALLOWED";
-
-	public static final String HOTEL_NAME_BLANK = "HOTEL NAME CAN'T BE BLANK";
-
-	public static final String DUPLICATED_HOTEL_MAIL = "DUPLICATED HOTEL MAIL";
-
+	private static final Logger LOG = LoggerFactory.getLogger(HotelService.class);
+	
 	@Autowired
 	private HotelDao hotelDao;
 
@@ -67,7 +48,7 @@ public class HotelService implements IHotelService {
 			throws OntimizeJEERuntimeException {
 
 		String user = daoHelper.getUser().getUsername();
-
+		
 		if (credential.isUserEmployee(user)) {
 
 			Integer hotelId = credential.getHotelFromUser(user);
@@ -84,8 +65,8 @@ public class HotelService implements IHotelService {
 
 			return this.daoHelper.query(this.hotelDao, keyMap, attrList);
 		} catch (BadSqlGrammarException e) {
-
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_DATA_INPUT);
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
 
 	}
@@ -98,41 +79,48 @@ public class HotelService implements IHotelService {
 
 		if (attrMap.containsKey(HotelDao.ATTR_STARS)) {
 			Integer stars = (Integer) attrMap.get(HotelDao.ATTR_STARS);
-			if (stars < 1 || stars > 5)
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_STARS);
+			if (stars < 1 || stars > 5) {
+				LOG.info(MsgLabels.HOTEL_WRONG_STARS);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_WRONG_STARS);
+			}
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_EMAIL)
 				&& !Utils.checkEmail(attrMap.get(HotelDao.ATTR_EMAIL).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_EMAIL);
+			LOG.info(MsgLabels.HOTEL_FORMAT_MAIL);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_MAIL);
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_LATITUDE)
 				&& !Utils.checkCoordinate(attrMap.get(HotelDao.ATTR_LATITUDE).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LATITUDE);
+			LOG.info(MsgLabels.HOTEL_FORMAT_LATITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LATITUDE);
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_LONGITUDE)
 				&& !Utils.checkCoordinate(attrMap.get(HotelDao.ATTR_LONGITUDE).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LONGITUDE);
+			LOG.info(MsgLabels.HOTEL_FORMAT_LONGITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LONGITUDE);
 		}
 
 		try {
 			return this.daoHelper.insert(this.hotelDao, attrMap);
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.HOTEL_MAIL_DUPLICATED);
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(DUPLICATED_HOTEL_MAIL);
+			res.setMessage(MsgLabels.HOTEL_MAIL_DUPLICATED);
 			return res;
 		} catch (DataIntegrityViolationException e) {
 
 			if (e.getMessage() != null && e.getMessage().contains("ck_hotel_htl_name")) {
+				LOG.info(MsgLabels.HOTEL_NAME_BLANK);
 				res.setCode(EntityResult.OPERATION_WRONG);
-				res.setMessage(HOTEL_NAME_BLANK);
+				res.setMessage(MsgLabels.HOTEL_NAME_BLANK);
 				return res;
 			}
-
+			LOG.error(MsgLabels.ERROR_DATA_INTEGRITY);
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("DATA INTEGRITY VIOLATION");
+			res.setMessage(MsgLabels.ERROR_DATA_INTEGRITY);
 			return res;
 		}
 
@@ -147,41 +135,48 @@ public class HotelService implements IHotelService {
 
 		if (attrMap.containsKey(HotelDao.ATTR_STARS)) {
 			Integer stars = (Integer) attrMap.get(HotelDao.ATTR_STARS);
-			if (stars < 1 || stars > 5)
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_STARS);
+			if (stars < 1 || stars > 5) {
+				LOG.info(MsgLabels.HOTEL_WRONG_STARS);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_WRONG_STARS);
+			}
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_EMAIL)
 				&& !Utils.checkEmail(attrMap.get(HotelDao.ATTR_EMAIL).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_EMAIL);
+			LOG.info(MsgLabels.HOTEL_FORMAT_MAIL);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_MAIL);
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_LATITUDE)
 				&& !Utils.checkCoordinate(attrMap.get(HotelDao.ATTR_LATITUDE).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LATITUDE);
+			LOG.info(MsgLabels.HOTEL_FORMAT_LATITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LATITUDE);
 		}
 
 		if (attrMap.containsKey(HotelDao.ATTR_LONGITUDE)
 				&& !Utils.checkCoordinate(attrMap.get(HotelDao.ATTR_LONGITUDE).toString())) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LONGITUDE);
+			LOG.info(MsgLabels.HOTEL_FORMAT_LONGITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LONGITUDE);
 		}
 
 		try {
 			return this.daoHelper.update(this.hotelDao, attrMap, keyMap);
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.HOTEL_MAIL_DUPLICATED);
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage(DUPLICATED_HOTEL_MAIL);
+			res.setMessage(MsgLabels.HOTEL_MAIL_DUPLICATED);
 			return res;
 		} catch (DataIntegrityViolationException e) {
 
 			if (e.getMessage() != null && e.getMessage().contains("ck_hotel_htl_name")) {
+				LOG.info(MsgLabels.HOTEL_NAME_BLANK);
 				res.setCode(EntityResult.OPERATION_WRONG);
-				res.setMessage(HOTEL_NAME_BLANK);
+				res.setMessage(MsgLabels.HOTEL_NAME_BLANK);
 				return res;
 			}
-
+			LOG.error(MsgLabels.ERROR_DATA_INTEGRITY);
 			res.setCode(EntityResult.OPERATION_WRONG);
-			res.setMessage("DATA INTEGRITY VIOLATION");
+			res.setMessage(MsgLabels.ERROR_DATA_INTEGRITY);
 			return res;
 		}
 
@@ -210,20 +205,24 @@ public class HotelService implements IHotelService {
 		Double radius = null;
 
 		if (!req.containsKey("latitude")) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, LATITUDE_REQUIRED);
+			LOG.info(MsgLabels.LOCATION_LATITUDE_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.LOCATION_LATITUDE_MANDATORY);
 		} else {
 			if (!Utils.checkCoordinate(req.get("latitude").toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LATITUDE);
+				LOG.info(MsgLabels.LOCATION_LATITUDE_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.LOCATION_LATITUDE_FORMAT);
 			} else {
 				latitudeReq = req.get("latitude").toString();
 			}
 		}
 
 		if (!req.containsKey("longitude")) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, LONGITUDE_REQUIRED);
+			LOG.info(MsgLabels.LOCATION_LONGITUDE_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.LOCATION_LONGITUDE_MANDATORY);
 		} else {
 			if (!Utils.checkCoordinate(req.get("longitude").toString())) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, WRONG_FORMAT_LONGITUDE);
+				LOG.info(MsgLabels.LOCATION_LONGITUDE_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.LOCATION_LONGITUDE_FORMAT);
 			} else {
 				longitudeReq = req.get("longitude").toString();
 			}
@@ -235,7 +234,8 @@ public class HotelService implements IHotelService {
 			try {
 				radius = Double.parseDouble(req.get("radius").toString());
 			} catch (NumberFormatException ex) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, INCORRECT_RADIUS_FORMAT);
+				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
 			}
 		}
 
@@ -250,9 +250,11 @@ public class HotelService implements IHotelService {
 		EntityResult hotelsER = this.daoHelper.query(this.hotelDao, null, attrList);
 		if (hotelsER.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 			if (hotelsER.calculateRecordNumber() == 0) {
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_HOTELS_IN_DATABASE);
+				LOG.info(MsgLabels.HOTEL_NOT_FOUND);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND);
 			}
 		} else {
+			LOG.info(MsgLabels.HOTEL_QUERY_ERROR);
 			return hotelsER;
 		}
 
@@ -271,7 +273,8 @@ public class HotelService implements IHotelService {
 		}
 		
 		if(hotelsInRadius.calculateRecordNumber() == 0) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, NO_HOTELS_IN_RADIUS);
+			LOG.info(MsgLabels.NO_HOTELS_IN_RADIUS);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_HOTELS_IN_RADIUS);
 		}
 		
 		

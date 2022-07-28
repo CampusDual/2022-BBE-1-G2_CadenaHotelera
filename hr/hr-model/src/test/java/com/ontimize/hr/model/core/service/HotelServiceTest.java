@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import com.ontimize.hr.model.core.dao.HotelDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -50,9 +51,9 @@ class HotelServiceTest {
 		data.put(HotelDao.ATTR_PHONE, "23445567");
 		data.put(HotelDao.ATTR_STARS, 45);
 
-		EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
+		//EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
 
-		assertEquals(HotelService.WRONG_STARS, service.hotelInsert(data).getMessage());
+		assertEquals(MsgLabels.HOTEL_WRONG_STARS, service.hotelInsert(data).getMessage());
 	}
 
 	@Test
@@ -67,7 +68,7 @@ class HotelServiceTest {
 		data.put(HotelDao.ATTR_PHONE, "23445567");
 
 		when(daoHelper.insert(hotelDao, data)).thenThrow(new DataIntegrityViolationException("ck_hotel_htl_name"));
-		assertEquals(HotelService.HOTEL_NAME_BLANK, service.hotelInsert(data).getMessage());
+		assertEquals(MsgLabels.HOTEL_NAME_BLANK, service.hotelInsert(data).getMessage());
 	}
 
 	@Test
@@ -81,7 +82,7 @@ class HotelServiceTest {
 		data.put(HotelDao.ATTR_PHONE, "23445567");
 
 		when(daoHelper.insert(hotelDao, data)).thenThrow(new DuplicateKeyException("uq_hotel_htl_email"));
-		assertEquals(HotelService.DUPLICATED_HOTEL_MAIL, service.hotelInsert(data).getMessage());
+		assertEquals(MsgLabels.HOTEL_MAIL_DUPLICATED, service.hotelInsert(data).getMessage());
 
 	}
 
@@ -98,7 +99,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelInsert(data);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_EMAIL, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_MAIL, er.getMessage());
 	}
 
 	@Test
@@ -115,7 +116,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelInsert(data);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LATITUDE, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LATITUDE, er.getMessage());
 	}
 
 	@Test
@@ -133,7 +134,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelInsert(data);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LONGITUDE, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LONGITUDE, er.getMessage());
 	}
 
 	@Test
@@ -148,9 +149,9 @@ class HotelServiceTest {
 		Map<String, Object> filter = new HashMap<String, Object>();
 		filter.put(HotelDao.ATTR_NAME, "Hotel Chungo");
 
-		EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
-
-		assertEquals(HotelService.WRONG_STARS, service.hotelUpdate(data, filter).getMessage());
+		//EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
+		
+		assertEquals(MsgLabels.HOTEL_WRONG_STARS, service.hotelUpdate(data, filter).getMessage());
 
 	}
 
@@ -168,7 +169,7 @@ class HotelServiceTest {
 
 		when(daoHelper.update(hotelDao, data, filter))
 				.thenThrow(new DataIntegrityViolationException("ck_hotel_htl_name"));
-		assertEquals(HotelService.HOTEL_NAME_BLANK, service.hotelUpdate(data, filter).getMessage());
+		assertEquals(MsgLabels.HOTEL_NAME_BLANK, service.hotelUpdate(data, filter).getMessage());
 
 	}
 
@@ -184,7 +185,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelUpdate(data, filter);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_EMAIL, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_MAIL, er.getMessage());
 
 	}
 
@@ -200,7 +201,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelUpdate(data, filter);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LATITUDE, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LATITUDE, er.getMessage());
 
 	}
 
@@ -216,7 +217,7 @@ class HotelServiceTest {
 		EntityResult er = service.hotelUpdate(data, filter);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LONGITUDE, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LONGITUDE, er.getMessage());
 
 	}
 
@@ -230,7 +231,7 @@ class HotelServiceTest {
 		data.put(HotelDao.ATTR_EMAIL, "hotelvegas@mail.com");
 
 		when(daoHelper.update(hotelDao, data, filter)).thenThrow(new DuplicateKeyException("uq_hotel_htl_email"));
-		assertEquals(HotelService.DUPLICATED_HOTEL_MAIL, service.hotelUpdate(data, filter).getMessage());
+		assertEquals(MsgLabels.HOTEL_MAIL_DUPLICATED, service.hotelUpdate(data, filter).getMessage());
 
 	}
 
@@ -244,7 +245,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.LATITUDE_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.LOCATION_LATITUDE_MANDATORY, er.getMessage());
 
 	}
 
@@ -258,7 +259,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.LONGITUDE_REQUIRED, er.getMessage());
+		assertEquals(MsgLabels.LOCATION_LONGITUDE_MANDATORY, er.getMessage());
 
 	}
 
@@ -273,7 +274,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LATITUDE, er.getMessage());
+		assertEquals(MsgLabels.LOCATION_LATITUDE_FORMAT, er.getMessage());
 
 	}
 
@@ -288,7 +289,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.WRONG_FORMAT_LONGITUDE, er.getMessage());
+		assertEquals(MsgLabels.LOCATION_LONGITUDE_FORMAT, er.getMessage());
 
 	}
 
@@ -303,7 +304,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.INCORRECT_RADIUS_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.WRONG_RADIUS_FORMAT, er.getMessage());
 
 	}
 
@@ -332,9 +333,9 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.NO_HOTELS_IN_DATABASE, er.getMessage());
+		assertEquals(MsgLabels.HOTEL_NOT_FOUND, er.getMessage());
 	}
-	
+
 	@Test
 	@DisplayName("Fails when the query fails")
 	void testHotelByCoordinatesQueryHotelsFails() {
@@ -360,8 +361,8 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-	}
-	
+		}
+
 	@Test
 	@DisplayName("Fails when there are no hotels in the radius")
 	void testHotelByCoordinatesNoHotelsInRadius() {
@@ -379,32 +380,36 @@ class HotelServiceTest {
 		attrList.add(HotelDao.ATTR_ADDRESS);
 
 		EntityResult hotelsER = new EntityResultMapImpl();
-		hotelsER.addRecord(new HashMap<String,Object>(){{
-			put(HotelDao.ATTR_ID, 1);
-			put(HotelDao.ATTR_LATITUDE,"43.3685141433047");
-			put(HotelDao.ATTR_LONGITUDE,"-8.409046581369644");
-			put(HotelDao.ATTR_NAME, "Hotel Riazor");
-			put(HotelDao.ATTR_CITY, "A Coruña" );
-			put(HotelDao.ATTR_ADDRESS, "Calle Riazor");
-		}});
-		
-		hotelsER.addRecord(new HashMap<String,Object>(){{
-			put(HotelDao.ATTR_ID, 2);
-			put(HotelDao.ATTR_LATITUDE,"42.21847248367241");
-			put(HotelDao.ATTR_LONGITUDE,"-8.748586559209471");
-			put(HotelDao.ATTR_NAME, "Hotel Balaidos" );
-			put(HotelDao.ATTR_CITY, "Vigo");
-			put(HotelDao.ATTR_ADDRESS,"Calle Balaidos");
-		}});
-		
+		hotelsER.addRecord(new HashMap<String, Object>() {
+			{
+				put(HotelDao.ATTR_ID, 1);
+				put(HotelDao.ATTR_LATITUDE, "43.3685141433047");
+				put(HotelDao.ATTR_LONGITUDE, "-8.409046581369644");
+				put(HotelDao.ATTR_NAME, "Hotel Riazor");
+				put(HotelDao.ATTR_CITY, "A Coruña");
+				put(HotelDao.ATTR_ADDRESS, "Calle Riazor");
+			}
+		});
+
+		hotelsER.addRecord(new HashMap<String, Object>() {
+			{
+				put(HotelDao.ATTR_ID, 2);
+				put(HotelDao.ATTR_LATITUDE, "42.21847248367241");
+				put(HotelDao.ATTR_LONGITUDE, "-8.748586559209471");
+				put(HotelDao.ATTR_NAME, "Hotel Balaidos");
+				put(HotelDao.ATTR_CITY, "Vigo");
+				put(HotelDao.ATTR_ADDRESS, "Calle Balaidos");
+			}
+		});
+
 		when(daoHelper.query(hotelDao, null, attrList)).thenReturn(hotelsER);
 
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(HotelService.NO_HOTELS_IN_RADIUS, er.getMessage());
+		assertEquals(MsgLabels.NO_HOTELS_IN_RADIUS, er.getMessage());
 	}
-	
+
 	@Test
 	@DisplayName("Fails")
 	void testHotelByCoordinatesHotelFindInRadius() {
@@ -422,24 +427,28 @@ class HotelServiceTest {
 		attrList.add(HotelDao.ATTR_ADDRESS);
 
 		EntityResult hotelsER = new EntityResultMapImpl();
-		hotelsER.addRecord(new HashMap<String,Object>(){{
-			put(HotelDao.ATTR_ID, 1);
-			put(HotelDao.ATTR_LATITUDE,"43.3685141433047");
-			put(HotelDao.ATTR_LONGITUDE,"-8.409046581369644");
-			put(HotelDao.ATTR_NAME, "Hotel Riazor");
-			put(HotelDao.ATTR_CITY, "A Coruña" );
-			put(HotelDao.ATTR_ADDRESS, "Calle Riazor");
-		}});
-		
-		hotelsER.addRecord(new HashMap<String,Object>(){{
-			put(HotelDao.ATTR_ID, 2);
-			put(HotelDao.ATTR_LATITUDE,"42.21847248367241");
-			put(HotelDao.ATTR_LONGITUDE,"-8.748586559209471");
-			put(HotelDao.ATTR_NAME, "Hotel Balaidos" );
-			put(HotelDao.ATTR_CITY, "Vigo");
-			put(HotelDao.ATTR_ADDRESS,"Calle Balaidos");
-		}});
-		
+		hotelsER.addRecord(new HashMap<String, Object>() {
+			{
+				put(HotelDao.ATTR_ID, 1);
+				put(HotelDao.ATTR_LATITUDE, "43.3685141433047");
+				put(HotelDao.ATTR_LONGITUDE, "-8.409046581369644");
+				put(HotelDao.ATTR_NAME, "Hotel Riazor");
+				put(HotelDao.ATTR_CITY, "A Coruña");
+				put(HotelDao.ATTR_ADDRESS, "Calle Riazor");
+			}
+		});
+
+		hotelsER.addRecord(new HashMap<String, Object>() {
+			{
+				put(HotelDao.ATTR_ID, 2);
+				put(HotelDao.ATTR_LATITUDE, "42.21847248367241");
+				put(HotelDao.ATTR_LONGITUDE, "-8.748586559209471");
+				put(HotelDao.ATTR_NAME, "Hotel Balaidos");
+				put(HotelDao.ATTR_CITY, "Vigo");
+				put(HotelDao.ATTR_ADDRESS, "Calle Balaidos");
+			}
+		});
+
 		when(daoHelper.query(hotelDao, null, attrList)).thenReturn(hotelsER);
 
 		EntityResult er = service.getHotelByCoordinates(req);
