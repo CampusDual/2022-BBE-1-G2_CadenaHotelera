@@ -158,8 +158,8 @@ public class BookingService implements IBookingService {
 		int hotelId;
 		Date startDate, endDate;
 
-		List<String> columns = new ArrayList<String>();
-		Map<String, Object> filter = new HashMap<String, Object>();
+		List<String> columns = new ArrayList<>();
+		Map<String, Object> filter = new HashMap<>();
 
 		if (!req.containsKey(Utils.COLUMNS)) {
 			LOG.info(MsgLabels.COLUMNS_MANDATORY);
@@ -171,8 +171,8 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.COLUMNS_HOTEL_ID_MANDATORY);
 		}
 		if (!columns.contains(RoomDao.ATTR_NUMBER)) {
-			LOG.info(MsgLabels.COLUMNS_ROOM_NUMBER_MANDATORY);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.COLUMNS_ROOM_NUMBER_MANDATORY);
+			LOG.info(MsgLabels.ROOM_NUMBER_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_NUMBER_MANDATORY);
 		}
 
 		if (!req.containsKey(Utils.FILTER)) {
@@ -244,9 +244,9 @@ public class BookingService implements IBookingService {
 					EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
 
 			if (resFilter.calculateRecordNumber() == 0) {
-				Map<String, Object> keyMapHotel = new HashMap<String, Object>();
+				Map<String, Object> keyMapHotel = new HashMap<>();
 				keyMapHotel.put(HotelDao.ATTR_ID, hotelId);
-				List<String> columnsHotel = new ArrayList<String>();
+				List<String> columnsHotel = new ArrayList<>();
 				columnsHotel.add(HotelDao.ATTR_NAME);
 				EntityResult resHotel = this.daoHelper.query(this.hotelDao, keyMapHotel, columnsHotel);
 

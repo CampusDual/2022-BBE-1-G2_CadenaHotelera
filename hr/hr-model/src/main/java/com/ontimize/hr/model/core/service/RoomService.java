@@ -1,5 +1,8 @@
 package com.ontimize.hr.model.core.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +21,9 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IRoomService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.entitys.RoomStatus;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -27,7 +33,9 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("RoomService")
 @Lazy
 public class RoomService implements IRoomService {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(RoomService.class);
+	
 	public static final String HOTEL_ID_MANDATORY = "HOTEL ID MANDATORY";
 
 	public static final String NO_SUCH_STATUS = "NO SUCH STATUS";
@@ -84,7 +92,7 @@ public class RoomService implements IRoomService {
 			catch (DuplicateKeyException e) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage("ROOM ALREADY EXISTS IN HOTEL");
+				result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
 				return result;
 			}
 			catch (DataIntegrityViolationException e)
@@ -92,12 +100,12 @@ public class RoomService implements IRoomService {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
 				if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
-					result.setMessage("NO SUCH TYPE OF ROOM");					
+					result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);					
 				} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-					result.setMessage(NO_SUCH_HOTEL);
+					result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 				}
 				if(e.getMessage()!=null &&e.getMessage().contains("ck_room_type_typ_name")) {
-					result.setMessage("ROOM NUMBER CANT BE BLANK");
+					result.setMessage(MsgLabels.ROOM_NUMBER_BLANK);
 				}
 				return result;
 			}
@@ -127,7 +135,7 @@ public class RoomService implements IRoomService {
 			} catch (ParseException e) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(DATE_FORMAT_INCORRECT);
+				result.setMessage(MsgLabels.DATE_FORMAT);
 				return result;
 			}
 		}
@@ -150,7 +158,7 @@ public class RoomService implements IRoomService {
 		catch (DuplicateKeyException e) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage("ROOM ALREADY EXISTS IN HOTEL");
+			result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
 			return result;
 		}
 		catch (DataIntegrityViolationException e)
@@ -158,9 +166,9 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if(e.getMessage()!=null && e.getMessage().contains("fk_type_room")) {
-				result.setMessage("NO SUCH TYPE OF ROOM");					
+				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);					
 			} else if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-				result.setMessage(NO_SUCH_HOTEL);
+				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
 			return result;
 		}
@@ -178,6 +186,10 @@ public class RoomService implements IRoomService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult roomUpdateStatus(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		return roomUpdtateStatusInternal(req);
+	}
+	
+	private EntityResult roomUpdtateStatusInternal(Map<String, Object> req) {
 		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
 		Map<String, Object> data = (Map<String, Object>) req.get("data");
 		EntityResult result = null;
@@ -194,17 +206,27 @@ public class RoomService implements IRoomService {
 		
 		//eliminamos cualquier intento de modificar otro campo de la tabla rooms
 		
-		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
-			hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			
-			filter.remove(RoomDao.ATTR_HTL_ID);
-			
-			filter.put(RoomDao.ATTR_HTL_ID, hotelId);
+		Integer auxHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+		if(!filter.containsKey(RoomDao.ATTR_HTL_ID)){
+				if(auxHotelId==-1)
+				{
+					LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+				}
+				else {
+					hotelId= auxHotelId;
+				}
+		} else {
+			try {
+				hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);			
+			} catch (Exception e) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
+			}
+			if(auxHotelId!=-1 && hotelId != auxHotelId) {
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
+			}
 		}
-		if(!filter.containsKey(RoomDao.ATTR_HTL_ID))
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HOTEL_ID_MANDATORY);
-		
-		hotelId=(Integer)filter.get(RoomDao.ATTR_HTL_ID);
+			
 		
 		
 		//hasta aqui comprobamos que idHotel tiene el usuario si es que este es un empleado
@@ -212,7 +234,7 @@ public class RoomService implements IRoomService {
 		if(!filter.containsKey(RoomDao.ATTR_NUMBER)) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage(ROOM_NUMBER_MANDATORY);
+			result.setMessage(MsgLabels.ROOM_NUMBER_MANDATORY);
 			return result;
 		}
 		
@@ -228,7 +250,7 @@ public class RoomService implements IRoomService {
 		if(rooms.calculateRecordNumber()==0) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage(ROOM_DOESNT_EXIST);
+			result.setMessage(MsgLabels.ROOM_NOT_EXIST);
 			return result;
 		}
 		
@@ -250,7 +272,7 @@ public class RoomService implements IRoomService {
 		if(!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
-			result.setMessage(STATUS_ID_MANDATORY);
+			result.setMessage(MsgLabels.ROOM_STATUS_MANDATORY);
 			return result;
 		}
 		
@@ -263,7 +285,7 @@ public class RoomService implements IRoomService {
 				if(startDate.after(endDate)) {
 					result = new EntityResultMapImpl();
 					result.setCode(EntityResult.OPERATION_WRONG);
-					result.setMessage(END_DATE_BEFORE_START_DATE);
+					result.setMessage(MsgLabels.DATE_BEFORE_GENERIC);
 					return result;
 				}
 				
@@ -275,15 +297,15 @@ public class RoomService implements IRoomService {
 			} catch (ParseException e) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(DATE_FORMAT_INCORRECT);
+				result.setMessage(MsgLabels.DATE_FORMAT);
 				return result;
 			}
 		}
 		//hasta aqui comprobamos que se le meta una fecha al estado de la habitación
 		
 				
-		Map<String, Object> keyMapBooking = new HashMap<String, Object>();
-		List<String> attrListBooking = new ArrayList<String>();
+		Map<String, Object> keyMapBooking = new HashMap<>();
+		List<String> attrListBooking = new ArrayList<>();
 		
 		keyMapBooking.put(BookingDao.ATTR_HTL_ID, hotelId);
 		keyMapBooking.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
@@ -298,7 +320,7 @@ public class RoomService implements IRoomService {
 			if(bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(ROOM_OCUPIED);
+				result.setMessage(MsgLabels.ROOM_OCUPIED);
 				return result;
 			}
 		}
@@ -315,16 +337,53 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if(e.getMessage()!=null && e.getMessage().contains("fk_hotel_room")) {
-				result.setMessage(NO_SUCH_HOTEL);
+				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
 			else if(e.getMessage()!=null && e.getMessage().contains("fk_room_room_status")) {
-				result.setMessage(NO_SUCH_STATUS);
+				result.setMessage(MsgLabels.ROOM_STATUS_NOT_EXISTS);
 			}
 			return result;
 		}
 		catch (Exception e) {
+			LOG.error(MsgLabels.ERROR);
 			throw e;
 		}
 	}
+
+
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult roomMarkDirty(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
+		if (keyMap==null || keyMap.isEmpty()) {
+			LOG.info(MsgLabels.DATA_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
+		}
+		
+		Map<String, Object> filter= new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+		
+		if (keyMap.containsKey(RoomDao.ATTR_HTL_ID)) {
+			filter.put(RoomDao.ATTR_HTL_ID, keyMap.get(RoomDao.ATTR_HTL_ID));
+		}
+		if(keyMap.containsKey(RoomDao.ATTR_NUMBER)) {
+			filter.put(RoomDao.ATTR_NUMBER, keyMap.get(RoomDao.ATTR_NUMBER));
+		}
+		
+		data.put(RoomDao.ATTR_STATUS_ID,RoomStatus.DIRTY);
+		
+		if(keyMap.containsKey(RoomDao.ATTR_STATUS_START)) {
+			data.put(RoomDao.ATTR_STATUS_START, keyMap.get(RoomDao.ATTR_STATUS_START));
+		}
+		if(keyMap.containsKey(RoomDao.ATTR_STATUS_END)) {
+			data.put(RoomDao.ATTR_STATUS_END, keyMap.get(RoomDao.ATTR_STATUS_END));
+		}
+		
+		Map<String, Object> req = new HashMap<>();
+		req.put("filter", filter);
+		req.put("data", data);
+		return roomUpdtateStatusInternal(req);
+	}
+	
+	
 
 }

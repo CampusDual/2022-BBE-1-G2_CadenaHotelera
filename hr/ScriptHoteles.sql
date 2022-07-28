@@ -145,6 +145,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomUpdate');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomDelete');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomUpdateStatus');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomMarkDirty');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeInsert');
@@ -274,6 +275,7 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,7
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,76);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,77);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,78);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,79);
 
 select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 from trole_server_permission t

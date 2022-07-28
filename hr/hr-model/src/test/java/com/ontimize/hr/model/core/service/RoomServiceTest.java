@@ -25,6 +25,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -62,13 +63,12 @@ class RoomServiceTest {
 		req.put("data", data);
 		
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
-		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.ROOM_DOESNT_EXIST, result.getMessage());
+		assertEquals(MsgLabels.ROOM_NOT_EXIST, result.getMessage());
 	}
 	
 	@Test
@@ -86,7 +86,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
@@ -117,7 +117,8 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
+		//when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
 		
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
@@ -130,7 +131,7 @@ class RoomServiceTest {
 
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.STATUS_ID_MANDATORY, result.getMessage());
+		assertEquals(MsgLabels.ROOM_STATUS_MANDATORY, result.getMessage());
 	}
 	
 	
@@ -149,7 +150,8 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
+		//when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -158,7 +160,7 @@ class RoomServiceTest {
 		
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.ROOM_NUMBER_MANDATORY, result.getMessage());
+		assertEquals(MsgLabels.ROOM_NUMBER_MANDATORY, result.getMessage());
 	}
 	
 	
@@ -178,7 +180,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -210,7 +212,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -227,7 +229,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.ROOM_OCUPIED, result.getMessage());
+		assertEquals(MsgLabels.ROOM_OCUPIED, result.getMessage());
 	}
 	
 	@Test
@@ -248,7 +250,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -265,7 +267,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.ROOM_OCUPIED, result.getMessage());
+		assertEquals(MsgLabels.ROOM_OCUPIED, result.getMessage());
 	}
 	
 	@Test
@@ -286,7 +288,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -321,7 +323,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -335,7 +337,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.END_DATE_BEFORE_START_DATE, result.getMessage());
+		assertEquals(MsgLabels.DATE_BEFORE_GENERIC, result.getMessage());
 	}
 	
 	@Test
@@ -356,7 +358,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -368,7 +370,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.DATE_FORMAT_INCORRECT, result.getMessage());
+		assertEquals(MsgLabels.DATE_FORMAT, result.getMessage());
 	}
 	
 	
@@ -390,7 +392,7 @@ class RoomServiceTest {
 		UserInformation userInfo = new UserInformation("Mister X", "", (Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>() , null);
 		
 		when(daoHelper.getUser()).thenReturn(userInfo);
-		when(credentialUtils.isUserEmployee(anyString())).thenReturn(false);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		EntityResult roomExistsResult = new EntityResultMapImpl(Arrays.asList(RoomDao.ATTR_HTL_ID,RoomDao.ATTR_NUMBER));
 		roomExistsResult.addRecord(new HashMap<String, Object>(){{
 			put(RoomDao.ATTR_HTL_ID, 1);
@@ -405,7 +407,7 @@ class RoomServiceTest {
 		when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenThrow(new DataIntegrityViolationException("fk_room_room_status"));
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(RoomService.NO_SUCH_STATUS, result.getMessage());
+		assertEquals(MsgLabels.ROOM_STATUS_NOT_EXISTS, result.getMessage());
 	}
 
 }

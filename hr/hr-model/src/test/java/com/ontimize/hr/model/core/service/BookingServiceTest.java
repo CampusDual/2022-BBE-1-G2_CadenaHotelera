@@ -1344,7 +1344,7 @@ class BookingServiceTest {
 //		 when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString()))
 //		  .thenReturn(result);
 		EntityResult resultFinal = service.bookingFreeQuery(req);
-		assertEquals(MsgLabels.COLUMNS_ROOM_NUMBER_MANDATORY, resultFinal.getMessage());
+		assertEquals(MsgLabels.ROOM_NUMBER_MANDATORY, resultFinal.getMessage());
 	}
 	
 	@Test

@@ -21,5 +21,7 @@ public interface IRoomService {
 	
 	public EntityResult roomUpdateStatus(Map<String, Object> req)
 			throws OntimizeJEERuntimeException;
+	
+	public EntityResult roomMarkDirty(Map<String, Object>keyMap) throws OntimizeJEERuntimeException;
 
 }

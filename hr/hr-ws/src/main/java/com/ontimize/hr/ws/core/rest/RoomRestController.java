@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ontimize.hr.api.core.service.IRoomService;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.rest.ORestController;
@@ -34,6 +35,15 @@ public class RoomRestController extends ORestController<IRoomService>{
 			EntityResult res = new EntityResultMapImpl();
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
+		}
+	}
+	
+	@PostMapping(value ="roomMarkDirty",produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult roomMarkDirty(@RequestBody Map<String, Object>req) {
+		try {
+			return roomService.roomMarkDirty(req);			
+		}catch (Exception e) {
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12);
 		}
 	}
 }
