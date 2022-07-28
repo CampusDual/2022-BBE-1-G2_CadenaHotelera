@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 
 import com.ontimize.hr.model.core.dao.EmployeeTypeDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
@@ -41,11 +42,10 @@ class EmployeeTypeServiceTest {
 	@DisplayName("insert name missing")
 	void InsertEmployeeTypeMissingName() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		//attrMap.put(EmployeeTypeDao.ATTR_NAME, "name");
 		attrMap.put(EmployeeTypeDao.ATTR_DESCRIPTION, "description");
 		attrMap.put(EmployeeTypeDao.ATTR_ROLE_ID, 1);
 		
-		assertEquals("missing " + EmployeeTypeDao.ATTR_NAME,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.EMPLOYEE_TYPE_NAME_MANDATORY,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -56,7 +56,7 @@ class EmployeeTypeServiceTest {
 		attrMap.put(EmployeeTypeDao.ATTR_DESCRIPTION, "description");
 		attrMap.put(EmployeeTypeDao.ATTR_ROLE_ID, 1);
 		
-		assertEquals("blank " + EmployeeTypeDao.ATTR_NAME,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.EMPLOYEE_TYPE_NAME_BLANK,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -69,7 +69,7 @@ class EmployeeTypeServiceTest {
 		
 		when(daoHelper.insert(employeeTypeDao, attrMap)).thenThrow(new DuplicateKeyException(""));
 		
-		assertEquals("Type name already exists",employeeTypeService.employeeTypeInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ class EmployeeTypeServiceTest {
 		
 		when(daoHelper.insert(employeeTypeDao, attrMap)).thenThrow(new DataIntegrityViolationException(""));
 		
-		assertEquals("Role does not exist",employeeTypeService.employeeTypeInsert(attrMap).getMessage());
+		assertEquals(MsgLabels.ROLE_NOT_EXIST,employeeTypeService.employeeTypeInsert(attrMap).getMessage());
 	}
 	
 	@Test
@@ -96,7 +96,7 @@ class EmployeeTypeServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		attrMap.put(EmployeeTypeDao.ATTR_ID, 1);
 		
-		assertEquals("blank " + EmployeeTypeDao.ATTR_NAME,employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.EMPLOYEE_TYPE_NAME_BLANK,employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -112,7 +112,7 @@ class EmployeeTypeServiceTest {
 		
 		when(daoHelper.update(employeeTypeDao, attrMap, keyMap)).thenThrow(new DuplicateKeyException(""));
 		
-		assertEquals("Type name already exists",employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED,employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	@Test
@@ -128,7 +128,7 @@ class EmployeeTypeServiceTest {
 				
 		when(daoHelper.update(employeeTypeDao, attrMap, keyMap)).thenThrow(new DataIntegrityViolationException(""));
 		
-		assertEquals("Role does not exist",employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
+		assertEquals(MsgLabels.ROLE_NOT_EXIST,employeeTypeService.employeeTypeUpdate(attrMap,keyMap).getMessage());
 	}
 	
 	

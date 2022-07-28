@@ -22,6 +22,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.BadSqlGrammarException;
 
 import com.ontimize.hr.model.core.dao.DetailsTypeDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -51,7 +52,7 @@ class DetailsTypeServiceTest {
 		List<String> attrList = new ArrayList<String>();
 		EntityResult res =  service.detailsTypeQuery(keyMap, null);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
-		assertEquals(DetailsTypeService.NO_FILTER_OR_EMPTY, res.getMessage());
+		assertEquals(MsgLabels.FILTER_MANDATORY, res.getMessage());
 	}
 	
 	@Test
@@ -62,7 +63,7 @@ class DetailsTypeServiceTest {
 		keyMap.put(DetailsTypeDao.ATTR_ID, 1);
 		EntityResult res =  service.detailsTypeQuery(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
-		assertEquals(DetailsTypeService.COLUMN_LIST_EMPTY, res.getMessage());
+		assertEquals(MsgLabels.COLUMNS_MANDATORY, res.getMessage());
 	}
 	
 	@Test
@@ -75,7 +76,7 @@ class DetailsTypeServiceTest {
 		when(daoHelper.query(isA(DetailsTypeDao.class), anyMap(), anyList())).thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult res =  service.detailsTypeQuery(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
-		assertEquals(DetailsTypeService.BAD_FILTER, res.getMessage());
+		assertEquals(MsgLabels.BAD_DATA, res.getMessage());
 	}
 	
 
@@ -84,7 +85,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeInsertCodeMandatory() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.CODE_MANDATORY);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_MANDATORY);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -101,7 +102,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeInsertCodeBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.CODE_IS_BLANK);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -119,7 +120,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeInsertCodeLength() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.MAX_LENGTH_CODE_IS_5);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -137,7 +138,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeInsertDuplicatedCode() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.DUPLICATE_CODE);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_DUPLICATE);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -156,7 +157,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeUpdateCodeBlank() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.CODE_IS_BLANK);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_BLANK);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -176,7 +177,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeUpdateCodeLength() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.MAX_LENGTH_CODE_IS_5);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -197,7 +198,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeUpdateDuplicatedCode() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.DUPLICATE_CODE);
+		result.setMessage(MsgLabels.DETAILS_TYPE_CODE_DUPLICATE);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -219,7 +220,7 @@ class DetailsTypeServiceTest {
 	void testDetailsTypeUpdateBadData() {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
-		result.setMessage(DetailsTypeService.BAD_DATA);
+		result.setMessage(MsgLabels.BAD_DATA);
 
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(DetailsTypeDao.ATTR_DESCRIPTION, "description");
@@ -243,7 +244,7 @@ class DetailsTypeServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.NO_FILTER_OR_EMPTY, res.getMessage());
+		assertEquals(MsgLabels.FILTER_MANDATORY, res.getMessage());
 	}
 	
 	@Test
@@ -254,7 +255,7 @@ class DetailsTypeServiceTest {
 		when(entityUtils.detailsTypeExists(keyMap)).thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.BAD_FILTER, res.getMessage());
+		assertEquals(MsgLabels.FILTER_MANDATORY, res.getMessage());
 	}
 	
 	@Test
@@ -265,7 +266,7 @@ class DetailsTypeServiceTest {
 		when(entityUtils.detailsTypeExists(keyMap)).thenThrow(new RuntimeException());
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.FETCHING_ERROR, res.getMessage());
+		assertEquals(MsgLabels.FETCHING_ERROR, res.getMessage());
 	}
 	
 	@Test
@@ -276,7 +277,7 @@ class DetailsTypeServiceTest {
 		when(entityUtils.detailsTypeExists(keyMap)).thenReturn(false);
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.NO_RECORDS_TO_DELETE, res.getMessage());
+		assertEquals(MsgLabels.NO_DATA_TO_DELETE, res.getMessage());
 	}
 	
 	@Test
@@ -288,7 +289,7 @@ class DetailsTypeServiceTest {
 		when(daoHelper.delete(isA(DetailsTypeDao.class), anyMap())).thenThrow(new DataIntegrityViolationException("fk_details_type"));
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.DETAIL_IN_USE, res.getMessage());
+		assertEquals(MsgLabels.DETAILS_TYPE_IN_USE, res.getMessage());
 	}
 	
 	
@@ -301,7 +302,7 @@ class DetailsTypeServiceTest {
 		when(daoHelper.delete(isA(DetailsTypeDao.class), anyMap())).thenThrow(new DataIntegrityViolationException(""));
 		EntityResult res = service.detailsTypeDelete(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG,res.getCode());
-		assertEquals(DetailsTypeService.DATA_INTEGRITY_ERROR, res.getMessage());
+		assertEquals(MsgLabels.ERROR_DATA_INTEGRITY, res.getMessage());
 	}
 	
 	@Test

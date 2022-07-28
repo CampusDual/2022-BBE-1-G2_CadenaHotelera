@@ -3,6 +3,8 @@ package com.ontimize.hr.model.core.service;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IEmployeeTypeService;
 import com.ontimize.hr.model.core.dao.EmployeeTypeDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -21,6 +24,8 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("EmployeeTypeService")
 @Lazy
 public class EmployeeTypeService implements IEmployeeTypeService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(EmployeeTypeService.class);
 
 	@Autowired
 	private EmployeeTypeDao employeeTypeDao;
@@ -42,20 +47,26 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 
 		try {
 
-			if (!attrMap.containsKey(EmployeeTypeDao.ATTR_NAME))
+			if (!attrMap.containsKey(EmployeeTypeDao.ATTR_NAME)) {
+				LOG.info(MsgLabels.EMPLOYEE_TYPE_NAME_MANDATORY);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-						"missing " + EmployeeTypeDao.ATTR_NAME);
+						MsgLabels.EMPLOYEE_TYPE_NAME_MANDATORY);
+			}
 			String name = attrMap.get(EmployeeTypeDao.ATTR_NAME).toString();
-			if (name.isBlank())
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "blank " + EmployeeTypeDao.ATTR_NAME);
+			if (name.isBlank()) {
+				LOG.info(MsgLabels.EMPLOYEE_TYPE_NAME_BLANK);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPLOYEE_TYPE_NAME_BLANK);
+			}
 			return this.daoHelper.insert(this.employeeTypeDao, attrMap);
 
 		} catch (DuplicateKeyException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Type name already exists");
+			LOG.info(MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED);
 
 		}
 		catch (DataIntegrityViolationException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Role does not exist");
+			LOG.info(MsgLabels.ROLE_NOT_EXIST);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROLE_NOT_EXIST);
 		}
 	}
 
@@ -68,17 +79,20 @@ public class EmployeeTypeService implements IEmployeeTypeService {
 			String name;
 			if (attrMap.containsKey(EmployeeTypeDao.ATTR_NAME)) {
 				name = attrMap.get(EmployeeTypeDao.ATTR_NAME).toString();
-				if (name.isBlank())
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "blank " + EmployeeTypeDao.ATTR_NAME);
+				if (name.isBlank()) {
+					LOG.info(MsgLabels.EMPLOYEE_TYPE_NAME_BLANK);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPLOYEE_TYPE_NAME_BLANK);
+				}
 			}
 			return this.daoHelper.update(this.employeeTypeDao, attrMap, keyMap);
 
 		} catch (DuplicateKeyException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Type name already exists");
-
+			LOG.info(MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPLOYEE_TYPE_NAME_OCCUPIED);
 		}
 		catch (DataIntegrityViolationException e) {
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, "Role does not exist");
+			LOG.info(MsgLabels.ROLE_NOT_EXIST);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROLE_NOT_EXIST);
 		}
 
 	}
