@@ -16,4 +16,6 @@ public interface IEmployeeScheduleService {
 		public EntityResult employeeScheduleUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 
 		public EntityResult employeeScheduleDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+		
+		public EntityResult employeeScheduleToday(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 }

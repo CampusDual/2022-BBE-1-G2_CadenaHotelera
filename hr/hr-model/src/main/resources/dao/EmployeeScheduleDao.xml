@@ -12,5 +12,18 @@
 		<Column>emp_sch_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>emp_sch_id</GeneratedKey>
-
+	<Queries>
+		<Query id="todaySchedule">
+		<Sentence>
+			<![CDATA[
+				SELECT #COLUMNS#
+				FROM employee_schedule
+					INNER JOIN employee
+    					ON emp_id =emp_sch_emp_id
+    			WHERE emp_sch_day = CURRENT_DATE
+				#WHERE_CONCAT#
+			]]>
+		</Sentence>
+		</Query>
+	</Queries>
 </JdbcEntitySetup>
