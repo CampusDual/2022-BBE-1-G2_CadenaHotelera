@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IDatesSeasonService;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -32,8 +33,6 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 public class DatesSeasonService implements IDatesSeasonService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatesSeasonService.class);
-
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Autowired
 	private DatesSeasonDao datesSeasonDao;
@@ -93,7 +92,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			Date endDate = null;
 
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
@@ -105,7 +104,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			try {
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -154,7 +153,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			Date startDate = null;
 			Date endDate = null;
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
@@ -166,7 +165,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			try {
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -191,7 +190,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			Date startDate = null;
 			Date endDate = null;
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
@@ -208,7 +207,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 				selectEndDate.add(DatesSeasonDao.ATTR_END_DATE);
 				EntityResult endDateER = this.daoHelper.query(this.datesSeasonDao, keyMap, selectEndDate);
 
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(endDateER.getRecordValues(0).get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e1) {
 				EntityResult res = new EntityResultMapImpl();
@@ -235,7 +234,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			Date startDate = null;
 			Date endDate = null;
 			try {
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -251,7 +250,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 				selectStartDate.add(DatesSeasonDao.ATTR_START_DATE);
 				EntityResult startDateER = this.daoHelper.query(this.datesSeasonDao, keyMap, selectStartDate);
 
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(startDateER.getRecordValues(0).get(DatesSeasonDao.ATTR_START_DATE).toString());
 			} catch (ParseException e1) {
 				EntityResult res = new EntityResultMapImpl();

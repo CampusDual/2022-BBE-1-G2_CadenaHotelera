@@ -39,22 +39,6 @@ public class ClientService implements IClientService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ClientService.class);	
 	
-	public static final String DATE_MANDATORY = "DATE_MANDATORY";
-
-	public static final String PARSE_DATE = "PARSE_DATE";
-
-	public static final String WRONG_HOTEL_FORMAT = "WRONG_HOTEL_FORMAT";
-
-	public static final String DATE_REQUIRED = "DATE_REQUIRED";
-
-	public static final String HOTEL_REQUIRED = "HOTEL_REQUIRED";
-
-	public static final String ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL = "ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL";
-
-	public static final String MAIL_ALREADY_EXISTS_IN_OUR_DATABASE = "MAIL_ALREADY_EXISTS_IN_OUR_DATABASE";
-
-	public static final String THE_HOTEL_DOES_NOT_EXIST = "THE_HOTEL_DOES_NOT_EXIST";
-
 	@Autowired
 	private ClientDao clientDao;
 

@@ -22,6 +22,7 @@ import com.ontimize.hr.api.core.service.IOffersService;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
@@ -42,8 +43,6 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 public class OffersService implements IOffersService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OffersService.class);
-
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Autowired
 	private OffersDao offersDao;
@@ -108,7 +107,7 @@ public class OffersService implements IOffersService {
 			}
 
 			try {
-				Date day = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
+				Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
 
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -149,7 +148,7 @@ public class OffersService implements IOffersService {
 
 			if (attrMap.containsKey(OffersDao.ATTR_DAY)) {
 				try {
-					Date day = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
+					Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
 
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.DATE_FORMAT);
@@ -222,7 +221,7 @@ public class OffersService implements IOffersService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
 		} else {
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_start").toString());
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get("qry_start").toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ENTRY_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_FORMAT);
@@ -238,7 +237,7 @@ public class OffersService implements IOffersService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_MANDATORY);
 		} else {
 			try {
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(keyMap.get("qry_end").toString());
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get("qry_end").toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_FORMAT);

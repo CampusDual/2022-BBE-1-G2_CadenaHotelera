@@ -22,6 +22,7 @@ import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.hr.model.core.service.utils.entitys.RoomStatus;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
@@ -46,8 +47,6 @@ public class RoomService implements IRoomService {
 
 	@Autowired
 	private CredentialUtils credentialUtils;
-
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
@@ -101,9 +100,9 @@ public class RoomService implements IRoomService {
 		int hotelId;
 		if (attrMap.containsKey(RoomDao.ATTR_STATUS_START) && attrMap.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO)
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(attrMap.get(RoomDao.ATTR_STATUS_START).toString());
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(attrMap.get(RoomDao.ATTR_STATUS_END).toString());
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(RoomDao.ATTR_STATUS_END).toString());
 
 				attrMap.remove(RoomDao.ATTR_STATUS_START);
 				attrMap.remove(RoomDao.ATTR_STATUS_END);
@@ -261,8 +260,8 @@ public class RoomService implements IRoomService {
 
 		if (data.containsKey(RoomDao.ATTR_STATUS_START) && data.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
-				startDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
-				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
+				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
 
 				if (startDate.after(endDate)) {
 					LOG.info(MsgLabels.DATE_BEFORE_GENERIC);

@@ -181,7 +181,7 @@ class ClientServiceTest {
 		attrList.add(HotelDao.ATTR_NAME);
 
 		when(daoHelper.query(hotelDao, keyMapHotel, attrList)).thenReturn(
-				new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, ClientService.THE_HOTEL_DOES_NOT_EXIST));
+				new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_NOT_EXISTS));
 
 		assertEquals(result.getCode(), service.clientsInDateQuery(req).getCode());
 		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
@@ -217,7 +217,7 @@ class ClientServiceTest {
 
 		when(daoHelper.query(hotelDao, keyMap, attrList)).thenReturn(resultHotel);
 		when(daoHelper.query(isA(ClientDao.class), anyMap(), any(), anyString())).thenReturn(new EntityResultMapImpl(
-				EntityResult.OPERATION_WRONG, 12, service.ON_THIS_DATE_THERE_ARE_NO_CLIENTS_IN_THE_HOTEL));
+				EntityResult.OPERATION_WRONG, 12, MsgLabels.CLIENT_NOT_FOUND));
 
 		assertEquals(result.getCode(), service.clientsInDateQuery(req).getCode());
 		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
