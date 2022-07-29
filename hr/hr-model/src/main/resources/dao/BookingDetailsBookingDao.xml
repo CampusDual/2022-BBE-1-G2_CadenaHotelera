@@ -6,22 +6,10 @@
 	catalog="" schema="${mainschema}" table="booking_details"
 	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
-		<Column>bok_det_id</Column>
+		<Column>bok_det_bok_id</Column>
 	</DeleteKeys>
 	<UpdateKeys>
-		<Column>bok_det_id</Column>
+		<Column>bok_det_bok_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>bok_det_id</GeneratedKey>
-	<Queries>
-		<Query id="updatePaid">
-			<Sentence>
-				<![CDATA[
-					UPDATE PUBLIC.booking_details
-					SET bok_det_paid = true
-					#WHERE#
-					RETURNING bok_det_id AS cambios;						
-				]]>
-			</Sentence>
-		</Query>
-	</Queries>
 </JdbcEntitySetup>

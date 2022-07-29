@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.BookingDetailsBookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
@@ -38,6 +40,8 @@ import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
+import com.ontimize.jee.common.db.SQLStatementBuilder.SQLStatement;
+import com.ontimize.jee.common.db.handler.PostgresSQLStatementHandler;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -80,6 +84,9 @@ public class BookingService implements IBookingService {
 
 	@Autowired
 	private BookingDetailsDao bookingDetailsDao;
+	
+	@Autowired
+	private BookingDetailsBookingDao bookingDetailsBookingDao;
 
 	@Autowired
 	private CredentialUtils credentialUtils;
@@ -1391,22 +1398,25 @@ public class BookingService implements IBookingService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult checkOut(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		
 		if (!req.containsKey(Utils.FILTER)) {
 			LOG.info(MsgLabels.FILTER_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.FILTER_MANDATORY);
 		}
+		
 		Map<String, Object> keyMap = (Map<String, Object>) req.get(Utils.FILTER);
+		
+		if (!keyMap.containsKey(BookingDao.ATTR_ID)) {
+			LOG.info(MsgLabels.BOOKING_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_MANDATORY);
+		}
+		
 		Map<String, Object> attrMap = new HashMap<>();
 		attrMap.put(BookingDao.ATTR_BOK_STATUS_CODE, "F");
 
 		List<String> attrListBooking = new ArrayList<>();
 		attrListBooking.add(BookingDao.ATTR_ENTRY_DATE);
 		attrListBooking.add(BookingDao.ATTR_DEPARTURE_DATE);
-
-		if (!keyMap.containsKey(BookingDao.ATTR_ID)) {
-			LOG.info(MsgLabels.BOOKING_MANDATORY);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_MANDATORY);
-		}
 
 		EntityResult resultBooking = daoHelper.query(this.bookingDao, keyMap, attrListBooking);
 
@@ -1421,7 +1431,7 @@ public class BookingService implements IBookingService {
 				departure = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
 						.parse(resultBooking.getRecordValues(0).get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 			} catch (ParseException e) {
-				e.printStackTrace();
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.DATE_FORMAT);
 			}
 
 			if (entry.before(today) && departure.after(today)) {
@@ -1429,8 +1439,42 @@ public class BookingService implements IBookingService {
 				attrMap.put(BookingDao.ATTR_DEPARTURE_DATE, departure);
 			}
 		} else {
+			LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 		}
+		Map<String, Object> keyMapBookingDetails = new HashMap<>();
+		keyMapBookingDetails.put(BookingDetailsDao.ATTR_BOOKING_ID, keyMap.get(BookingDao.ATTR_ID));
+		
+		List<String> attrListBookingDetails = new ArrayList<>();
+		attrListBookingDetails.add(BookingDetailsDao.ATTR_PRICE);
+		attrListBookingDetails.add(BookingDetailsDao.ATTR_PAID);
+		
+		EntityResult resultBookingDetails = daoHelper.query(bookingDetailsDao, keyMapBookingDetails, attrListBookingDetails);
+		
+		BigDecimal totalPrice = new BigDecimal("0");
+		for(int i=0;i<resultBookingDetails.calculateRecordNumber();i++) {
+			totalPrice = totalPrice.add((BigDecimal)resultBookingDetails.getRecordValues(i).get(BookingDetailsDao.ATTR_PRICE));
+			//BookingDetailsList.add(resultBookingDetails.getRecordValues(i).get(BookingDetailsDao.ATTR_ID).toString());
+		}
+		
+		Map<String, Object> keyMapBookingDetailsUpdate = new HashMap<>();
+		keyMapBookingDetailsUpdate.put(BookingDetailsDao.ATTR_BOOKING_ID, keyMap.get(BookingDao.ATTR_ID));
+		Map<String, Object> attrMapBookingDetailsUpdate = new HashMap<>();
+		attrMapBookingDetailsUpdate.put(BookingDetailsDao.ATTR_PAID, true);
+		//List<String> BookingDetailsList = new ArrayList<>();
+		
+		
+//		SQLStatement sqls = SQLStatementBuilder.createUpdateQuery("booking_details",attrMapBookingDetailsUpdate,keyMapBookingDetailsUpdate);
+//		bookingDetailsDao.unsafeUpdate(attrMapBookingDetailsUpdate,keyMapBookingDetailsUpdate);
+		
+		//BasicExpression whereBookingDetailsIn = new BasicExpression(new BasicField(BookingDetailsDao.ATTR_ID), BasicOperator.IN_OP,	BookingDetailsList);
+		
+		//keyMapBookingDetailsUpdate.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, whereBookingDetailsIn);
+		
+		//EntityResult update = daoHelper.query(bookingDetailsDao, keyMapBookingDetailsUpdate,new ArrayList<>(Arrays.asList(BookingDetailsDao.ATTR_BOOKING_ID)),"updatePaid");		
+		daoHelper.update(bookingDetailsBookingDao,attrMapBookingDetailsUpdate,keyMapBookingDetailsUpdate);		
+		
+		attrMap.put(BookingDao.ATTR_BOK_BILLING, totalPrice);
 
 		return daoHelper.update(this.bookingDao, attrMap, keyMap);
 	}

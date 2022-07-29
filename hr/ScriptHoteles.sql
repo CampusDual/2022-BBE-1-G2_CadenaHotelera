@@ -542,9 +542,10 @@ insert into room_status(rsts_status,rsts_description) values ('mantenimiento','h
 insert into room_status(rsts_status,rsts_description) values ('reforma','habitacion cerrada por reformas');
 insert into room_status(rsts_status,rsts_description) values ('sucia','habitacion cerrada por necesidad de limpieza profunda');
 
-insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('CARLOS', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
-insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JOSE', 'PÃREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
-insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('JUAN', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('Carlos', 'LOPEZ','LOPEZ','33445566T','344565789','carlos@micorreo.com');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('Mario', 'PEREZ','MARTINEZ','76545454Y','667788990','jp@mail.net');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('Juan', 'JUAREZ','LOPEZ','3444455556P','22334433','juan@mail.co.uk');
+insert  into client (cli_name,cli_surname1,cli_surname2,cli_identification,cli_phone,cli_email) values ('Miguel', 'JUAREZ','LOPEZ','3444455556P','22334433','juan.m@mail.co.uk');
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_status_code, bok_comments)
 values (1,1,'101','2022-06-25','2022-06-30','F','comments');
@@ -666,30 +667,161 @@ values(10,'2022-06-29',1,350,true),
 
 ALTER SEQUENCE booking_bok_id_seq RESTART WITH 11;
 
+--Creamos los roles--
+insert into trole(rolename,xmlclientpermission) values('gestor','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 insert into trole(rolename,xmlclientpermission) values('recepcionista','<?xml version="1.0" encoding="UTF-8"?><security></security>');
+insert into trole(rolename,xmlclientpermission) values('limpieza','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 insert into trole(rolename,xmlclientpermission) values('botones','<?xml version="1.0" encoding="UTF-8"?><security></security>');
 
+--Creamos los usuarios--
 insert into tuser (user_,password,name,surname,email,nif) values('juan','password','juan','Perico','juan-perioc@examlpe.com','11223344J');
-insert into tuser (user_,password,name,surname,email,nif) values('Mario','password','Mario','Perico','Mario-perioc@examlpe.com','1122334455J');
+insert into tuser (user_,password,name,surname,email,nif) values('mario','password','Mario','Perico','mario-perioc@examlpe.com','11223355J');
+insert into tuser (user_,password,name,surname,email,nif) values('miguel','password','Miguel','Perico','miguel-perioc@examlpe.com','11223366J');
+insert into tuser (user_,password,name,surname,email,nif) values('carlos','password','Carlos','Perico','Carlos-perioc@examlpe.com','11223366J');
 
-insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Recepcionista','descripción',0);
-insert into employee_type (etyp_name,etyp_desc) values('Limpieza','descripción');
+--Creamos los puestos de trabajo--
+insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Gestor','desc',1);
+insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Recepcionista','desc',2);
+insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('Limpieza','desc',3);
+insert into employee_type (etyp_name,etyp_desc,etyp_role_id) values('externo','desc',4);
 
+--creamos los empleados--
 insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
 values('1','Juan','Perico','Palotes','ES 92 5555 6666 7777 5555','11223344J','juan-perico@Yahoo.es','666555444','1','juan');
+insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
+values('1','Mario','Perico','Palotes','ES 92 5555 6666 7777 6666','11223345J','mario-perico@Yahoo.es','666555445','1','mario');
+insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
+values('1','Miguel','Perico','Palotes','ES 92 5555 6666 7777 7777','11223346J','miguel-perico@Yahoo.es','666555446','1','miguel');
+insert into employee(emp_etyp_id,emp_name,emp_surname1,emp_surname2,emp_bank_account, emp_identification,emp_email,emp_phone,emp_htl_id,emp_usr_user)
+values('1','Carlos','Perico','Palotes','ES 92 5555 6666 7777 8888','11223347J','carlos-perico@Yahoo.es','666555447','1','carlos');
 
+--prueba de horario de empleado--
 insert into employee_schedule(emp_sch_emp_id,emp_sch_day,emp_sch_turn_in,emp_sch_turn_out)
 values(1,'2022-07-26','8:00','14:00');
 
-
+--asignamos rol a los usuarios creados--
 insert into tuser_role(id_rolename,user_) values(1,'juan');
-insert into tuser_role(id_rolename,user_) values(2,'Mario');
+insert into tuser_role(id_rolename,user_) values(2,'mario');
+insert into tuser_role(id_rolename,user_) values(3,'miguel');
+insert into tuser_role(id_rolename,user_) values(4,'carlos');
 
+--asginamos permisos a gerente--
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IHotelService/hotelQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IHotelService/hotelInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomTypeService/roomTypeInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomService/roomQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomService/roomInsert'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingOcupiedQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingByType'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingUpdateById'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientsInDateQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeTypeService/employeeTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeTypeService/employeeTypeInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeService/employeeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeService/employeeInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISeasonService/seasonQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISeasonService/seasonInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IDetailsTypeService/detailsTypeInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeScheduleService/employeeScheduleQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeScheduleService/employeeScheduleInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomService/roomUpdateStatus'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/sendMailClients'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offersByDateRangeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offerQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offerInsert'));
+
+--asignamos permisos a recepcionista--
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingOcupiedQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingSearchByClient'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IRoomService/roomUpdateStatus'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingByType'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingUpdateById'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeClockService/employeeClockIn'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeClockService/employeeClockOut'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeScheduleService/employeeScheduleQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/getBudget'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingcheckintodayQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/checkOut'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
+
+--asignamos permisos a rol limpieza--
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(3,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingOcupiedCleanQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(3,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeClockService/employeeClockIn'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(3,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeClockService/employeeClockOut'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(3,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IEmployeeScheduleService/employeeScheduleQuery'));
+
+--asignamos permisos a agencia de viajes externa--
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/getBudget'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingByType'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISeasonService/seasonQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offersByDateRangeQuery'));
 
 
 
+
+
+--insertamos temporadas--
 insert into season(sea_name, sea_multiplier) values ('LOW',1);
 insert into season(sea_name, sea_multiplier) values ('HIGH',1.5);
 
@@ -710,12 +842,9 @@ insert into dates_season(dts_htl_id, dts_start_date, dts_end_date, dts_sea_id, d
 insert into offers (ofe_day, ofe_htl_id, ofe_rom_typ_id, ofe_night_price) values
                     ('2022-07-25',2,1,150);
 
-
-
-
-
-
 -- inserto ejemplo bok_details
 insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_price,bok_det_paid) values
                             (1,2,'2022-06-27',25,false);
+insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_price,bok_det_paid) values
+                            (1,2,'2022-06-27',50,false);
 

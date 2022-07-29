@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
+import com.ontimize.hr.model.core.dao.BookingDetailsBookingDao;
+import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.dao.SeasonDao;
@@ -97,6 +100,12 @@ class BookingServiceTest {
 	
 	@Mock
 	private BookingDao bookingDao;
+	
+	@Mock
+	private BookingDetailsDao bookingDetailsDao;
+	
+	@Mock
+	private BookingDetailsBookingDao bookingDetailsBookingDao;
 	
 	@Mock
 	private ClientDao clientDao;
@@ -1972,6 +1981,127 @@ class BookingServiceTest {
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), any(),anyString())).thenThrow(new RuntimeException());
 		EntityResult resultFinal = service.bookingFreeByTypeQuery(req);
 		assertEquals(EntityResult.OPERATION_WRONG, resultFinal.getCode());
+	}
+	
+	@Test
+	@DisplayName("CheckOut Ok")
+	void bookingCheckOutOk() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_ID, 1);
+		req.put(Utils.FILTER, filter);
+		
+		EntityResult resultBooking = new EntityResultMapImpl();
+		Map<String,Object> resultBookingIn = new HashMap<>();
+		resultBookingIn.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-29");
+		resultBookingIn.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-31");
+		resultBooking.addRecord(resultBookingIn);
+		
+		EntityResult resultBookingDetails = new EntityResultMapImpl();
+		Map<String,Object> resultBookingDetailsIn = new HashMap<>();
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PRICE, new BigDecimal("100"));
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PAID, true);
+		resultBookingDetails.addRecord(resultBookingDetailsIn);
+		
+		
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any()))
+		.thenReturn(resultBooking);		
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), any()))
+		.thenReturn(resultBookingDetails);
+		when(daoHelper.update(isA(BookingDetailsBookingDao.class), anyMap(),anyMap()))
+		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		when(daoHelper.update(isA(BookingDao.class), anyMap(),anyMap()))
+		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.checkOut(req).getCode());
+	}
+	
+	@Test
+	@DisplayName("CheckOut no filter")
+	void bookingCheckOutNoFilter() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_ID, 1);
+		//req.put(Utils.FILTER, filter);	
+		
+		assertEquals(MsgLabels.FILTER_MANDATORY, service.checkOut(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("CheckOut no booking id")
+	void bookingCheckOutNoBookingId() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		//filter.put(BookingDao.ATTR_ID, 1);
+		req.put(Utils.FILTER, filter);	
+		
+		assertEquals(MsgLabels.BOOKING_MANDATORY, service.checkOut(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("CheckOut Booking not exists")
+	void bookingCheckOutBookingNotExists() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_ID, 1);
+		req.put(Utils.FILTER, filter);
+		
+		EntityResult resultBooking = new EntityResultMapImpl();
+		Map<String,Object> resultBookingIn = new HashMap<>();
+		resultBookingIn.put(BookingDao.ATTR_ENTRY_DATE, "2022-07-29");
+		resultBookingIn.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-31");
+		//resultBooking.addRecord(resultBookingIn);
+		
+		EntityResult resultBookingDetails = new EntityResultMapImpl();
+		Map<String,Object> resultBookingDetailsIn = new HashMap<>();
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PRICE, new BigDecimal("100"));
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PAID, true);
+		resultBookingDetails.addRecord(resultBookingDetailsIn);
+		
+		
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any()))
+		.thenReturn(resultBooking);		
+//		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), any()))
+//		.thenReturn(resultBookingDetails);
+//		when(daoHelper.update(isA(BookingDetailsBookingDao.class), anyMap(),anyMap()))
+//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+//		when(daoHelper.update(isA(BookingDao.class), anyMap(),anyMap()))
+//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		assertEquals(MsgLabels.BOOKING_NOT_EXISTS, service.checkOut(req).getMessage());
+	}
+	
+	@Test
+	@DisplayName("CheckOut Bad date format")
+	void bookingCheckOutBadDateFormat() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put(BookingDao.ATTR_ID, 1);
+		req.put(Utils.FILTER, filter);
+		
+		EntityResult resultBooking = new EntityResultMapImpl();
+		Map<String,Object> resultBookingIn = new HashMap<>();
+		resultBookingIn.put(BookingDao.ATTR_ENTRY_DATE, "a");
+		resultBookingIn.put(BookingDao.ATTR_DEPARTURE_DATE, "2022-07-31");
+		resultBooking.addRecord(resultBookingIn);
+		
+		EntityResult resultBookingDetails = new EntityResultMapImpl();
+		Map<String,Object> resultBookingDetailsIn = new HashMap<>();
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PRICE, new BigDecimal("100"));
+		resultBookingDetailsIn.put(BookingDetailsDao.ATTR_PAID, true);
+		resultBookingDetails.addRecord(resultBookingDetailsIn);
+		
+		
+		when(daoHelper.query(isA(BookingDao.class), anyMap(), any()))
+		.thenReturn(resultBooking);		
+//		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), any()))
+//		.thenReturn(resultBookingDetails);
+//		when(daoHelper.update(isA(BookingDetailsBookingDao.class), anyMap(),anyMap()))
+//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+//		when(daoHelper.update(isA(BookingDao.class), anyMap(),anyMap()))
+//		.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		assertEquals(MsgLabels.DATE_FORMAT, service.checkOut(req).getMessage());
 	}
 	
 	
