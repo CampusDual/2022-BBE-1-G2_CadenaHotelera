@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -151,7 +152,14 @@ public class EmployeeClockService implements IEmployeeClockService {
 		}
 
 	}
-
+	
+	/**
+	 * EmployeeClockIn.
+	 *
+	 * @param attrMap the WHERE conditions
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockIn(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
@@ -188,6 +196,16 @@ public class EmployeeClockService implements IEmployeeClockService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.EMPLOYEE_ID_FORMAT);
 			}
 		}
+		
+		List<String> attrListClock = new ArrayList<>();
+		attrListClock.add(EmployeeClockDao.ATTR_CLOCK_IN);
+		
+		EntityResult resultClock = daoHelper.query(employeeClockDao, data, attrListClock, EmployeeClockDao.QUERY_CLOCK_IN);
+		
+		if(resultClock.getRecordValues(0).get("bool").toString().equals("false")) {
+			LOG.info(MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_OUT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_OUT);
+		}
 
 		if (data.containsKey(EmployeeClockDao.ATTR_CLOCK_IN)) {
 			data.remove(EmployeeClockDao.ATTR_CLOCK_IN);
@@ -203,7 +221,14 @@ public class EmployeeClockService implements IEmployeeClockService {
 		return this.daoHelper.insert(this.employeeClockDao, data);
 
 	}
-
+	
+	/**
+	 * EmployeeClockOut.
+	 *
+	 * @param attrMap the WHERE conditions
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult employeeClockOut(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
@@ -238,7 +263,16 @@ public class EmployeeClockService implements IEmployeeClockService {
 			LOG.info(MsgLabels.EMPLOYEE_ID_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.EMPLOYEE_ID_FORMAT);
 		}
-
+		List<String> attrListClock = new ArrayList<>();
+		attrListClock.add(EmployeeClockDao.ATTR_CLOCK_IN);
+		
+		EntityResult resultClock = daoHelper.query(employeeClockDao, data, attrListClock, EmployeeClockDao.QUERY_CLOCK_OUT);
+		
+		if(resultClock.getRecordValues(0).get("bool").toString().equals("false")) {
+			LOG.info(MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_IN);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_IN);
+		}
+		
 		if (data.containsKey(EmployeeClockDao.ATTR_CLOCK_OUT)) {
 			data.remove(EmployeeClockDao.ATTR_CLOCK_OUT);
 			data.put(EmployeeClockDao.ATTR_CLOCK_OUT, new Date());

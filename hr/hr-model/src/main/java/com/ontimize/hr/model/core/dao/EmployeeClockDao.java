@@ -16,6 +16,9 @@ public class EmployeeClockDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_CLOCK_IN = "emp_clk_in";
 	public static final String ATTR_CLOCK_OUT = "emp_clk_out";
 	
+	public static final String QUERY_CLOCK_IN = "checkIn";
+	public static final String QUERY_CLOCK_OUT = "checkOut";
+	
 	
 }
 

@@ -12,5 +12,27 @@
 		<Column>emp_clk_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>emp_clk_id</GeneratedKey>
+	<Queries>
+		<Query id="checkIn">
+			<Sentence>
+				<![CDATA[
+					SELECT count(emp_clk_in) = count(emp_clk_out)
+					as bool 
+					from PUBLIC.employee_clock 
+					#WHERE#				
+				]]>
+			</Sentence>
+		</Query>
+		<Query id="checkOut">
+			<Sentence>
+				<![CDATA[
+					SELECT count(emp_clk_in) > count(emp_clk_out)
+					as bool 
+					from PUBLIC.employee_clock 
+					#WHERE#				
+				]]>
+			</Sentence>
+		</Query>
+	</Queries>
 
 </JdbcEntitySetup>

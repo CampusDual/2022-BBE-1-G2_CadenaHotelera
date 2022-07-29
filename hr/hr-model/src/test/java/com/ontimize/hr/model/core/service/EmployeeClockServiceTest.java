@@ -1,6 +1,10 @@
 package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -60,7 +64,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockQuery bas data")
+	@DisplayName("EmployeeClockQuery bad data")
 	void QueryEmployeeBadData() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		List<String> attrList = new ArrayList<String>();
@@ -99,7 +103,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert no ClokIn and ClockOut")
+	@DisplayName("EmployeeClockInsert no ClokIn or ClockOut")
 	void InsertEmployeeClockInsertNoClock() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		attrMap.put(EmployeeClockDao.ATTR_EMPLOYEE_ID, 1);
@@ -151,7 +155,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert Error")
+	@DisplayName("EmployeeClockUpdate ok")
 	void UpdateEmployeeClockOk() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -165,7 +169,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert Error")
+	@DisplayName("EmployeeClockUpdate no date")
 	void UpdateEmployeeClockNoDate() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -179,7 +183,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert Error")
+	@DisplayName("EmployeeClockUpdate Employee not exist")
 	void UpdateEmployeeClockEmployeeNotExist() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -193,7 +197,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert Error")
+	@DisplayName("EmployeeClockUpdate Wronf date format")
 	void UpdateEmployeeClockWrongDateFormat() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -207,7 +211,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInsert Error")
+	@DisplayName("EmployeeClockUpdate Error")
 	void UpdateEmployeeClockError() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -233,7 +237,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockDeleteOk")
+	@DisplayName("EmployeeClockDelete bad Data")
 	void DeleteEmployeeClockError() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		keyMap.put(EmployeeClockDao.ATTR_ID, 2);
@@ -242,6 +246,32 @@ public class EmployeeClockServiceTest {
 		when(daoHelper.delete(employeeClockDao, keyMap)).thenThrow(new BadSqlGrammarException(null, null, null));
 		
 		assertEquals(MsgLabels.BAD_DATA,employeeClockService.employeeClockDelete(keyMap).getMessage());
+	}
+	
+	@Test
+	@DisplayName("EmployeeClockIn False Clock Out")
+	void InsertEmployeeClockInFalseClockOut() {
+		Map<String, Object> attrMap = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put(EmployeeClockDao.ATTR_EMPLOYEE_ID, 1);
+		attrMap.put(Utils.DATA, data);
+		
+		UserInformation user = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(daoHelper.getUser()).thenReturn(user);
+		when(credentialUtils.isUserEmployee("Mister X")).thenReturn(true);
+		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
+		when(entityUtils.employeeExists(1)).thenReturn(true);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", false);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
+		//when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		assertEquals(MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_OUT,employeeClockService.employeeClockIn(attrMap).getMessage());
 	}
 	
 	@Test
@@ -257,6 +287,13 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.isUserEmployee("Mister X")).thenReturn(true);
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
 		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
@@ -278,6 +315,13 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
 		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL,employeeClockService.employeeClockIn(attrMap).getCode());
@@ -297,6 +341,13 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.isUserEmployee("Mister X")).thenReturn(true);
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
 		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
@@ -371,7 +422,31 @@ public class EmployeeClockServiceTest {
 		assertEquals(MsgLabels.EMPLOYEE_NOT_EXIST,employeeClockService.employeeClockIn(attrMap).getMessage());
 	}
 	
-	
+	@Test
+	@DisplayName("EmployeeClockOut False clock in")
+	void InsertEmployeeClockOutFalseClockIn() {
+		Map<String, Object> attrMap = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put(EmployeeClockDao.ATTR_EMPLOYEE_ID, 1);
+		attrMap.put(Utils.DATA, data);
+		
+		UserInformation user = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		when(daoHelper.getUser()).thenReturn(user);
+		when(credentialUtils.isUserEmployee("Mister X")).thenReturn(true);
+		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
+		when(entityUtils.employeeExists(1)).thenReturn(true);
+		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", false);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
+		//when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		assertEquals(MsgLabels.EMPLOYEE_CLOCK_NO_CLOCK_IN,employeeClockService.employeeClockOut(attrMap).getMessage());
+	}
 	
 	@Test
 	@DisplayName("EmployeeClockOutOK")
@@ -387,13 +462,20 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
 		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL,employeeClockService.employeeClockOut(attrMap).getCode());
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInOK + date in")
+	@DisplayName("EmployeeClockOutOK + date in")
 	void InsertEmployeeClockOutWithDateIn() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -407,13 +489,20 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
 		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL,employeeClockService.employeeClockOut(attrMap).getCode());
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockInOK + date out")
+	@DisplayName("EmployeeClockOutOK + date out")
 	void InsertEmployeeClockOutWithDateOut() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -427,13 +516,20 @@ public class EmployeeClockServiceTest {
 		when(credentialUtils.getEmployeeIDFromUser("Mister X")).thenReturn(1);
 		when(entityUtils.employeeExists(1)).thenReturn(true);
 		
+		EntityResult result = new EntityResultMapImpl();
+		Map<String,Object> res = new HashMap<>();
+		res.put("bool", true);
+		result.addRecord(res);
+		
+		when(daoHelper.query(isA(EmployeeClockDao.class), anyMap(), any(),anyString())).thenReturn(result);
+		
 		when(daoHelper.insert(employeeClockDao, data)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL,employeeClockService.employeeClockOut(attrMap).getCode());
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockIn no data")
+	@DisplayName("EmployeeClockOut no data")
 	void InsertEmployeeClockOutNoData() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		
@@ -442,7 +538,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockIn no Employee Id")
+	@DisplayName("EmployeeClockOut no Employee Id")
 	void InsertEmployeeClockOutNoEmployeeId() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -452,7 +548,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockIn wrong Employee Id")
+	@DisplayName("EmployeeClockOut wrong Employee Id")
 	void InsertEmployeeClockOutWrongEmployeeId() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -468,7 +564,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockIn Employee Id Wrong Format")
+	@DisplayName("EmployeeClockOut Employee Id Wrong Format")
 	void InsertEmployeeClockOutFormatEmployeeId() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -484,7 +580,7 @@ public class EmployeeClockServiceTest {
 	}
 	
 	@Test
-	@DisplayName("EmployeeClockIn Employee does not exist")
+	@DisplayName("EmployeeClockOut Employee does not exist")
 	void InsertEmployeeClockOutEmployeeNoExist() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
 		Map<String, Object> data = new HashMap<String, Object>();
