@@ -1,8 +1,5 @@
 package com.ontimize.hr.model.core.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,24 +35,6 @@ public class RoomService implements IRoomService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RoomService.class);
 
-	public static final String HOTEL_ID_MANDATORY = "HOTEL ID MANDATORY";
-
-	public static final String NO_SUCH_STATUS = "NO SUCH STATUS";
-
-	public static final String NO_SUCH_HOTEL = "NO SUCH HOTEL";
-
-	public static final String ROOM_OCUPIED = "ROOM_OCUPIED";
-
-	public static final String DATE_FORMAT_INCORRECT = "DATE_FORMAT_INCORRECT";
-
-	public static final String END_DATE_BEFORE_START_DATE = "END_DATE_MUST_BE_AFTER_START_DATE";
-
-	public static final String ROOM_NUMBER_MANDATORY = "ROOM_NUMBER_IS_MANDATORY";
-
-	public static final String STATUS_ID_MANDATORY = "STATUS_ID_IS_MANDATORY";
-
-	public static final String ROOM_DOESNT_EXIST = "ROOM_DOESNT_EXIST";
-
 	@Autowired
 	private RoomDao roomDao;
 
@@ -62,9 +43,6 @@ public class RoomService implements IRoomService {
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
-
-	@Autowired
-	private EmployeeService employeeService;
 
 	@Autowired
 	private CredentialUtils credentialUtils;
@@ -87,6 +65,7 @@ public class RoomService implements IRoomService {
 			result = this.daoHelper.insert(this.roomDao, attrMap);
 			return result;
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.ROOM_ALREADY_EXISTS);
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
@@ -95,16 +74,20 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if (e.getMessage() != null && e.getMessage().contains("fk_type_room")) {
+				LOG.info(MsgLabels.ROOM_TYPE_NOT_EXIST);
 				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);
 			} else if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
+				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
 				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
 			if (e.getMessage() != null && e.getMessage().contains("ck_room_type_typ_name")) {
+				LOG.info(MsgLabels.ROOM_NUMBER_BLANK);
 				result.setMessage(MsgLabels.ROOM_NUMBER_BLANK);
 			}
 			return result;
 		} catch (Exception e) {
-			throw e;
+			LOG.error(MsgLabels.ERROR);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ERROR);
 		}
 	}
 
@@ -128,6 +111,7 @@ public class RoomService implements IRoomService {
 				attrMap.put(RoomDao.ATTR_STATUS_START, startDate);
 				attrMap.put(RoomDao.ATTR_STATUS_END, endDate);
 			} catch (ParseException e) {
+				LOG.info(MsgLabels.DATE_FORMAT);
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
 				result.setMessage(MsgLabels.DATE_FORMAT);
@@ -150,6 +134,7 @@ public class RoomService implements IRoomService {
 			result = this.daoHelper.update(this.roomDao, attrMap, keyMap);
 			return result;
 		} catch (DuplicateKeyException e) {
+			LOG.info(MsgLabels.ROOM_ALREADY_EXISTS);
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_ALREADY_EXISTS);
@@ -158,13 +143,16 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if (e.getMessage() != null && e.getMessage().contains("fk_type_room")) {
+				LOG.info(MsgLabels.ROOM_TYPE_NOT_EXIST);
 				result.setMessage(MsgLabels.ROOM_TYPE_NOT_EXIST);
 			} else if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
+				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
 				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			}
 			return result;
 		} catch (Exception e) {
-			throw e;
+			LOG.error(MsgLabels.ERROR);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ERROR);
 		}
 	}
 
@@ -208,10 +196,12 @@ public class RoomService implements IRoomService {
 		} else {
 			try {
 				hotelId = (Integer) filter.get(RoomDao.ATTR_HTL_ID);
-			} catch (Exception e) {
+			} catch (NumberFormatException e) {
+				LOG.info(MsgLabels.HOTEL_ID_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
 			}
 			if (auxHotelId != -1 && hotelId != auxHotelId) {
+				LOG.info(MsgLabels.NO_ACCESS_TO_HOTEL);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
 			}
 		}
@@ -220,6 +210,7 @@ public class RoomService implements IRoomService {
 		// empleado
 
 		if (!filter.containsKey(RoomDao.ATTR_NUMBER)) {
+			LOG.info(MsgLabels.ROOM_NUMBER_MANDATORY);
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_NUMBER_MANDATORY);
@@ -237,6 +228,7 @@ public class RoomService implements IRoomService {
 		EntityResult rooms = daoHelper.query(this.roomDao, keyMapRoom, attrListRoom);
 
 		if (rooms.calculateRecordNumber() == 0) {
+			LOG.info(MsgLabels.ROOM_NOT_EXIST);
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_NOT_EXIST);
@@ -260,6 +252,7 @@ public class RoomService implements IRoomService {
 		// si no enviamos datos ponemos los campos de status a null
 
 		if (!data.containsKey(RoomDao.ATTR_STATUS_ID)) {
+			LOG.info(MsgLabels.ROOM_STATUS_MANDATORY);
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			result.setMessage(MsgLabels.ROOM_STATUS_MANDATORY);
@@ -272,6 +265,7 @@ public class RoomService implements IRoomService {
 				endDate = new SimpleDateFormat(DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
 
 				if (startDate.after(endDate)) {
+					LOG.info(MsgLabels.DATE_BEFORE_GENERIC);
 					result = new EntityResultMapImpl();
 					result.setCode(EntityResult.OPERATION_WRONG);
 					result.setMessage(MsgLabels.DATE_BEFORE_GENERIC);
@@ -284,6 +278,7 @@ public class RoomService implements IRoomService {
 				data.put(RoomDao.ATTR_STATUS_START, startDate);
 				data.put(RoomDao.ATTR_STATUS_END, endDate);
 			} catch (ParseException e) {
+				LOG.info(MsgLabels.DATE_FORMAT);
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
 				result.setMessage(MsgLabels.DATE_FORMAT);
@@ -306,6 +301,7 @@ public class RoomService implements IRoomService {
 
 		for (int i = 0; i < c; i++) {
 			if (bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
+				LOG.info(MsgLabels.ROOM_OCUPIED);
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
 				result.setMessage(MsgLabels.ROOM_OCUPIED);
@@ -322,14 +318,16 @@ public class RoomService implements IRoomService {
 			result = new EntityResultMapImpl();
 			result.setCode(EntityResult.OPERATION_WRONG);
 			if (e.getMessage() != null && e.getMessage().contains("fk_hotel_room")) {
+				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
 				result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
 			} else if (e.getMessage() != null && e.getMessage().contains("fk_room_room_status")) {
+				LOG.info(MsgLabels.ROOM_STATUS_NOT_EXISTS);
 				result.setMessage(MsgLabels.ROOM_STATUS_NOT_EXISTS);
 			}
 			return result;
 		} catch (Exception e) {
 			LOG.error(MsgLabels.ERROR);
-			throw e;
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.ERROR);
 		}
 	}
 
