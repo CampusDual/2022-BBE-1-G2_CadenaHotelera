@@ -54,7 +54,7 @@ public class Utils {
 
 	public static boolean checkEmail(String email) {
 		String emailPattern = "^((\\w[^\\W]+)[\\.\\-]?){1,}\\@(([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-				return Pattern.compile(emailPattern).matcher(email).matches();
+		return Pattern.compile(emailPattern).matcher(email).matches();
 	}
 
 	public static Date sumarDiasAFecha(Date fecha, int dias) {
@@ -112,8 +112,8 @@ public class Utils {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 	}
 
-	public static void sendMail(String date, String nameJSON) throws MessagingException,AddressException {
-		
+	public static void sendMail(String date, String nameJSON) throws MessagingException, AddressException {
+
 		Properties props = new Properties();
 
 		props.put("mail.smtp.host", "smtp.gmail.com");
@@ -134,34 +134,31 @@ public class Utils {
 			}
 		});
 
-	
+		Message message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(CredentialUtils.sender));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(CredentialUtils.receiver));
 
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(CredentialUtils.sender));
-			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(CredentialUtils.receiver));
+		message.setSubject("Exceptions Hotels customer relationship");
 
-			message.setSubject("Exceptions Hotels customer relationship");
+		BodyPart messageBodyPart = new MimeBodyPart();
 
-			BodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setText(
+				"In the following email we attach in a json file the list of clients requested for the date " + date
+						+ "\n" + "\n" + "\n" + " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ");
 
-			messageBodyPart.setText(
-					"In the following email we attach in a json file the list of clients requested for the date " + date
-							+ "\n" + "\n" + "\n"
-							+ " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ");
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(messageBodyPart);
 
-			Multipart multipart = new MimeMultipart();
-			multipart.addBodyPart(messageBodyPart);
+		messageBodyPart = new MimeBodyPart();
 
-			messageBodyPart = new MimeBodyPart();
+		DataSource source = new FileDataSource(nameJSON);
+		messageBodyPart.setDataHandler(new DataHandler(source));
+		messageBodyPart.setFileName(nameJSON);
+		multipart.addBodyPart(messageBodyPart);
 
-			DataSource source = new FileDataSource(nameJSON);
-			messageBodyPart.setDataHandler(new DataHandler(source));
-			messageBodyPart.setFileName(nameJSON);
-			multipart.addBodyPart(messageBodyPart);
+		message.setContent(multipart);
 
-			message.setContent(multipart);
-
-			Transport.send(message);
+		Transport.send(message);
 	}
 
 	public static void createJSONClients(EntityResult er, String nameJSON) {
@@ -190,4 +187,5 @@ public class Utils {
 		}
 
 	}
+
 }

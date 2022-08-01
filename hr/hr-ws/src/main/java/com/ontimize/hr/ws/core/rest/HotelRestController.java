@@ -38,4 +38,17 @@ public class HotelRestController extends ORestController<IHotelService> {
 		}
 		
 	}
+	
+	@PostMapping(value = "getAirports/search", produces = MediaType.APPLICATION_JSON_VALUE )
+	public EntityResult getAirports(@RequestBody Map<String,Object> req) {
+		try {
+			return this.hotelService.getAirports(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+		
+	}
 }
