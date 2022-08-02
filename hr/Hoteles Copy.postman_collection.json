@@ -944,7 +944,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-07-04\",\r\n        \"bok_departure_date\" : \"2022-07-05\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-08-01\",\r\n        \"bok_departure_date\" : \"2022-08-09\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1194,7 +1194,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n        \"filter\":{\r\n            \"bok_htl_id\": 1,\r\n            \"bok_entry_date\": \"2022-06-01\",\r\n            \"bok_departure_date\": \"2022-06-25\",\r\n            \"rom_typ_id\": 3\r\n        },\r\n        \"columns\": [\r\n            \"rom_htl_id\",\r\n            \"rom_number\",\r\n            \"rom_typ_id\"\r\n        ],\r\n      \"sqltypes\": {\r\n        \"bok_htl_id\" : 4,\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\":91\r\n    }\r\n}",
+							"raw": "{\r\n        \"filter\":{\r\n            \"bok_htl_id\": 1,\r\n            \"bok_entry_date\": \"2022-08-01\",\r\n            \"bok_departure_date\": \"2022-08-09\",\r\n            \"rom_typ_id\": 2\r\n        },\r\n        \"columns\": [\r\n            \"rom_htl_id\",\r\n            \"rom_number\",\r\n            \"rom_typ_id\"\r\n        ],\r\n      \"sqltypes\": {\r\n        \"bok_htl_id\" : 4,\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\":91\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1256,7 +1256,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"bok_entry_date\":\"2022-07-09\",\r\n        \"bok_departure_date\":\"2022-07-12\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
+							"raw": "{\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"bok_entry_date\":\"2022-07-26\",\r\n        \"bok_departure_date\":\"2022-07-30\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2695,8 +2695,28 @@
 				{
 					"name": "Today Employee Schedule",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"qry_htl_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/todayStaff",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"todayStaff"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2815,6 +2835,123 @@
 								"detailstypehotel",
 								"detailsTypeHotel",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list detailsType",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"det_id\": 1\r\n    },\r\n    \"columns\": [\r\n        \"det_id\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstype/detailsType/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Añadir tipo de detalle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"det_code\":\"CHOCL\",\r\n        \"det_description\":\"COCHOLATE EN LA ALMOHADA\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstype/detailsType",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modificar tipo de detalle",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"det_id\":5\r\n    },\r\n    \"data\":{\r\n        \"det_code\":\"PRKNG\",\r\n        \"det_description\":\"APARCAMIENTO POR UN DIA\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstype/detailsType",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar tipo de detalle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"det_id\":5\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstype/detailsType",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType"
 							]
 						}
 					},
