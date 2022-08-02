@@ -299,6 +299,7 @@ public class HotelService implements IHotelService {
 	}
 
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getAirports(Map<String, Object> req) {
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
