@@ -28,9 +28,8 @@
 			     LEFT JOIN
 			     	PUBLIC.booking b
 			     on 
-			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id
-			     where bok_status_code like 'A'			     	
-			    #WHERE_CONCAT#
+			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id			     	
+			    #WHERE#
 			    Order by rom_number 
 			   ]]>
    			</Sentence>
@@ -83,10 +82,24 @@
 			     on 
 			     	c.cli_id = b.bok_cli_id
 			     WHERE
-			     	b.bok_entry_date = CURRENT_DATE 				     	
+			     	b.bok_entry_date = CURRENT_DATE and b.bok_status_code = 'A'				     	
 			    #WHERE_CONCAT# 
 			   ]]>
   			</Sentence>
+		</Query>
+		<Query id="capacityBookingQuery">
+			<Sentence>
+			   <![CDATA[
+			   	SELECT
+			     	#COLUMNS#
+			    FROM
+			     	PUBLIC.room_type rt
+			    JOIN PUBLIC.room r on rt.rtyp_id = r.rom_typ_id 
+				JOIN PUBLIC.booking b on b.bok_htl_id = r.rom_htl_id and b.bok_rom_number = r.rom_number 
+				JOIN PUBLIC.client c on b.bok_cli_id = c.cli_id
+				#WHERE#
+			   ]]>
+   			</Sentence>
 		</Query>
 		<Query id="priceNightByType">
 			<Sentence>

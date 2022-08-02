@@ -18,11 +18,11 @@ import com.ontimize.jee.server.rest.ORestController;
 @RequestMapping("/bookingDetails")
 public class BookingDetailsRestController extends ORestController<IBookingDetailsService> {
 	@Autowired
-	private IBookingDetailsService datesSeasonService;
+	private IBookingDetailsService bookingDetailsService;
 
 	@Override
 	public IBookingDetailsService getService() {
-		return this.datesSeasonService;
+		return this.bookingDetailsService;
 	}
 	
 	@PostMapping(value="addDetail", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,6 +39,6 @@ public class BookingDetailsRestController extends ORestController<IBookingDetail
 		else {
 			keyMap= null;			
 		}
-		return this.datesSeasonService.bookingDetailsAdd(keyMap);
+		return this.bookingDetailsService.bookingDetailsAdd(keyMap);
 	}
 }

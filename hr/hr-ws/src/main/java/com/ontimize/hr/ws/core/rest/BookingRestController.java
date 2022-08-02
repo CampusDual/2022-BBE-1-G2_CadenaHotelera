@@ -142,6 +142,17 @@ public class BookingRestController extends ORestController<IBookingService> {
 		}
 	}
 	
+	@PostMapping(value ="bookingCheckIn",  produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult bookingCheckIn(@RequestBody Map<String,Object>req) {
+		try {
+			return this.bookingService.checkIn(req);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
+	}
+	
 	@PostMapping(value ="bookingCheckOut",  produces = MediaType.APPLICATION_JSON_VALUE)
 	public EntityResult bookingCheckOut(@RequestBody Map<String,Object>req) {
 		try {

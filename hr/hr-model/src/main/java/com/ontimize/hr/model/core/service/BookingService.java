@@ -25,6 +25,7 @@ import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsBookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
+import com.ontimize.hr.model.core.dao.BookingGuestDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
@@ -85,6 +86,9 @@ public class BookingService implements IBookingService {
 	
 	@Autowired
 	private BookingDetailsBookingDao bookingDetailsBookingDao;
+	
+	@Autowired
+	private BookingGuestDao bookingGuestDao;
 
 	@Autowired
 	private CredentialUtils credentialUtils;
@@ -268,6 +272,7 @@ public class BookingService implements IBookingService {
 			LOG.info(MsgLabels.HOTEL_ID_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.error(MsgLabels.ERROR);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR);
 		}
@@ -407,8 +412,8 @@ public class BookingService implements IBookingService {
 		BasicField hotelIdB = new BasicField(hotelIdS);
 		BasicExpression bexp = new BasicExpression(hotelIdB, BasicOperator.EQUAL_OP, hotelId);
 		BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, endDate);
-		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, startDate);
+		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, startDate);
+		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, endDate);
 		BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
@@ -474,10 +479,13 @@ public class BookingService implements IBookingService {
 		BasicField statusStart = new BasicField(statusStartDate);
 		BasicField statusEnd = new BasicField(statusEndDate);
 		BasicField status = new BasicField(statusS);
-
+		BasicField statusB = new BasicField(BookingDao.ATTR_BOK_STATUS_CODE);
+		
+		BasicExpression bexp17 = new BasicExpression(statusB, BasicOperator.LIKE_OP, "A");
+		
 		BasicExpression bexp1 = new BasicExpression(statusStart, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(statusStart, BasicOperator.LESS_EQUAL_OP, endDate);
-		BasicExpression bexp3 = new BasicExpression(statusEnd, BasicOperator.MORE_EQUAL_OP, startDate);
+		BasicExpression bexp2 = new BasicExpression(statusStart, BasicOperator.LESS_EQUAL_OP, startDate);
+		BasicExpression bexp3 = new BasicExpression(statusEnd, BasicOperator.MORE_EQUAL_OP, endDate);
 		BasicExpression bexp4 = new BasicExpression(statusEnd, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(statusStart, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(statusEnd, BasicOperator.MORE_EQUAL_OP, endDate);
@@ -495,8 +503,10 @@ public class BookingService implements IBookingService {
 
 		BasicExpression bexp10 = new BasicExpression(bexp7, BasicOperator.OR_OP, bexp8);
 		BasicExpression bexp11 = new BasicExpression(bexp9, BasicOperator.OR_OP, bexp10);
+		
+		BasicExpression bexp18 = new BasicExpression(bexp11, BasicOperator.OR_OP, bexp16);
 
-		return new BasicExpression(bexp11, BasicOperator.OR_OP, bexp16);
+		return new BasicExpression(bexp17, BasicOperator.OR_OP, bexp18);
 	}
 
 	/**
@@ -1140,6 +1150,9 @@ public class BookingService implements IBookingService {
 		filterBooking.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		List<String> attrListBooking = new ArrayList<>();
+		attrListBooking.add(BookingDao.ATTR_ID);
+		attrListBooking.add(BookingDao.ATTR_CLI_ID);
+		attrListBooking.add(BookingDao.ATTR_HTL_ID);
 		attrListBooking.add(BookingDao.ATTR_ROM_NUMBER);
 		attrListBooking.add(BookingDao.ATTR_ENTRY_DATE);
 		attrListBooking.add(BookingDao.ATTR_DEPARTURE_DATE);
@@ -1392,7 +1405,152 @@ public class BookingService implements IBookingService {
 		return new BasicExpression(bexpTypeAndHotel, BasicOperator.AND_OP, bexpDates);
 
 	}
+	/**
+	 * Method to receive clients to Hotel.
+	 * 
+	 * @param req Receives the request data. Which contains the FILTER.
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult checkIn(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		
+		if (!req.containsKey(Utils.FILTER)) {
+			LOG.info(MsgLabels.FILTER_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.FILTER_MANDATORY);
+		}
+		
+		Map<String, Object> filter = (Map<String, Object>) req.get(Utils.FILTER);
+		
+		if (!req.containsKey(Utils.DATA)) {
+			LOG.info(MsgLabels.DATA_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
+		}
+		
+		Map<String, Object> data = (Map<String, Object>) req.get(Utils.DATA);
+		
+		//obtenemos el filter y el data
+		
+		if(!filter.containsKey(ClientDao.ATTR_NAME)) {
+			LOG.info(MsgLabels.CLIENT_NAME_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.CLIENT_NAME_MANDATORY);
+		}
+		
+		if(!filter.containsKey(ClientDao.ATTR_IDENTIFICATION)) {
+			LOG.info(MsgLabels.CLIENT_IDENTIFICATION_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.CLIENT_IDENTIFICATION_MANDATORY);
+		}
+		
+		//comprobamos los campos obligatorios
+		
+		if(credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
+			if(credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername())<0) {
+				if(!filter.containsKey(BookingDao.ATTR_HTL_ID)) {
+					LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+				}
+			}else {
+				if((Integer)filter.get(BookingDao.ATTR_HTL_ID)!=credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername())) {
+					LOG.info(MsgLabels.NO_ACCESS_TO_HOTEL);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
+				}
+			}
+		}else {
+			if(!filter.containsKey(BookingDao.ATTR_HTL_ID)) {
+				LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+			}
+		}		
+		//comprobamos quien hace la consulta y a donde tiene acceso
+		
+		Map<String,Object> filterRoom = new HashMap<>();
+		filterRoom.put(ClientDao.ATTR_NAME, filter.get(ClientDao.ATTR_NAME));
+		filterRoom.put(ClientDao.ATTR_IDENTIFICATION, filter.get(ClientDao.ATTR_IDENTIFICATION));
+		filterRoom.put(BookingDao.ATTR_HTL_ID, filter.get(BookingDao.ATTR_HTL_ID));
+		List<String> attrListRoom = new ArrayList<>();
+		attrListRoom.add(ClientDao.ATTR_ID);
+		attrListRoom.add(BookingDao.ATTR_ID);
+		attrListRoom.add(RoomTypeDao.ATTR_CAPACITY);
+		EntityResult resultBookingClient = daoHelper.query(bookingDao, filterRoom, attrListRoom, "capacityBookingQuery");
+		
+		if(resultBookingClient.isEmpty()) {
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
+		}
+		//obtenemos la informacion de booking buscando por nombre e identificacion
 
+		int roomCap = 0;
+		if(resultBookingClient.calculateRecordNumber()>0) {
+			roomCap = Integer.parseInt(resultBookingClient.getRecordValues(0).get(RoomTypeDao.ATTR_CAPACITY).toString());
+		}
+		
+		List<Object> guests =	(List<Object>) data.get("guests");
+
+		EntityResult resClientes = new EntityResultMapImpl();
+		
+		if(roomCap<guests.size()+1) {
+			LOG.info(MsgLabels.ROOM_CAPACITY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_CAPACITY);
+		}
+		//comprobamos que no hay mas huespedes de los que admite la habitacion
+		
+		Map<String,Object> mapPrincipalGuest = new HashMap<>();
+		mapPrincipalGuest.put(BookingGuestDao.ATTR_BOK_ID, (Integer)resultBookingClient.getRecordValues(0).get(BookingDao.ATTR_ID));
+		mapPrincipalGuest.put(BookingGuestDao.ATTR_CLI_ID, (Integer)resultBookingClient.getRecordValues(0).get(BookingDao.ATTR_CLI_ID));
+		daoHelper.insert(bookingGuestDao, mapPrincipalGuest);
+		//agregamos el cliente que hace la reserva
+		
+		
+		//iniciamos bucle para recorrer todos los huespedes 
+		for(int i=0;i<guests.size();i++) {
+			Map<String,Object> mapClients = (Map<String, Object>) guests.get(i);
+			try{
+				resClientes=daoHelper.insert(clientDao, mapClients);
+				//tratamos de incluirlos como clientes a la BD
+			}catch(DuplicateKeyException e) {
+				if(e.getMessage().contains("uq_client_cli_birthday_cli_identification")) {
+					Map<String,Object> mapClient = new HashMap<>();
+					mapClient.put(ClientDao.ATTR_NAME, mapClients.get(ClientDao.ATTR_NAME));
+					try {
+						mapClient.put(ClientDao.ATTR_BIRTHDAY, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(mapClients.get(ClientDao.ATTR_BIRTHDAY).toString()));
+					} catch (ParseException e1) {
+						LOG.info(MsgLabels.DATE_FORMAT);
+						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
+					}
+					List<String> listClient = new ArrayList<>();
+					listClient.add(ClientDao.ATTR_ID);
+					EntityResult resClient = daoHelper.query(clientDao, mapClient, listClient);
+					//si el cliente ya existia buscamos su ID
+					
+					Map<String,Object> mapGuests = new HashMap<>();
+					mapGuests.put(BookingGuestDao.ATTR_BOK_ID, (Integer)resultBookingClient.getRecordValues(0).get(BookingDao.ATTR_ID));
+					mapGuests.put(BookingGuestDao.ATTR_CLI_ID, (Integer) resClient.getRecordValues(0).get(ClientDao.ATTR_ID));
+					daoHelper.insert(bookingGuestDao, mapGuests);
+					//agregamos los clientes ya existentes
+				}
+				if(e.getMessage().contains("uq_client_cli_email")) {
+				
+				}
+			}
+			if(resClientes.get(ClientDao.ATTR_ID)!= null) {
+				Map<String,Object> mapGuests = new HashMap<>();
+				mapGuests.put(BookingGuestDao.ATTR_BOK_ID, (Integer)resultBookingClient.getRecordValues(0).get(BookingDao.ATTR_ID));
+				mapGuests.put(BookingGuestDao.ATTR_CLI_ID, (Integer)resClientes.get(ClientDao.ATTR_ID));
+				daoHelper.insert(bookingGuestDao, mapGuests);
+				//agregamos los clientes nuevos
+			}
+		}
+		
+		return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0);	
+	}
+	/**
+	 * Method to generate a client exit from Hotel.
+	 * 
+	 * @param req Receives the request data. Which contains the FILTER.
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult checkOut(Map<String, Object> req) throws OntimizeJEERuntimeException {

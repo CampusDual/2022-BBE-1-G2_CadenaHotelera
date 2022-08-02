@@ -6,6 +6,7 @@ public class MsgLabels {
 	public static final String CLIENT_NOT_EXISTS = "CLIENT_DOES_NOT_EXIST";
 	public static final String CLIENT_ID_MANDATORY = "CLIENT_ID_IS MANDATORY";
 	public static final String CLIENT_NAME_MANDATORY = "CLIENT_NAME_IS MANDATORY";
+	public static final String CLIENT_IDENTIFICATION_MANDATORY = "CLIENT_IDENTIFICATION_IS MANDATORY";
 	public static final String CLIENT_ID_FORMAT = "WRONG_CLIENT_ID_FORMAT";
 	public static final String CLIENT_MAIL_FORMAT = "WRONG_CLIENT_MAIL_FORMAT";
 	public static final String CLIENT_MAIL_EXISTS = "CLIENT_MAIL_ALREADY_EXISTS";
@@ -66,6 +67,7 @@ public class MsgLabels {
 	public static final String ROOM_STATUS_NOT_EXISTS= "ROOM_STATUS_NOT_EXISTS";
 	public static final String ROOM_OCUPIED = "ROOM_OCUPIED";
 	public static final String ROOM_NUMBER_BLANK ="ROOM_NUMBER_BLANK";
+	public static final String ROOM_CAPACITY ="ROOM_CAPACITY_SURPASSED";
 	
 	//ROOM_STATUS
 	public static final String ROOM_STATUS_MANDATORY= "ROOM_STATUS_IS_MANDATORY";
