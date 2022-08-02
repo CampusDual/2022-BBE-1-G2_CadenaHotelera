@@ -2,30 +2,59 @@ package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.mail.internet.AddressException;
+
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.internal.matchers.InstanceOf;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
+import com.ontimize.hr.model.core.service.utils.entitys.airportapi.Airport;
+import com.ontimize.hr.model.core.service.utils.entitys.airportapi.ApiAirport;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 @ExtendWith(MockitoExtension.class)
 class HotelServiceTest {
+
+	private static final Logger LOG = LoggerFactory.getLogger(HotelService.class);
 
 	@Mock
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -39,6 +68,12 @@ class HotelServiceTest {
 	@Mock
 	private CredentialUtils credential;
 
+	@Mock
+	private EntityUtils utils;
+
+	@Mock
+	private ApiAirport apiAirport;
+
 	@Test
 	@DisplayName("Inserting wrong number of stars")
 	void insertWrongNumberOfStarsTest() {
@@ -50,8 +85,6 @@ class HotelServiceTest {
 		data.put(HotelDao.ATTR_EMAIL, "hotel@correo.com");
 		data.put(HotelDao.ATTR_PHONE, "23445567");
 		data.put(HotelDao.ATTR_STARS, 45);
-
-		//EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
 
 		assertEquals(MsgLabels.HOTEL_WRONG_STARS, service.hotelInsert(data).getMessage());
 	}
@@ -149,8 +182,9 @@ class HotelServiceTest {
 		Map<String, Object> filter = new HashMap<String, Object>();
 		filter.put(HotelDao.ATTR_NAME, "Hotel Chungo");
 
-		//EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, HotelService.WRONG_STARS);
-		
+		// EntityResult res = new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+		// HotelService.WRONG_STARS);
+
 		assertEquals(MsgLabels.HOTEL_WRONG_STARS, service.hotelUpdate(data, filter).getMessage());
 
 	}
@@ -361,7 +395,7 @@ class HotelServiceTest {
 		EntityResult er = service.getHotelByCoordinates(req);
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		}
+	}
 
 	@Test
 	@DisplayName("Fails when there are no hotels in the radius")
@@ -411,7 +445,7 @@ class HotelServiceTest {
 	}
 
 	@Test
-	@DisplayName("Fails")
+	@DisplayName("Success hotelByCoordinates")
 	void testHotelByCoordinatesHotelFindInRadius() {
 		Map<String, Object> req = new HashMap<String, Object>();
 		req.put("latitude", "42.88133571272967");
@@ -455,6 +489,347 @@ class HotelServiceTest {
 
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
 		assertTrue(er.calculateRecordNumber() > 0);
+	}
+
+	@Test
+	@DisplayName("Fails when there is no id hotel in req")
+	void testGetAirportsHotelMandatory() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put("radius", 100);
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when format hotel id is wrong")
+	void testGetAirportFormatIdHotel() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, "fail");
+		req.put("radius", 100);
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_ID_FORMAT, er.getMessage());
+
+	}
+
+	@Test
+	@DisplayName("Fails when hotel doesn't exist")
+	void testGetAirportHotelNotExists() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 100);
+
+		when(utils.hotelExists(anyInt())).thenReturn(false);
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
+
+	}
+
+	@Test
+	@DisplayName("Fails when radius format is wrong")
+	void testGetAirportWrongRadiusFormat() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", "fails");
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.WRONG_RADIUS_FORMAT, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when radius format is out of range")
+	void testGetAirportRadiusOutRange() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 501);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.RADIUS_OUT_OF_RANGE, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when the hotel not found")
+	void testGetAirportHotelNotFound() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+			}
+		});
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_NOT_FOUND, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when the hotel query fails")
+	void testGetAirportHotelFatalQuery() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_WRONG);
+			}
+		});
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+
+	@Test
+	@DisplayName("fails when throwing an exception initializing the CloseableHttpClient")
+	void testGetAirportExceptionClient() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getClient()).thenThrow(new KeyManagementException());
+		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+
+	@Test
+
+	@DisplayName("fails when throwing an exception when try get token access")
+	void testGetAirportErrorGetToken() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getTokenAccess(anyString(), anyString(), anyString(), any())).thenThrow(new IOException());
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+
+	@Test
+	@DisplayName("fails when there are no hotels in radius")
+	void testGetAirportNoHotelsInRadius() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		List<Airport> lista = new ArrayList<>();
+
+		try {
+			when(apiAirport.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.NO_HOTELS_IN_RADIUS, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("success with radius")
+	void testGetAiportSuccess() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		List<Airport> lista = new ArrayList<>();
+		lista.add(new Airport());
+		try {
+			when(apiAirport.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
+		assertTrue(er.calculateRecordNumber() > 0);
+	}
+
+	@Test
+	@DisplayName("success without radius")
+	void testGetAiportSuccessWithoutRadius() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		List<Airport> lista = new ArrayList<>();
+		lista.add(new Airport());
+		try {
+			when(apiAirport.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
+		assertTrue(er.calculateRecordNumber() > 0);
+	}
+
+	@Test
+
+	@DisplayName("fails when throwing an exception when try get airportsList")
+	void testGetAirportErrorGetList() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiAirport.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+		
+		try {
+			when(apiAirport.getList(anyString(), anyString(), anyString(), anyString(), any())).thenThrow(new IOException());
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+		
+		EntityResult er = service.getAirports(req);
+
+		
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
 	}
 
 }

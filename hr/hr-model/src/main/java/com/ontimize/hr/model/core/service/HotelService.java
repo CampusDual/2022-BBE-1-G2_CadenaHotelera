@@ -1,11 +1,16 @@
 package com.ontimize.hr.model.core.service;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;	
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +50,10 @@ public class HotelService implements IHotelService {
 
 	@Autowired
 	private EntityUtils utils;
-
+	
+	@Autowired
+	private ApiAirport apiAirport;
+	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -323,6 +331,10 @@ public class HotelService implements IHotelService {
 				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
 			}
+			if(radius<0 || radius > 500) {
+				LOG.info(MsgLabels.RADIUS_OUT_OF_RANGE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RADIUS_OUT_OF_RANGE);
+			}
 		}
 
 		// get latitude/longitude hotel
@@ -348,15 +360,33 @@ public class HotelService implements IHotelService {
 		String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString();
 
 		// get CloseableHttpClient
-		CloseableHttpClient client = ApiAirport.getClient();
+		CloseableHttpClient client = null;
+		try {
+			client = apiAirport.getClient();
+		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
 		
 		//get token
-		String tokenAccess = ApiAirport.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
-				CredentialsApi.CLIENT_SECRET, client);
+		String tokenAccess = null;
+		try {
+			tokenAccess = apiAirport.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
+					CredentialsApi.CLIENT_SECRET, client);
+		} catch (IOException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
 		
 		//get Airports
-		List<Airport> listAirports = ApiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(),
-				client);
+		List<Airport> listAirports = null;
+		try {
+			listAirports = apiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(),
+					client);
+		} catch (IOException | URISyntaxException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
 
 		// check there are airports in radius
 		if (listAirports.isEmpty()) {
