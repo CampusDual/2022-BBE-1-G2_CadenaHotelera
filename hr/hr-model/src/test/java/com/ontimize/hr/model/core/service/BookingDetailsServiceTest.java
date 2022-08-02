@@ -8,8 +8,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +32,7 @@ import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.services.user.UserInformation;
@@ -690,12 +695,32 @@ class BookingDetailsServiceTest {
 		when(entityUtils.isBookinActive(17)).thenReturn(true);
 		when(entityUtils.detailTypeExists(55)).thenReturn(true);
 		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
-		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);		
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);
+		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(true);
 		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
 		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenThrow(new BadSqlGrammarException(null, null, null));
 		EntityResult res = service.bookingDetailsAdd(keyMap);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.BAD_DATA, res.getMessage());
+	}
+	
+
+	@Test
+	@DisplayName("Hotel and service exists but not on the hotel Insert charge")
+	void serviceNotInHoteladdDetailTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 17);
+		keyMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 55);
+		keyMap.put(BookingDetailsDao.ATTR_PRICE, 35);
+		when(entityUtils.bookingExists(17)).thenReturn(true);
+		when(entityUtils.isBookinActive(17)).thenReturn(true);
+		when(entityUtils.detailTypeExists(55)).thenReturn(true);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);
+		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(false);
+		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
+		EntityResult res = service.bookingDetailsAdd(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 	}
 	
 	
@@ -710,11 +735,13 @@ class BookingDetailsServiceTest {
 		when(entityUtils.isBookinActive(17)).thenReturn(true);
 		when(entityUtils.detailTypeExists(55)).thenReturn(true);
 		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
-		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);		
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);
+		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(true);
 		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
 		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult res = service.bookingDetailsAdd(keyMap);
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 	}
+	
 	
 }

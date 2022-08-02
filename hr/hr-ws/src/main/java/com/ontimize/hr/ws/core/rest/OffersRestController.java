@@ -31,7 +31,7 @@ public class OffersRestController extends ORestController<IOffersService> {
 	}
 	
 	@PostMapping(value = "bydaterange",produces = MediaType.APPLICATION_JSON_VALUE)
-	public EntityResult offersByDateRangeQuery(@RequestBody Map<String, Object> req) {
+	public EntityResult offersByDateRange(@RequestBody Map<String, Object> req) {
 		Map<String, Object> keyMap=null;
 		List<String> attrList=new ArrayList<>(Arrays.asList(OffersDao.ATTR_HTL_OFFER,OffersDao.ATTR_ROOM_TYPE_ID,OffersDao.ATTR_DAY));
 		
@@ -42,6 +42,6 @@ public class OffersRestController extends ORestController<IOffersService> {
 		} catch (Exception e){
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,"UNKNOWN ERROR");
 		}
-		return this.offersService.offersByDateRangeQuery(keyMap	,attrList);				
+		return this.offersService.offersByDateRange(keyMap	,attrList);				
 	}
 }

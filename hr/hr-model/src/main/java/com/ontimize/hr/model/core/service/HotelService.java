@@ -359,7 +359,7 @@ public class HotelService implements IHotelService {
 				client);
 
 		// check there are airports in radius
-		if (listAirports.size() == 0) {
+		if (listAirports.isEmpty()) {
 			LOG.info(MsgLabels.NO_HOTELS_IN_RADIUS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_HOTELS_IN_RADIUS);
 		}

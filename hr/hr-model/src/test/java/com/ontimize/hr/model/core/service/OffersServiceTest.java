@@ -446,7 +446,7 @@ class OffersServiceTest {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
 		List<String> attrList = new ArrayList<String>(Arrays.asList(OffersDao.ATTR_ID, OffersDao.ATTR_HTL_OFFER,
 				OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.EMPTY_FILTER, res.getMessage());
 	}
@@ -460,7 +460,7 @@ class OffersServiceTest {
 
 		keyMap.put("qry_end", "2022-07-21");
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.ENTRY_DATE_MANDATORY, res.getMessage());
 	}
@@ -474,7 +474,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "adsflokasd");
 		keyMap.put("qry_end", "2022-07-21");
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.ENTRY_DATE_FORMAT, res.getMessage());
 	}
@@ -487,7 +487,7 @@ class OffersServiceTest {
 				OffersDao.ATTR_ROOM_TYPE_ID, OffersDao.ATTR_NIGHT_PRICE));
 		keyMap.put("qry_start", "2022-07-21");
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.DEPARTURE_DATE_MANDATORY, res.getMessage());
 	}
@@ -501,7 +501,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", "asdfasdf");
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.DEPARTURE_DATE_FORMAT, res.getMessage());
 	}
@@ -515,7 +515,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", null);
 		keyMap.put("qry_end", null);
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.ENTRY_DATE_BLANK, res.getMessage());
 	}
@@ -529,7 +529,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", null);
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.DEPARTURE_DATE_BLANK, res.getMessage());
 	}
@@ -543,7 +543,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", "2022-07-20");
 
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.DATE_BEFORE, res.getMessage());
 	}
@@ -557,7 +557,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", "2022-07-23");
 		keyMap.put(OffersDao.ATTR_ROOM_TYPE_ID, "a");
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.ROOM_TYPE_FORMAT, res.getMessage());
 	}
@@ -571,7 +571,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", "2022-07-23");
 		keyMap.put(OffersDao.ATTR_HTL_OFFER, "a");
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.HOTEL_ID_FORMAT, res.getMessage());
 	}
@@ -585,7 +585,7 @@ class OffersServiceTest {
 		keyMap.put("qry_start", "2022-07-21");
 		keyMap.put("qry_end", "2022-07-23");
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 		assertEquals(0, res.calculateRecordNumber());
 	}
@@ -601,7 +601,7 @@ class OffersServiceTest {
 		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
 		when(entityUtils.hotelExists(1)).thenReturn(true);
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 		assertEquals(0, res.calculateRecordNumber());
 	}
@@ -630,7 +630,7 @@ class OffersServiceTest {
 		});
 
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(fakeResults);
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 		assertEquals(1, res.calculateRecordNumber());
 	}
@@ -646,7 +646,7 @@ class OffersServiceTest {
 		keyMap.put(OffersDao.ATTR_HTL_OFFER, 1);
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
 		when(entityUtils.hotelExists(1)).thenReturn(false);
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.HOTEL_NOT_EXIST, res.getMessage());
 	}
@@ -664,7 +664,7 @@ class OffersServiceTest {
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
 		when(entityUtils.hotelExists(1)).thenReturn(true);
 		when(entityUtils.roomTypeExists(1)).thenReturn(false);
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.ROOM_TYPE_NOT_EXIST, res.getMessage());
 	}
@@ -680,7 +680,7 @@ class OffersServiceTest {
 		keyMap.put("made_up_column", "blerg");
 		when(daoHelper.query(isA(OffersDao.class), anyMap(), anyList()))
 				.thenThrow(new BadSqlGrammarException(null, null, null));
-		EntityResult res = service.offersByDateRangeQuery(keyMap, attrList);
+		EntityResult res = service.offersByDateRange(keyMap, attrList);
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 		assertEquals(MsgLabels.BAD_DATA, res.getMessage());
 	}

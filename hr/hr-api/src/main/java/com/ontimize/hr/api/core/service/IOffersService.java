@@ -21,6 +21,6 @@ public interface IOffersService {
 	public EntityResult offerDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 	
 	
-	public EntityResult offersByDateRangeQuery(Map<String, Object>keyMap , List<String> attrList) throws OntimizeJEERuntimeException;
+	public EntityResult offersByDateRange(Map<String, Object>keyMap , List<String> attrList) throws OntimizeJEERuntimeException;
 
 }

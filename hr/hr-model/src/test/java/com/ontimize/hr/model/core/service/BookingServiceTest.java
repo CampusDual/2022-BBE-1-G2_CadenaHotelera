@@ -10,8 +10,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,28 +24,10 @@ import com.ontimize.hr.model.core.dao.DatesSeasonDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
@@ -61,7 +41,6 @@ import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 import com.ontimize.hr.model.core.dao.ClientDao;
-import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
@@ -71,8 +50,6 @@ import com.ontimize.jee.common.services.user.UserInformation;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-
-	private static final String DATE_FORMAT_ISO = "yyyy-MM-dd";
 
 	@Mock
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -118,7 +95,7 @@ class BookingServiceTest {
 	@DisplayName("ID room type wrong format")
 	void testGetBudgetIncorrectFormatRoomType() {
 		Map<String, Object> req = new HashMap<>();
-		Map<String, Object> filter = new HashMap();
+		Map<String, Object> filter = new HashMap<>();
 		req.put("filter", filter);
 
 		filter.put(RoomDao.ATTR_TYPE_ID, "fail");
@@ -133,7 +110,7 @@ class BookingServiceTest {
 	@DisplayName("Id hotel wrong format")
 	void testGetBudgetIncorretFormatHotel() {
 		Map<String, Object> req = new HashMap<>();
-		Map<String, Object> filter = new HashMap();
+		Map<String, Object> filter = new HashMap<>();
 		req.put("filter", filter);
 
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
@@ -496,7 +473,7 @@ class BookingServiceTest {
 		filter.put(BookingDao.ATTR_HTL_ID , 1);
 		filter.put(HotelDao.ATTR_CITY, "Las Vegas");
 		req.put("filter",filter);
-		UserInformation userinfo = new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
+		new UserInformation("Mister X", "password", new ArrayList<GrantedAuthority>(), null);
 
 		EntityResult result = service.bookingFreeByCityOrHotel(req);
 				

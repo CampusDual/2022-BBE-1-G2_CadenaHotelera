@@ -102,11 +102,15 @@ public class MsgLabels {
 	
 
 	// BOOKING_DETAILS_TYPE
+	public static final String DETAILS_TYPE_ID_MANDATORY= "DETAILS_TYPE_ID_MANDATORY";
+	public static final String DETAILS_TYPE_ID_FORMAT="DETAILS_TYPE_ID_FORMAT";
 	public static final String DETAILS_TYPE_CODE_MANDATORY = "DETAILS_TYPE_CODE_MANDATORY";
 	public static final String DETAILS_TYPE_CODE_BLANK = "DETAILS_TYPE_CODE_BLANK";
 	public static final String DETAILS_TYPE_CODE_MAX_LENGTH = "DETAILS_TYPE_CODE_MAX_LENGTH_IS_5";
 	public static final String DETAILS_TYPE_CODE_DUPLICATE = "DETAILS_TYPE_CODE_DUPLICATE";
 	public static final String DETAILS_TYPE_IN_USE = "DETAILS_TYPE_IN_USE";
+	public static final String DETAILS_TYPE_NOT_EXISTS= "DETAILS_TYPE_NOT_EXISTS";
+	public static final String DETAILS_TYPE_NOT_EXISTS_IN_HOTEL="DETAILS_TYPE_NOT_EXISTS_IN_HOTEL";
 
 	// HOTEL
 	public static final String HOTEL_ID_MANDATORY = "HOTEL_ID_IS_MANDATORY";
@@ -179,4 +183,11 @@ public class MsgLabels {
 	public static final String ERROR = "ERROR";
 	public static final String ERROR_SENDING_MAIL = "ERROR_SENDING_MAIL";
 	public static final String FETCHING_ERROR = "ERROR_WHILE_CHECKING_FOR_RECORDS";
+	
+	
+	
+	
+	private MsgLabels() {
+		
+	}
 }

@@ -209,7 +209,7 @@ public class OffersService implements IOffersService {
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult offersByDateRangeQuery(Map<String, Object> keyMap, List<String> columns) {
+	public EntityResult offersByDateRange(Map<String, Object> keyMap, List<String> columns) {
 		if (keyMap == null || keyMap.isEmpty()) {
 			LOG.info(MsgLabels.EMPTY_FILTER);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPTY_FILTER);

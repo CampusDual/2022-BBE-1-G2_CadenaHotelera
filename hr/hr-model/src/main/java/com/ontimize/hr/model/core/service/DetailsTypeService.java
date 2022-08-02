@@ -28,9 +28,9 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
  */
 @Service("DetailsTypeService")
 public class DetailsTypeService implements IDetailsTypeService {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(DetailsTypeService.class);
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -52,19 +52,19 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult detailsTypeQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
-		if (keyMap==null || keyMap.isEmpty()) {
+		if (keyMap == null || keyMap.isEmpty()) {
 			LOG.info(MsgLabels.FILTER_MANDATORY);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.FILTER_MANDATORY);
 		}
-		if (attrList==null || attrList.isEmpty()) {
+		if (attrList == null || attrList.isEmpty()) {
 			LOG.info(MsgLabels.COLUMNS_MANDATORY);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.COLUMNS_MANDATORY);
 		}
 		try {
-			return this.daoHelper.query(this.detailsTypeDao, keyMap, attrList);			
-		}catch (BadSqlGrammarException e) {
+			return this.daoHelper.query(this.detailsTypeDao, keyMap, attrList);
+		} catch (BadSqlGrammarException e) {
 			LOG.info(MsgLabels.BAD_DATA);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA); 
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
 	}
 
@@ -93,7 +93,8 @@ public class DetailsTypeService implements IDetailsTypeService {
 
 			if (attrMap.get(DetailsTypeDao.ATTR_CODE).toString().length() > 5) {
 				LOG.info(MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
 			}
 
 			return this.daoHelper.insert(this.detailsTypeDao, attrMap);
@@ -115,7 +116,7 @@ public class DetailsTypeService implements IDetailsTypeService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult detailsTypeUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
-	
+
 		try {
 			if (attrMap.containsKey(DetailsTypeDao.ATTR_CODE)) {
 				if (Utils.stringIsNullOrBlank(attrMap.get(DetailsTypeDao.ATTR_CODE).toString())) {
@@ -125,20 +126,29 @@ public class DetailsTypeService implements IDetailsTypeService {
 
 				if (attrMap.get(DetailsTypeDao.ATTR_CODE).toString().length() > 5) {
 					LOG.info(MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+							MsgLabels.DETAILS_TYPE_CODE_MAX_LENGTH);
 				}
 			}
 			return this.daoHelper.update(this.detailsTypeDao, attrMap, keyMap);
-		}
-		catch(BadSqlGrammarException ex) {
-			LOG.info(MsgLabels.BAD_DATA);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.BAD_DATA);
-		
 		} catch (DuplicateKeyException ex) {
 			LOG.info(MsgLabels.DETAILS_TYPE_CODE_DUPLICATE);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DETAILS_TYPE_CODE_DUPLICATE);
+		} catch (DataIntegrityViolationException e) {
+			if (e.getMessage().contains("fk_dhtl_det")) {
+				LOG.info(MsgLabels.DETAILS_TYPE_IN_USE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DETAILS_TYPE_IN_USE);
+			}
+			else {
+				LOG.error(MsgLabels.ERROR_DATA_INTEGRITY,e);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_DATA_INTEGRITY);
+			}
+		} catch (BadSqlGrammarException ex) {
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
+
 		}
-		
+
 	}
 
 	/**

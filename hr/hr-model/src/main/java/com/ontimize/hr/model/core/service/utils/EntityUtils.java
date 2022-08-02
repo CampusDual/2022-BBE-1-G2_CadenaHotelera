@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.DetailsTypeDao;
+import com.ontimize.hr.model.core.dao.DetailsTypeHotelDao;
 import com.ontimize.hr.model.core.dao.EmployeeDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
@@ -38,6 +39,9 @@ public class EntityUtils {
 	
 	@Autowired
 	private DetailsTypeDao detailsTypeDao;
+	
+	@Autowired
+	private DetailsTypeHotelDao detailsTypeHotelDao;
 	
 	@Autowired
 	private BookingDao bookingDao;
@@ -123,9 +127,30 @@ public class EntityUtils {
 			throw new OntimizeJEERuntimeException();
 		}
 	}
+	/**
+	 * check if the detail type is allowed in a concrete hotel
+	 * @param detailId id of the type of service
+	 * @param hotelId id of the hotel
+	 * @return true if the hotel has the service and is active false in any other case including non existing hotels and services
+	 */	
+	public boolean detailTypeExistsInHotel(Integer detailId, Integer hotelId) {
+		Map<String, Object>keyMap = new HashMap<>();
+		keyMap.put(DetailsTypeHotelDao.ATTR_DET_ID, detailId);
+		keyMap.put(DetailsTypeHotelDao.ATTR_HTL_ID, hotelId);
+		keyMap.put(DetailsTypeHotelDao.ATTR_ACTIVE, true);
+		EntityResult res = daoHelper.query(detailsTypeHotelDao, keyMap, Arrays.asList(DetailsTypeHotelDao.ATTR_DET_ID,DetailsTypeHotelDao.ATTR_HTL_ID));
+		if (res.getCode()== EntityResult.OPERATION_SUCCESSFUL)
+		{
+			return res.calculateRecordNumber()==1;
+		}
+		else
+		{
+			throw new OntimizeJEERuntimeException();
+		}
+	}
 	
 	/**
-	 * Checks if the filter conditions returns results. Useful to chek if updates or deletes are going to affect records 
+	 * Checks if the filter conditions returns results. Useful to check if updates or deletes are going to affect records 
 	 * @param filter
 	 * @return
 	 */
