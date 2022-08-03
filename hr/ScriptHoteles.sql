@@ -142,6 +142,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/hotelUpdate');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/hotelDelete');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/getHotelByCoordinates');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/getAirports');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomInsert');
@@ -290,6 +291,9 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,8
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,82);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,83);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,84);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,85);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,86);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,87);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t
@@ -592,7 +596,7 @@ insert  into client (cli_name,cli_surname1,cli_surname2,cli_birthday,cli_identif
 insert  into client (cli_name,cli_surname1,cli_surname2,cli_birthday,cli_identification,cli_phone,cli_email) values ('Miguel', 'JUAREZ','LOPEZ','1989-08-08','3444455557P','22334433','juan.m@mail.co.uk');
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_status_code, bok_comments)
-values (1,1,'101','2022-06-25','2022-06-30','F','comments');
+values (1,1,'101','2022-07-25','2022-07-30','F','comments');
 
 insert into booking_details(bok_det_bok_id,bok_det_date,bok_det_type,bok_det_price,bok_det_paid)
 values(1,'2022-06-25',1,120,true),
@@ -602,7 +606,7 @@ values(1,'2022-06-25',1,120,true),
       (1,'2022-06-29',1,120,true);
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_status_code,bok_comments)
-values (1,1,'102','2022-06-27','2022-07-02','F','comments');
+values (1,1,'102','2022-07-27','2022-08-02','F','comments');
 
 insert into booking_details(bok_det_bok_id,bok_det_date,bok_det_type,bok_det_price,bok_det_paid)
 values(2,'2022-06-27',1,120,true),
@@ -630,7 +634,7 @@ values(4,'2022-07-03',1,120,true),
       (4,'2022-07-06',1,120,true);
 
 insert into booking (bok_cli_id,bok_htl_id,bok_rom_number,bok_entry_date,bok_departure_date,bok_status_code,bok_comments)
-values (1,1,'105','2022-06-28','2022-07-07','F','comments');
+values (1,1,'105','2022-07-03','2022-07-07','F','comments');
 
 insert into booking_details(bok_det_bok_id,bok_det_date,bok_det_type,bok_det_price,bok_det_paid)
 values(5,'2022-06-28',1,120,true),

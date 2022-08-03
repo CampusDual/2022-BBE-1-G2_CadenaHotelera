@@ -35,39 +35,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-32",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\": {\r\n        \"htl_address\": \"address\",\r\n        \"htl_phone\": \"phone\",\r\n        \"htl_zip_code\": \"zipCode\",\r\n        \"htl_email\": \"mail\",\r\n        \"htl_city\": \"ciudad\",\r\n        \"htl_name\": \"nombre\",\r\n        \"htl_stars\": 4\r\n    },\r\n    \"sqltypes\": {\r\n        \"htl_address\": 12,\r\n        \"htl_phone\": 12,\r\n        \"htl_zip_code\": 12,\r\n        \"htl_email\": 12,\r\n        \"htl_city\": 12,\r\n        \"htl_name\": 12,\r\n        \"htl_stars\": 4\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/hotels/hotel",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"hotels",
-										"hotel"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Get hotel -R",
@@ -211,39 +179,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-33",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\": {\r\n        \"typ_name\": \"tipo1\",\r\n        \"typ_bed_number\": 2,\r\n        \"typ_base_price\": 200\r\n    },\r\n    \"sqltypes\": {\r\n        \"typ_name\": 12,\r\n        \"typ_bed_number\": 4,\r\n        \"typ_base_price\": 2\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/roomtypes/roomType",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"roomtypes",
-										"roomType"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Get roomType -R",
@@ -386,39 +322,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-29",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\": {\r\n        \"rom_htl_id\": 4,\r\n        \"rom_number\": 202,\r\n        \"rom_typ_id\": 2\r\n    },\r\n    \"sqltypes\": {\r\n        \"rom_htl_id\": 2,\r\n        \"rom_number\": 12,\r\n        \"rom_typ_id\": 2\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/rooms/room",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"rooms",
-										"room"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Get rooms -R",
@@ -427,7 +331,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"rom_htl_id\": 1\r\n    },\r\n    \"columns\": [\r\n        \"rom_number\",\"rom_typ_id\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"rom_htl_id\": 1\r\n    },\r\n    \"columns\": [\r\n        \"rom_number\",\"rom_typ_id\",\"rom_rsts_id\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -447,40 +351,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-39",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"filter\": {\r\n        \"rom_htl_id\": 1\r\n    },\r\n    \"columns\": [\r\n        \"rom_number\",\"rom_typ_id\"\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/rooms/room/search",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"rooms",
-										"room",
-										"search"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Put rooms -U",
@@ -545,7 +416,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"rom_number\" :\"108\",\r\n        \"rom_htl_id\":1\r\n\t},\r\n    \"data\": {\r\n        \"rom_rsts_id\":2,\r\n        \"rom_status_start\":\"2022-06-17\",\r\n        \"rom_status_end\":\"2022-06-20\"\r\n    }\r\n}",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"rom_number\" :\"101\",\r\n        \"rom_htl_id\":1\r\n\t},\r\n    \"data\": {\r\n        \"rom_rsts_id\":3\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -598,39 +469,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-30",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\":{\r\n        \"cli_name\": \"nombre\",\r\n        \"cli_surname1\": \"apellido1\",\r\n        \"cli_surname2\": \"apellido2\",\r\n        \"cli_identification\": \"44556677F\",\r\n        \"cli_phone\": \"666555444\",\r\n        \"cli_email\": \"mail@mail.com\"\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/clients/client",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"clients",
-										"client"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Get client -R",
@@ -712,40 +551,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-17",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"columns\":[\"cli_name\",\"cli_surname1\",\"cli_surname2\"],\r\n    \"filter\":{\r\n        \"qry_date\":\"2022-07-03\",\r\n        \"bok_htl_id\":1\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/clients/clientsDate/search",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"clients",
-										"clientsDate",
-										"search"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Del client -D",
@@ -754,7 +560,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n    \t\"cli_id\": 1\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n    \t\"cli_id\": 5\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -877,11 +683,26 @@
 				{
 					"name": "HabitacionesLibres",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-06-18\",\r\n        \"bok_departure_date\" : \"2022-06-22\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-08-03\",\r\n        \"bok_departure_date\": \"2022-08-07\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -902,50 +723,31 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-41",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-07-01\",\r\n        \"bok_departure_date\" : \"2022-07-05\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:33333/bookings/bookingFree/search",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"bookingFree",
-										"search"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "HabitacionesOcupadas",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-07-04\",\r\n        \"bok_departure_date\" : \"2022-07-05\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-08-01\",\r\n        \"bok_departure_date\" : \"2022-08-31\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -966,41 +768,52 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-40",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"filter\": {\r\n        \"hotel\":\"1\",\r\n        \"inicio\": \"04/07/2022\",\r\n        \"fin\" : \"05/07/2022\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ],\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
+					"response": []
+				},
+				{
+					"name": "HabitacionesOcupadasLimpieza",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
 								},
-								"url": {
-									"raw": "http://localhost:33333/bookings/bookingOcupied/search",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"bookingOcupied",
-										"search"
-									]
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
 								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingOcupiedClean/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingOcupiedClean",
+								"search"
+							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
 					"name": "Delete booking",
@@ -1009,7 +822,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"filter\": {\r\n    \t\"bok_id\": 9\r\n    \r\n    }\r\n}",
+							"raw": "{\"filter\": {\r\n    \t\"bok_id\": 12\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1029,40 +842,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-11",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\"filter\": {\r\n    \t\"bok_id\": 4\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/bookings/booking/delete",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"booking",
-										"delete"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Update Booking",
@@ -1071,7 +851,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :11\r\n\t},\r\n    \"data\": {\r\n        \"bok_entry_date\": \"2022-07-12\",\r\n        \"bok_departure_date\": \"2022-07-11\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :10\r\n\t},\r\n    \"data\": {\r\n        \"bok_entry_date\": \"2022-07-10\",\r\n        \"bok_departure_date\": \"2022-07-11\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1091,40 +871,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-10",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" : 2\r\n\t},\r\n    \"data\": {\r\n        \"inicio\": \"27/06/2022\",\r\n        \"fin\": \"03/07/2022\",\r\n        \"tipo\":1\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/bookings/booking/update",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"booking",
-										"update"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "CheckInToday",
@@ -1153,40 +900,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-7",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"columns\":[\"bok_id\",\"bok_rom_number\",\"cli_name\"],\r\n    \"filter\":{\r\n        \"bok_htl_id\":1\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/bookings/bookingcheckintoday/search",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"bookingcheckintoday",
-										"search"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "BookingFreeByType",
@@ -1195,7 +909,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n        \"filter\":{\r\n            \"bok_htl_id\": 1,\r\n            \"bok_entry_date\": \"2022-06-01\",\r\n            \"bok_departure_date\": \"2022-06-25\",\r\n            \"rom_typ_id\": 3\r\n        },\r\n        \"columns\": [\r\n            \"rom_htl_id\",\r\n            \"rom_number\",\r\n            \"rom_typ_id\"\r\n        ],\r\n      \"sqltypes\": {\r\n        \"bok_htl_id\" : 4,\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\":91\r\n    }\r\n}",
+							"raw": "{\r\n        \"filter\":{\r\n            \"bok_htl_id\": 1,\r\n            \"bok_entry_date\": \"2022-08-01\",\r\n            \"bok_departure_date\": \"2022-08-31\",\r\n            \"rom_typ_id\": 1\r\n        },\r\n        \"columns\": [\r\n            \"rom_htl_id\",\r\n            \"rom_number\",\r\n            \"rom_typ_id\"\r\n        ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1215,40 +929,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-45",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"filter\":{\r\n        \"bok_htl_id\":1,\r\n        \"rom_typ_id\":2,\r\n        \"bok_entry_date\":\"2022-07-06\",\r\n        \"bok_departure_date\":\"2022-07-09\"\r\n    },\r\n    \"columns\":[\"rom_number\"],\r\n    \"sqltypes\":{\r\n        \"bok_htl_id\":4,\r\n        \"bok_departure_date\":91,\r\n        \"bok_entry_date\":91\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/bookings/bookingFreeByType/search",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"bookingFreeByType",
-										"search"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "BookingByType",
@@ -1257,7 +938,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"bok_entry_date\":\"2022-07-09\",\r\n        \"bok_departure_date\":\"2022-07-12\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
+							"raw": "{\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"bok_entry_date\":\"2022-08-03\",\r\n        \"bok_departure_date\":\"2022-08-07\",\r\n        \"rom_typ_id\":1\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1276,39 +957,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "BG2-42",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\":{\r\n        \"bok_htl_id\":1,\r\n        \"bok_cli_id\":1,\r\n        \"bok_entry_date\":\"2022-07-09\",\r\n        \"bok_departure_date\":\"2022-07-12\",\r\n        \"rom_typ_id\":2\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:33333/bookings/bookingbytype",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"bookings",
-										"bookingbytype"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "bookingSearchByClient",
@@ -1317,7 +966,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"cli_name\": \"CARLOS\",\r\n        \"cli_identification\": \"33445566T\",\r\n        \"bok_htl_id\": 1\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"cli_name\": \"Mario\",\r\n        \"cli_identification\": \"76545454Y\",\r\n        \"bok_htl_id\": 1\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1341,13 +990,13 @@
 					"response": []
 				},
 				{
-					"name": "FAIL",
+					"name": "BookingCheckIn",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"columns\": [\"rom_number\",\"rom_htl_id\"],\r\n    \"filter\":{\r\n        \"@basic_expression\": {\r\n            \"lop\":{\r\n                \"lop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"rom_htl_id\",\r\n                        \"op\": \"<>\",\r\n                        \"rop\": 1\r\n                    },\r\n                    \"op\": \"OR\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_htl_id\",\r\n                        \"op\": \"=\",\r\n                        \"rop\": 1\r\n                    }\r\n                },\r\n                \"op\":\"OR\",\r\n                \"rop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-03\"},\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                 }\r\n            },\r\n            \"op\":\"OR\",\r\n            \"rop\":{\r\n                \"lop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-03\"\r\n                    },\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                },\r\n                \"op\":\"OR\",\r\n                \"rop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-03\"},\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                 }\r\n            }\r\n        }\r\n    },\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"cli_name\": \"Mario\",\r\n        \"cli_identification\": \"76545454Y\",\r\n        \"bok_htl_id\": 1\r\n    },\r\n    \"data\": {\r\n        \"guests\": [\r\n            {\r\n                \"cli_name\": \"cliente\",\r\n                \"cli_surname1\": \"surname\",\r\n                \"cli_birthday\": \"1989-08-08\",\r\n                \"cli_identification\": \"11223322S\"\r\n            },\r\n            {\r\n                \"cli_name\": \"cliente2\",\r\n                \"cli_surname1\": \"surname2\",\r\n                \"cli_birthday\": \"1989-08-07\",\r\n                \"cli_identification\": \"11223323S\"\r\n            },\r\n            {\r\n                \"cli_name\": \"cliente4\",\r\n                \"cli_surname1\": \"surname3\",\r\n                \"cli_birthday\": \"1989-08-10\",\r\n                \"cli_identification\": \"11223322J\"\r\n            }\r\n        ]\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1355,29 +1004,27 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:33333/bookings/bookingFree/search",
-							"protocol": "http",
+							"raw": "localhost:33333/bookings/bookingCheckIn",
 							"host": [
 								"localhost"
 							],
 							"port": "33333",
 							"path": [
 								"bookings",
-								"bookingFree",
-								"search"
+								"bookingCheckIn"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Post BookingCheckOut",
+					"name": "BookingCheckOut",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :11\r\n\t}    \r\n}",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :13\r\n\t}    \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1450,6 +1097,65 @@
 							"path": [
 								"bookings",
 								"bookingGetBudget",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post BookingDetails -R",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_det_bok_id\":1\r\n        },\r\n    \"columns\": [\r\n        \"bok_det_price\",\r\n        \"bok_det_bok_id\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/bookingDetails/bookingDetails/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookingDetails",
+								"bookingDetails",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FAIL",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"columns\": [\"rom_number\",\"rom_htl_id\"],\r\n    \"filter\":{\r\n        \"@basic_expression\": {\r\n            \"lop\":{\r\n                \"lop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"rom_htl_id\",\r\n                        \"op\": \"<>\",\r\n                        \"rop\": 1\r\n                    },\r\n                    \"op\": \"OR\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_htl_id\",\r\n                        \"op\": \"=\",\r\n                        \"rop\": 1\r\n                    }\r\n                },\r\n                \"op\":\"OR\",\r\n                \"rop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-03\"},\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                 }\r\n            },\r\n            \"op\":\"OR\",\r\n            \"rop\":{\r\n                \"lop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-03\"\r\n                    },\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                },\r\n                \"op\":\"OR\",\r\n                \"rop\":{\r\n                    \"lop\":{\r\n                        \"lop\": \"bok_entry_date\",\r\n                        \"op\": \"<=\",\r\n                        \"rop\": \"2022-07-03\"},\r\n                    \"op\": \"AND\",\r\n                    \"rop\":{\r\n                        \"lop\": \"bok_departure_date\",\r\n                        \"op\": \">=\",\r\n                        \"rop\": \"2022-07-04\"\r\n                    }\r\n                 }\r\n            }\r\n        }\r\n    },\r\n    \"sqltypes\": {\r\n        \"bok_departure_date\": 91,\r\n        \"bok_entry_date\": 91\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingFree/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingFree",
 								"search"
 							]
 						}
@@ -1553,40 +1259,7 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Sprint2-BG2-47",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\": {\r\n        \"emp_etyp_id\": 1,\r\n        \"emp_name\": \"Miguel\",\r\n        \"emp_surname1\": \"Miguel\",\r\n        \"emp_surname2\": \"Miguel\",\r\n        \"emp_birth_date\": \"2000-05-06\",\r\n        \"emp_bank_account\": \"ES 92 7777 8888 8888 3333\",\r\n        \"emp_address\": \"Mechanical Avenue 123\",\r\n        \"emp_identification\": \"934g3h4f\",\r\n        \"emp_email\": \"miguel@example.com\",\r\n        \"emp_phone\": \"99999999999\",\r\n        \"emp_htl_id\": 1,\r\n        \"emp_usr_user\": null\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:33333/employees/employee",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"employees",
-										"employee"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "crear usuario a empleado",
@@ -1630,40 +1303,262 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Sprint2-BG2-47",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"data\":{\r\n        \"emp_id\":2,\r\n        \"emp_usr_user\":\"migui\",\r\n        \"qry_password\":\"password\"\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:33333/employees/createUser",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "33333",
-									"path": [
-										"employees",
-										"createUser"
-									]
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "EmployeeClock",
+			"item": [
+				{
+					"name": "EmployeeClock -C",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_clk_emp_id\": 1,\r\n        \"emp_clk_in\": \"2022-07-26-8:00\",\r\n        \"emp_clk_out\": \"2022-07-26-10:00\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeClock/employeeClock",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"employeeClock"
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "EmployeeClock -R",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"emp_clk_emp_id\":1\r\n        },\r\n    \"columns\": [\r\n        \"emp_clk_id\",\r\n        \"emp_clk_in\",\r\n        \"emp_clk_out\"\r\n    ],\r\n    \"sqltypes\":{\r\n        \"emp_clk_in\":93\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/employeeClock/employeeClock/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"employeeClock",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EmployeeClock -U",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"emp_clk_id\" :4\r\n\t},\r\n    \"data\": {\r\n        \"emp_clk_in\": \"2022-07-26-17:00\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeClock/employeeClock",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"employeeClock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EmployeeClock -D",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n    \t\"emp_clk_id\": \"a\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeClock/employeeClock",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"employeeClock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fichar IN",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_clk_emp_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/employeeClock/clock/in",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"clock",
+								"in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fichar OUT",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_clk_emp_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/employeeClock/clock/out",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"clock",
+								"out"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "EmployeeShedule",
+			"item": [
+				{
+					"name": "EmployeeSchedule -C",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_sch_emp_id\":2,\r\n        \"emp_sch_day\":\"2022-07-26\",\r\n        \"emp_sch_turn_in\":\"10:00:00\",\r\n        \"emp_sch_turn_out\":\"12:00:00\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/employeeSchedule",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"employeeSchedule"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EmployeeSchedule -U",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"emp_sch_id\" :2\r\n\t},\r\n    \"data\": {\r\n        \"emp_sch_turn_in\":\"12:00:00\"\r\n    },\r\n    \"sqltypes\":{\r\n        \"emp_sch_turn_in\":92,\r\n        \"emp_sch_turn_out\":92\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/employeeSchedule",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"employeeSchedule"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1925,6 +1820,71 @@
 			]
 		},
 		{
+			"name": "DetailsType",
+			"item": [
+				{
+					"name": "modify details type by hotel",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"dhtl_det_id\":1,\r\n        \"dhtl_htl_id\":2\r\n    },\r\n    \"data\":{\r\n        \"dhtl_det_id\":1,\r\n        \"dhtl_htl_id\":2,\r\n        \"dhtl_active\":true\r\n    }\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstypehotel/detailsTypeHotel/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstypehotel",
+								"detailsTypeHotel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete details type by hotel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"dhtl_det_id\":1,\r\n        \"dhtl_htl_id\":2\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstypehotel/detailsTypeHotel/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstypehotel",
+								"detailsTypeHotel",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Sprint2",
 			"item": [
 				{
@@ -2067,13 +2027,92 @@
 					]
 				},
 				{
+					"name": "HabitacionesLibres Copy",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "migui",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_entry_date\": \"2022-06-25\",\r\n        \"bok_departure_date\" : \"2022-07-25\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingFree/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingFree",
+								"search"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "BG2-41",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-07-01\",\r\n        \"bok_departure_date\" : \"2022-07-05\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:33333/bookings/bookingFree/search",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "33333",
+									"path": [
+										"bookings",
+										"bookingFree",
+										"search"
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
 					"name": "HabitacionesDisponiblesPorCiudad Copy",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\":{\r\n        \"htl_city\":\"Las vegas\",\r\n        \"bok_entry_date\":\"2022-07-15\",\r\n        \"bok_departure_date\":\"2022-07-30\"\r\n\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\":{\r\n        \"htl_city\":\"Las Vegas\",\r\n        \"bok_entry_date\":\"2022-07-15\",\r\n        \"bok_departure_date\":\"2022-07-30\"\r\n\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2402,6 +2441,21 @@
 				{
 					"name": "get Season Copy",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2547,7 +2601,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"filter\": {\r\n        \"start_day\": \"2022-07-11\",\r\n        \"end_day\":\"2022-07-25\",\r\n        \"htl_id\": 2,\r\n        \"rtyp_id\":1\r\n    }\r\n}",
+							"raw": "{\r\n    \"filter\": {\r\n        \"start_day\": \"2022-07-23\",\r\n        \"end_day\":\"2022-07-25\",\r\n        \"htl_id\": 1,\r\n        \"rtyp_id\":10\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2601,6 +2655,635 @@
 							"body": null
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "Sprint3",
+			"item": [
+				{
+					"name": "BG2-8 Hotels Near GPS",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"radius\":60.0,\r\n    \"latitude\": \"42.88133571272967\",\r\n    \"longitude\": \"-8.544512255871647\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/hotels/hotelByCoordinates/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"hotels",
+								"hotelByCoordinates",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-9 Today Employee Schedule",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"qry_htl_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/todayStaff",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"todayStaff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-5 Dirty Ocupied Rooms",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "miguel",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingOcupiedClean/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingOcupiedClean",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-18 Offers by date range",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"qry_start\":\"2070-02-02\",\r\n        \"qry_end\":\"2071-03-03\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/offers/bydaterange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"offers",
+								"bydaterange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-21 Free Rooms",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"bok_htl_id\":\"1\",\r\n        \"bok_entry_date\": \"2022-08-03\",\r\n        \"bok_departure_date\": \"2022-08-25\"\r\n    },\r\n    \"columns\": [\r\n        \"rom_htl_id\",\r\n        \"rom_number\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookings/bookingFree/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingFree",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-19 Dirty Room Mark",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"rom_htl_id\":1,\r\n        \"rom_number\":\"101\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/rooms/roomMarkDirty",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"rooms",
+								"roomMarkDirty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-31 List Services (DetailsType)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \"det_direct_payment\":false\r\n    },\r\n    \"columns\":[\"det_id\",\"det_code\",\"det_description\"]\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/detailstype/detailsType/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-31 Add Service (DetailsType)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"det_code\": \"srvce\",\r\n        \"det_description\": \"new_service\",\r\n        \"det_direct_payment\": false\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/detailstype/detailsType",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstype",
+								"detailsType"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-50 Status Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"rom_number\" :\"201\",\r\n        \"rom_htl_id\":1\r\n\t},\r\n    \"data\": {\r\n        \"rom_rsts_id\":3,\r\n        \"rom_status_start\":\"2022-08-03\",\r\n        \"rom_status_end\":\"2022-08-10\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/rooms/roomUpdate/status",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"rooms",
+								"roomUpdate",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-26 Send Mail Police",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"qry_date\": \"2022-07-03\",\r\n        \"bok_htl_id\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/clients/sendMailClients",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"clients",
+								"sendMailClients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-48 Add Service To Booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"bok_det_bok_id\": 1,\r\n        \"bok_det_type\": 4,\r\n        \"bok_det_price\": 32.5,\r\n        \r\n        \"bok_det_paid\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/bookingDetails/addDetail",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookingDetails",
+								"addDetail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-49 Employee Schedule -C",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_sch_emp_id\":2,\r\n        \"emp_sch_day\":\"2022-07-26\",\r\n        \"emp_sch_turn_in\":\"10:00:00\",\r\n        \"emp_sch_turn_out\":\"12:00:00\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/employeeSchedule",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"employeeSchedule"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-49 Employee Schedule -R",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"emp_sch_emp_id\":1\r\n        },\r\n    \"columns\": [\r\n        \"emp_sch_day\",\r\n        \"emp_sch_turn_in\",\r\n        \"emp_sch_turn_out\",\r\n        \"emp_sch_turn_extra\",\r\n        \"emp_sch_comments\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/employeeSchedule/employeeSchedule/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeSchedule",
+								"employeeSchedule",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-51 Clock IN",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "god",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_clk_emp_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/employeeClock/clock/in",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"clock",
+								"in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-51 Clock OUT",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"emp_clk_emp_id\":1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/employeeClock/clock/out",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"employeeClock",
+								"clock",
+								"out"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-54 Booking CheckOut",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"filter\" :{\r\n\t\t\"bok_id\" :12\r\n\t}    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/bookings/bookingCheckOut",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingCheckOut"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-54 Booking CheckIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"cli_name\": \"Mario\",\r\n        \"cli_identification\": \"76545454Y\",\r\n        \"bok_htl_id\": 1\r\n    },\r\n    \"data\": {\r\n        \"guests\": [\r\n            {\r\n                \"cli_name\": \"cliente\",\r\n                \"cli_surname1\": \"surname\",\r\n                \"cli_birthday\": \"1989-08-08\",\r\n                \"cli_identification\": \"11223322S\"\r\n            },\r\n            {\r\n                \"cli_name\": \"cliente2\",\r\n                \"cli_surname1\": \"surname2\",\r\n                \"cli_birthday\": \"1989-08-07\",\r\n                \"cli_identification\": \"11223323S\"\r\n            },\r\n            {\r\n                \"cli_name\": \"cliente4\",\r\n                \"cli_surname1\": \"surname3\",\r\n                \"cli_birthday\": \"1989-08-10\",\r\n                \"cli_identification\": \"11223322J\"\r\n            }\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/bookings/bookingCheckIn",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"bookings",
+								"bookingCheckIn"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-57 List Services(DetailsType) By Hotel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\":{\r\n        \r\n    },\"columns\":[\"dhtl_htl_id\",\"dhtl_det_id\"]\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstypehotel/detailsTypeHotel/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstypehotel",
+								"detailsTypeHotel",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-57 Add Services(DetailsType) By Hotel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\":{\r\n        \"dhtl_det_id\":5,\r\n        \"dhtl_htl_id\":2,\r\n        \"dhtl_active\":true\r\n    }\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:33333/detailstypehotel/detailsTypeHotel/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"detailstypehotel",
+								"detailsTypeHotel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BG2-55 Airports Near Hotels",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"htl_id\": 1,\r\n    \"radius\":100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:33333/hotels/getAirports/search",
+							"host": [
+								"localhost"
+							],
+							"port": "33333",
+							"path": [
+								"hotels",
+								"getAirports",
+								"search"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
