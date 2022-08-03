@@ -371,10 +371,19 @@ public class BookingDetailsService implements IBookingDetailsService {
 			LOG.info(MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
 		}
-		
-		if(!entityUtils.detailTypeExistsInHotel(detailsType, hotelid)) {
-			LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
+
+		if (hotelid == -1) {
+			if(!entityUtils.detailTypeExistsInHotel(detailsType, entityUtils.getHotelFromBooking(bookingId))) {
+				LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
+			}
+		} else {
+			if (!entityUtils.detailTypeExistsInHotel(detailsType, hotelid)) {
+				LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
+			}
 		}
 
 		Map<String, Object> keyMapInsert = new HashMap<>();

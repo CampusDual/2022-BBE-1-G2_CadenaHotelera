@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -723,6 +724,26 @@ class BookingDetailsServiceTest {
 		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
 	}
 	
+	
+	@Test
+	@DisplayName("Admin Hotel and service exists but not on the hotel Insert charge")
+	void adminServiceNotInHoteladdDetailTest() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 17);
+		keyMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 55);
+		keyMap.put(BookingDetailsDao.ATTR_PRICE, 35);
+		when(entityUtils.bookingExists(17)).thenReturn(true);
+		when(entityUtils.isBookinActive(17)).thenReturn(true);
+		when(entityUtils.detailTypeExists(55)).thenReturn(true);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
+		UserInformation userInfo = new UserInformation("Mister X", "password", (Collection<GrantedAuthority>) new ArrayList<GrantedAuthority>(), null);
+		when(daoHelper.getUser()).thenReturn(userInfo);
+		when(entityUtils.getHotelFromBooking(17)).thenReturn(1);
+		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(false);
+		EntityResult res = service.bookingDetailsAdd(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL, res.getMessage());
+	}
 	
 	@Test
 	@DisplayName("Fake Insert charge")

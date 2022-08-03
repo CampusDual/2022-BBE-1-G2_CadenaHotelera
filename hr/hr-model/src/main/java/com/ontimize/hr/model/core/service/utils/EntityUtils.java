@@ -276,4 +276,25 @@ public class EntityUtils {
 		}
 	}
 	
+	/**
+	 * Returns the hotel id from the booking
+	 * @param bookingId id of the booking
+	 * @return Returns the hotel id from the booking -1 if the booking does not exist throws an exception when the query return an error 
+	 */
+	public Integer getHotelFromBooking(Integer bookingId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		EntityResult res = daoHelper.query(bookingDao, keyMap, Arrays.asList(BookingDao.ATTR_HTL_ID));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if(res.calculateRecordNumber()==1) {
+				return (Integer) res.getRecordValues(0).get(BookingDao.ATTR_HTL_ID);
+			}
+			else {
+				return -1;
+			}
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
 }
