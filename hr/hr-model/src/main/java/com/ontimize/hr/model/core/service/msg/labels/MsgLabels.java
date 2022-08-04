@@ -89,6 +89,7 @@ public class MsgLabels {
 	public static final String BOOKING_NO_CHANGES = "UNABLE_TO_CHANGE_BOOKING";
 	public static final String BOOKING_NOT_ACTIVE = "BOOKING NOT ACTIVE";
 	public static final String BOOKING_NOT_FROM_YOUR_HOTEL = "BOOKING NOT FROM YOUR HOTEL";
+	public static final String BOOKING_USED_OFFER_ID_INSTEAD_CODE="BOOKING_USED_OFFER_ID_INSTEAD_CODE";
 
 	// BOOKING_DETAILS
 	public static final String BOOKING_DETAILS_BOOKING_ID_MANDATORY = "BOK_DET_BOK_ID_MANDATORY ";
@@ -96,6 +97,7 @@ public class MsgLabels {
 	public static final String BOOKING_DETAILS_TYPE_MANDATORY = "DETAILS_TYPE_ID_MANDATORY";
 	public static final String BOOKING_DETAILS_PRICE_MANDATORY = "PRICE_MANDATORY";
 	public static final String BOOKING_DETAILS_PRICE_NEGATIVE = "PRICE_NEGATIVE";
+	public static final String BOOKING_DETAILS_PRICE_ZERO="PRICE_ZERO";
 	public static final String BOOKING_DETAILS_PAID_MANDATORY = "PAID_MANDATORY";
 	public static final String BOOKING_DETAILS_DATE_TODAY = "ONLY TODAY ALLOWED";
 	public static final String BOOKING_DETAILS_PRICE_FORMAT = "PRICE_FORMAT";
@@ -143,6 +145,12 @@ public class MsgLabels {
 	public static final String OFFERS_DAY_MANDATORY = "OFFERS_DAY_MANDATORY";
 	public static final String OFFERS_PRICE_NIGHT_MANDATORY = "OFFERS_PRICE_NIGHT_MANDATORY";
 
+	//SPECIAL OFFERS
+	public static final String SPECIAL_OFFER_DOES_NOT_EXIST ="SPECIAL_OFFER_DOES_NOT_EXIST";
+	public static final String SPECIAL_OFFER_DOES_NOT_APPLY ="SPECIAL_OFFER_DOES_NOT_APPLY";
+	public static final String SPECIAL_OFFER_ID_FORMAT ="SPECIAL_OFFER_ID_FORMAT";
+	public static final String SPECIAL_OFFER_ID_MANDATORY="SPECIAL_OFFER_ID_MANDATORY";
+	
 	// DATES
 	public static final String ENTRY_DATE_MANDATORY = "ENTRY_DATE_IS_MANDATORY";
 	public static final String DEPARTURE_DATE_MANDATORY = "DEPARTURE_DATE_IS_MANDATORY";

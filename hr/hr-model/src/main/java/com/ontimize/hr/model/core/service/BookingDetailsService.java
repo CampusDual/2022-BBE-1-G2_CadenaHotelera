@@ -331,6 +331,11 @@ public class BookingDetailsService implements IBookingDetailsService {
 			else {
 				try {
 					price = Double.parseDouble(keyMap.get(BookingDetailsDao.ATTR_PRICE).toString());
+					if (price == 0) {
+						LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_ZERO);
+						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+								MsgLabels.BOOKING_DETAILS_PRICE_ZERO);
+					}
 					if (price < 0) {
 						LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_NEGATIVE);
 						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
@@ -344,13 +349,10 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 			}
 		}
+		Double nominalPrice = price;
 		Boolean paid = false;
 		if (keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
-			if (keyMap.get(BookingDetailsDao.ATTR_PAID) instanceof Boolean) {
-				paid = (Boolean) keyMap.get(BookingDetailsDao.ATTR_PAID);
-			} else {
 				paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
-			}
 		}
 
 		if (!entityUtils.bookingExists(bookingId)) {
@@ -392,6 +394,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 		keyMapInsert.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, detailsType);
 		keyMapInsert.put(BookingDetailsDao.ATTR_PAID, paid);
 		keyMapInsert.put(BookingDetailsDao.ATTR_PRICE, price);
+		keyMapInsert.put(BookingDetailsDao.ATTR_NOMINAL_PRICE, nominalPrice);
 		try {
 			return daoHelper.insert(bookingDetailsDao, keyMapInsert);
 		} catch (BadSqlGrammarException e) {

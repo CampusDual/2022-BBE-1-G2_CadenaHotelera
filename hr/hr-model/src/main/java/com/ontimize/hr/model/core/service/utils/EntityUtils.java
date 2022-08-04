@@ -16,6 +16,8 @@ import com.ontimize.hr.model.core.dao.EmployeeDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferCodeDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferDao;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
@@ -48,6 +50,12 @@ public class EntityUtils {
 	
 	@Autowired
 	private EmployeeDao employeeDao;
+	
+	@Autowired
+	private SpecialOfferDao specialOfferDao;
+	
+	@Autowired
+	private SpecialOfferCodeDao specialOfferCodeDao;
 	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -292,6 +300,68 @@ public class EntityUtils {
 			else {
 				return -1;
 			}
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	/**
+	 * Returns the offer associated to a booking
+	 * @param bookingId id of the booking
+	 * @return returns the id of the offer applicable to the booking, null if it does not have one or -1 if the booking does not exist
+	 */
+	
+	public Integer getOfferFromBooking(Integer bookingId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		EntityResult res = daoHelper.query(bookingDao, keyMap, Arrays.asList(BookingDao.ATTR_BOK_OFFER_ID));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if(res.calculateRecordNumber()==1) {
+				return (Integer) res.getRecordValues(0).get(BookingDao.ATTR_BOK_OFFER_ID);
+			}
+			else {
+				return -1;
+			}
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	/**
+	 * Checks if the specialOffer exists
+	 * @param specialOfferId The id of the special offer
+	 * @return true if the special offer exists, false otherwise
+	 */
+	
+	public boolean specialOfferExists(Integer specialOfferId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(SpecialOfferDao.ATTR_ID, specialOfferId);
+		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(BookingDao.ATTR_BOK_OFFER_ID));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			return res.calculateRecordNumber()==1;
+
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	/**
+	 * Searches the special offer id from the coupon code
+	 * @param code coupon code
+	 * @return special offer id if found, -1 otherwise.
+	 */
+	public Integer getSpecialOfferIdFromCode(String code) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(SpecialOfferCodeDao.ATTR_ID, code);
+		EntityResult res = daoHelper.query(specialOfferCodeDao, keyMap, Arrays.asList(SpecialOfferCodeDao.ATTR_OFFER_ID));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if(res.calculateRecordNumber()==1) {
+				return (Integer) res.getRecordValues(0).get(SpecialOfferCodeDao.ATTR_OFFER_ID);
+			}
+			else {
+				return -1;
+			}
+
 		} else {
 			throw new OntimizeJEERuntimeException();
 		}
