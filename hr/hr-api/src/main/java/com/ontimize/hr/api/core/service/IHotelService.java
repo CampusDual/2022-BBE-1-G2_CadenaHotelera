@@ -22,4 +22,6 @@ public interface IHotelService {
 	public EntityResult getHotelByCoordinates(Map<String, Object> req) throws OntimizeJEERuntimeException;
 
 	public EntityResult getAirports( Map<String,Object> req) throws OntimizeJEERuntimeException;
+
+	public EntityResult getWeather(Map<String, Object> req)throws OntimizeJEERuntimeException;
 }

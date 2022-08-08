@@ -143,6 +143,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/hotelDelete');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/getHotelByCoordinates');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/getAirports');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IHotelService/getWeather');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IRoomService/roomInsert');
@@ -868,6 +869,8 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offerQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offerInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsAdd'));
 
 --asignamos permisos a recepcionista--
 insert into trole_server_permission(id_rolename,id_server_permission)
@@ -945,8 +948,9 @@ insert into dates_season(dts_htl_id, dts_start_date, dts_end_date, dts_sea_id, d
 insert into dates_season(dts_htl_id, dts_start_date, dts_end_date, dts_sea_id, dts_comments)  values
                         (1,'2022-01-15','2022-05-15',2,'Crazy season Las vegas hotel');
 --inserto oferta dia aleatorio, 25 de julio, hotel vigo(2) en tipo doble(1), suele valer 200 la pongo a 150
-insert into offers (ofe_day, ofe_htl_id, ofe_rom_typ_id, ofe_night_price) values
-                    ('2022-07-25',2,1,150);
+insert into offers (ofe_day, ofe_htl_id, ofe_rom_typ_id, ofe_night_price) values ('2022-07-25',2,1,150);
+insert into offers (ofe_day, ofe_htl_id, ofe_rom_typ_id, ofe_night_price) values ('2022-08-15',1,1,150);
+insert into offers (ofe_day, ofe_htl_id, ofe_rom_typ_id, ofe_night_price) values ('2022-08-20',1,2,50);
 
 -- inserto ejemplo bok_details
 insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_price,bok_det_nominal_price,bok_det_paid) values

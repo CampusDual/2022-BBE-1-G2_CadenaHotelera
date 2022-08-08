@@ -170,7 +170,7 @@ public class BookingService implements IBookingService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingFreeQuery(Map<String, Object> req) throws OntimizeJEERuntimeException {
-		int hotelId;
+		int hotelId = 0;
 		Date startDate, endDate;
 
 		List<String> columns = new ArrayList<>();
@@ -198,7 +198,11 @@ public class BookingService implements IBookingService {
 
 		try {
 			if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
-				hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+				if(credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername())!=Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString())) {
+					LOG.info(MsgLabels.NO_ACCESS_TO_HOTEL);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
+				}
+				hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
 			} else {
 				if (!filter.containsKey(BookingDao.ATTR_HTL_ID)) {
 					LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
