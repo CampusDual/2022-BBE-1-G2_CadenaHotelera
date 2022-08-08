@@ -145,8 +145,7 @@
 				<version>${postgresql.version}</version>
 
 			</dependency>
-
-
+	
 		</dependencies>
 
 

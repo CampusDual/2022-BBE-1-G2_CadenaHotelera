@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.jsf.FacesContextUtils;
 
 import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
@@ -28,6 +31,7 @@ import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.dao.BookingGuestDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.dao.DetailsTypeDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
@@ -37,6 +41,7 @@ import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
+import com.ontimize.hr.model.core.service.utils.entitys.DetailBill;
 import com.ontimize.hr.model.core.service.utils.entitys.Season;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
@@ -51,6 +56,13 @@ import com.ontimize.jee.common.tools.BasicExpressionTools;
 import com.ontimize.jee.common.tools.EntityResultTools;
 import com.ontimize.jee.common.tools.ertools.CountAggregateFunction;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
+
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  * The Class BookingService.
@@ -93,7 +105,7 @@ public class BookingService implements IBookingService {
 
 	@Autowired
 	private CredentialUtils credentialUtils;
-	
+
 	@Autowired
 	private EntityUtils entityUtils;
 
@@ -618,22 +630,24 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_FORMAT);
 		}
 
-		if(parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
+		if (parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
 			LOG.info(MsgLabels.BOOKING_USED_OFFER_ID_INSTEAD_CODE);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_USED_OFFER_ID_INSTEAD_CODE);
-		}
-		
-		Integer offerID = null;
-		if (parameters.containsKey("qry_code")) {
-				offerID = entityUtils.getSpecialOfferIdFromCode(parameters.get("qry_code").toString());
-				if(offerID==-1) {
-					LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
-				}
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+					MsgLabels.BOOKING_USED_OFFER_ID_INSTEAD_CODE);
 		}
 
-		if (offerID != null && offerID!=-1 && !specialOfferService.isOfferAplicable(offerID, hotelId, roomType, entryDate,
-				departureDate, Calendar.getInstance().getTime())) {
+		Integer offerID = null;
+		if (parameters.containsKey("qry_code")) {
+			offerID = entityUtils.getSpecialOfferIdFromCode(parameters.get("qry_code").toString());
+			if (offerID == -1) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+			}
+		}
+
+		if (offerID != null && offerID != -1 && !specialOfferService.isOfferAplicable(offerID, hotelId, roomType,
+				entryDate, departureDate, Calendar.getInstance().getTime())) {
 			LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
 		}
@@ -680,10 +694,10 @@ public class BookingService implements IBookingService {
 						{
 							put(BookingDetailsDao.ATTR_BOOKING_ID, result.get(BookingDao.ATTR_ID));
 							put(BookingDetailsDao.ATTR_DATE, day);
-							put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID,  1);
+							put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 							put(BookingDetailsDao.ATTR_PAID, false);
 							put(BookingDetailsDao.ATTR_PRICE, price);
-							put(BookingDetailsDao.ATTR_NOMINAL_PRICE,price);
+							put(BookingDetailsDao.ATTR_NOMINAL_PRICE, price);
 						}
 					});
 				});
@@ -1900,6 +1914,86 @@ public class BookingService implements IBookingService {
 		EntityResult res = this.daoHelper.query(this.bookingDao, keyMap, columns, BookingDao.QUERY_OCUPIED_ROOMS);
 		return EntityResultTools.dofilter(res, EntityResultTools.keysvalues(RoomDao.ATTR_HTL_ID, hotelId));
 
+	}
+
+	/**
+	 * This method returns a pdf jasper report, with the spending details of a
+	 * chosen reservation.
+	 * 
+	 * @param booking booking id
+	 * @return pdf report
+	 */
+	@Override
+	public byte[] getPdfReport(int booking) {
+		Integer bookingId = booking;
+
+		// get bookingDetails
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
+
+		List<String> columns = Arrays.asList(DetailsTypeDao.ATTR_DESCRIPTION, BookingDetailsDao.ATTR_DATE,
+				BookingDetailsDao.ATTR_PRICE, BookingDetailsDao.ATTR_NOMINAL_PRICE,
+				BookingDetailsDao.ATTR_DISCOUNT_REASON);
+
+		EntityResult detailsER = this.daoHelper.query(this.bookingDetailsDao, keyMap, columns,
+				BookingDetailsDao.QUERY_DETAILS_BY_BOK);
+
+		List<DetailBill> listDetail = new ArrayList<DetailBill>();
+		for (int i = 0; i < detailsER.calculateRecordNumber(); i++) {
+			String type = detailsER.getRecordValues(i).get(DetailsTypeDao.ATTR_DESCRIPTION).toString();
+			String date = detailsER.getRecordValues(i).get(BookingDetailsDao.ATTR_DATE).toString();
+			Double price = Double
+					.parseDouble(detailsER.getRecordValues(i).get(BookingDetailsDao.ATTR_NOMINAL_PRICE).toString());
+			Double finalPrice = Double
+					.parseDouble(detailsER.getRecordValues(i).get(BookingDetailsDao.ATTR_PRICE).toString());
+			String reasonDiscount;
+			try {
+				reasonDiscount = detailsER.getRecordValues(i).get(BookingDetailsDao.ATTR_DISCOUNT_REASON).toString();
+			} catch (NullPointerException e) {
+				reasonDiscount = "";
+			}
+			listDetail.add(new DetailBill(type, date, price, finalPrice, reasonDiscount));
+		}
+
+		// get info Hotel and Client
+		Map<String, Object> keyMapHC = new HashMap<>();
+		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		List<String> columnsHC = Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,
+				ClientDao.ATTR_EMAIL,ClientDao.ATTR_IDENTIFICATION,ClientDao.ATTR_PHONE, HotelDao.ATTR_NAME, HotelDao.ATTR_ADDRESS);
+
+		EntityResult hotelAndClientER = this.daoHelper.query(this.clientDao, keyMapHC, columnsHC,
+				ClientDao.QUERY_CLIENT_AND_HOTEL_BY_BOK);
+		String clientName = hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_NAME).toString() + " "
+				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME1).toString() + " "
+				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME2).toString();
+		
+
+		String invoiceRoute = "src/resources/invoice.jasper";
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("NameHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_NAME).toString());
+		parameters.put("AddressHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_ADDRESS).toString());
+		parameters.put("ClientName", clientName);
+		parameters.put("ClientMail", hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_EMAIL).toString());
+		parameters.put("ClientId", hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_IDENTIFICATION).toString());
+		parameters.put("ClientPhone", hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_PHONE));
+		parameters.put("CollectionBeanParam", new JRBeanCollectionDataSource(listDetail));
+		parameters.put("logo_path", "https://miro.medium.com/max/1400/1*PPhdDMQE6jrGGuWHU1ioQg.png");
+		byte[] pdf = null;
+		try {
+
+			JasperPrint jas = JasperFillManager.fillReport(invoiceRoute, parameters, new JREmptyDataSource());
+			pdf = JasperExportManager.exportReportToPdf(jas);
+			JasperExportManager.exportReportToPdfFile(jas, "src/resources/report.pdf");
+
+			String subjectMail = "Expense report";
+			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
+			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf");
+
+		} catch (JRException | MessagingException e) {
+			LOG.error(e.getMessage());
+		}
+
+		return pdf;
 	}
 
 }

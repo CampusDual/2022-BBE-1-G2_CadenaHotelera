@@ -124,7 +124,7 @@ public class Utils {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 	}
 
-	public static void sendMail(String date, String nameJSON) throws MessagingException, AddressException {
+	public static void sendMail(String receiver,String subject, String text, String nameAttachedFile) throws MessagingException, AddressException {
 
 		Properties props = new Properties();
 
@@ -148,24 +148,22 @@ public class Utils {
 
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(CredentialUtils.sender));
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(CredentialUtils.receiver));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
 
-		message.setSubject("Exceptions Hotels customer relationship");
+		message.setSubject(subject);
 
 		BodyPart messageBodyPart = new MimeBodyPart();
 
-		messageBodyPart.setText(
-				"In the following email we attach in a json file the list of clients requested for the date " + date
-						+ "\n" + "\n" + "\n" + " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ");
+		messageBodyPart.setText(text);
 
 		Multipart multipart = new MimeMultipart();
 		multipart.addBodyPart(messageBodyPart);
 
 		messageBodyPart = new MimeBodyPart();
 
-		DataSource source = new FileDataSource(nameJSON);
+		DataSource source = new FileDataSource(nameAttachedFile);
 		messageBodyPart.setDataHandler(new DataHandler(source));
-		messageBodyPart.setFileName(nameJSON);
+		messageBodyPart.setFileName(nameAttachedFile);
 		multipart.addBodyPart(messageBodyPart);
 
 		message.setContent(multipart);
