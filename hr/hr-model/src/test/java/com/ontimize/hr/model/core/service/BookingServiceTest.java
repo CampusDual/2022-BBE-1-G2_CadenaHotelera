@@ -2117,6 +2117,9 @@ class BookingServiceTest {
 				put(ClientDao.ATTR_EMAIL,"mario@gmail.com");
 				put(HotelDao.ATTR_NAME, "Gran Hotel Cococha");
 				put(HotelDao.ATTR_ADDRESS, "Calle Melancolía");
+				put(ClientDao.ATTR_EMAIL,"mimail@gmail.com");
+				put(ClientDao.ATTR_IDENTIFICATION,"78521447A");
+				put(ClientDao.ATTR_PHONE,"999777444");
 			}});	
 		}});
 		
