@@ -538,4 +538,14 @@ public class EntityUtils {
 		return product;
 	}
 	
+	public Map<String, Object> fillConditionMap(OfferCondition condition){
+		Map<String, Object> result = new HashMap<>();
+		if (condition.getConditionId()!=null) result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
+		if (condition.getHotelId()!=null) result.put(SpecialOfferConditionDao.ATTR_HOTEL_ID, condition.getHotelId());
+		if (condition.getRoomType()!=null) result.put(SpecialOfferConditionDao.ATTR_TYPE_ID, condition.getRoomType());
+		if (condition.getStartBookingOffer()!=null) result.put(SpecialOfferCodeDao.ATTR_START, condition.getStartBookingOffer());
+		if (condition.getEndBookingOffer()!=null) result.put(SpecialOfferConditionDao.ATTR_END, condition.getEndBookingOffer());
+		return result;
+	}
+	
 }

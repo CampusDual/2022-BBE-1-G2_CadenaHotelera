@@ -125,6 +125,10 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 		return false;
 	}
 
+	public EntityResult insertCondition(OfferCondition condition) {
+		return daoHelper.insert(specialOfferConditionDao, entityUtils.fillConditionMap(condition));
+	}
+	
 	/**
 	 * Checks if the condition is valid. Always checks that all the dates are not in the past
 	 * @param condition

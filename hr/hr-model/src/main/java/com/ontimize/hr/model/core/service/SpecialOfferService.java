@@ -238,6 +238,13 @@ public class SpecialOfferService implements ISpecialOffersService {
 		EntityResult offer =  daoHelper.insert(specialOfferDao, insertMap);
 		if(offer.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
 			Integer offerID = (Integer) offer.getRecordValues(0).get(SpecialOfferDao.ATTR_ID);
+			for(OfferCondition condition: conditions) {
+				condition.setOfferId(offerID);
+				EntityResult conditionResult = conditionService.insertCondition(condition);
+				
+			}
+			for(OfferProduct product:products) product.setSpecialOfferId(offerID);
+			
 		}
 			return offer;
 	}
