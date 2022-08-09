@@ -197,6 +197,8 @@ public class MsgLabels {
 	public static final String ERROR_SENDING_MAIL = "ERROR_SENDING_MAIL";
 	public static final String FETCHING_ERROR = "ERROR_WHILE_CHECKING_FOR_RECORDS";
 	
+	// RECOMMENDATIONS
+	public static final String NO_RECOMMENDATIONS_IN_RADIUS ="NO_RECOMMENDATIONS_IN_RADIUS";
 	
 	
 	
