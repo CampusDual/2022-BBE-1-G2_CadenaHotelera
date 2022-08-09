@@ -422,13 +422,8 @@ public class HotelService implements IHotelService {
 	
 	
 	@Override
-<<<<<<< HEAD
 	// @Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getRecommendations(Map<String, Object> req) {
-=======
-	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException {
->>>>>>> 2c691f53fab1ed44985f8a44fb14b93610b30802
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
 
