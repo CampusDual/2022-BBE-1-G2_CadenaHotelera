@@ -4,23 +4,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.dao.DetailsTypeDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 
 
@@ -39,6 +46,11 @@ import com.ontimize.hr.model.core.dao.SeasonDao;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
+
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
@@ -2082,8 +2094,52 @@ class BookingServiceTest {
 	}
 	
 	
+	@Test
+	@DisplayName("Fails when JasperReports thorw a exception")
+	void testGetPdfReportJRException() {
+		
+		when(daoHelper.query(isA(BookingDetailsDao.class), anyMap(), anyList(),anyString())).thenReturn(new EntityResultMapImpl() {{
+			addRecord(new HashMap<String,Object>(){{
+				put(DetailsTypeDao.ATTR_DESCRIPTION, "night price");
+				put(BookingDetailsDao.ATTR_DATE,"2022-23-01");
+				put(BookingDetailsDao.ATTR_NOMINAL_PRICE,200.0);
+				put(BookingDetailsDao.ATTR_PRICE, 250.0);
+				put(BookingDetailsDao.ATTR_DISCOUNT_REASON, "good boy");
+			}});	
+		}});
+		
+		when(daoHelper.query(isA(ClientDao.class), anyMap(), anyList(),anyString())).thenReturn(new EntityResultMapImpl() {{
+			addRecord(new HashMap<String,Object>(){{
+				put(DetailsTypeDao.ATTR_DESCRIPTION, "night price");
+				put(ClientDao.ATTR_NAME,"Mario");
+				put(ClientDao.ATTR_SURNAME1,"Nogueira");
+				put(ClientDao.ATTR_SURNAME2,"Bouzas");
+				put(ClientDao.ATTR_EMAIL,"mario@gmail.com");
+				put(HotelDao.ATTR_NAME, "Gran Hotel Cococha");
+				put(HotelDao.ATTR_ADDRESS, "Calle Melancolía");
+				put(ClientDao.ATTR_EMAIL,"mimail@gmail.com");
+				put(ClientDao.ATTR_IDENTIFICATION,"78521447A");
+				put(ClientDao.ATTR_PHONE,"999777444");
+			}});	
+		}});
+		
+		try (MockedStatic<JasperFillManager> mocked = mockStatic(JasperFillManager.class)) {
+			mocked.when(() -> JasperFillManager.fillReport(anyString(), anyMap(),isA(JREmptyDataSource.class))).thenThrow(new JRException(""));
+		}
+		
+		assertEquals(null, service.getPdfReport(1));
+		
+		
+	}
 	
-			
+	@Test
+	@DisplayName("Fails when sending email")
+	void testGetPdfReportFailSendMail() {
+		try (MockedStatic<Utils> mocked = mockStatic(Utils.class)) {
+			mocked.when(() -> Utils.sendMail(anyString(), anyString(),anyString(),anyString())).thenThrow(new MessagingException(""));
+		}
+	}
+	
 	public EntityResult createNohotelResult() {
 		return new EntityResultMapImpl(new ArrayList<>(Arrays.asList(HotelDao.ATTR_ID)));
 	}

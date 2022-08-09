@@ -687,7 +687,7 @@ class ClientServiceTest {
 
 		EntityResult er;
 		try (MockedStatic<Utils> mocked = mockStatic(Utils.class)) {
-			mocked.when(() -> Utils.sendMail(anyString(), anyString())).thenThrow(new AddressException());
+			mocked.when(() -> Utils.sendMail(anyString(),anyString(),anyString(), anyString())).thenThrow(new AddressException());
 			er = service.sendMailClients(req);
 		}
 

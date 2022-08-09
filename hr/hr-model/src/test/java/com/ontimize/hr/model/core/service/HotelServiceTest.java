@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.internet.AddressException;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -830,6 +832,181 @@ class HotelServiceTest {
 		
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+	
+	@Test
+	@DisplayName("Fails when there is no id hotel in req")
+	void testGetWeatherHotelMandatory() {
+		Map<String, Object> req = new HashMap<String, Object>();
+
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Fails when format hotel id is wrong")
+	void testGetWeatherFormatIdHotel() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, "fail");
+
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_ID_FORMAT, er.getMessage());
+
+	}
+	
+	@Test
+	@DisplayName("Fails when hotel doesn't exist")
+	void testGetWeatherHotelNotExists() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+
+		when(utils.hotelExists(anyInt())).thenReturn(false);
+
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
+
+	}
+	
+	@Test
+	@DisplayName("Fails when the hotel not found")
+	void testGetWeatherHotelNotFound() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+			}
+		});
+
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_NOT_FOUND, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("Fails when the hotel query fails")
+	void testGetWeatherHotelFatalQuery() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_WRONG);
+			}
+		});
+
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+	
+	@Test
+	@DisplayName("fails when the Latitude format isnt the correct")
+	void testGetWeatherWrongLatitudeFormat() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "a");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+		
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LATITUDE, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("fails when the Longitude format isnt the correct")
+	void testGetWeatherWrongLongitudeFormat() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "a");
+					}
+				});
+			}
+		});
+		
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_FORMAT_LONGITUDE, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("GetWeatherOk")
+	void testGetWeather() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+		JsonObject jObject = Json.createObjectBuilder()
+			    .add("DailyForecasts", Json.createArrayBuilder()
+			         .add("streetAddress")
+			         .add("city")
+			         .add("state")
+			         .add("postalCode"))
+			    .add("DailyForecasts", Json.createArrayBuilder()
+			         .add("streetAddress")
+			         .add("city")
+			         .add("state")
+			         .add("postalCode"))
+			     .build();
+		
+		when(utils.geoPosition(anyString(),anyString())).thenReturn("12345");
+		when(utils.getWeather(anyString(),anyString())).thenReturn(jObject);
+		
+		EntityResult er = service.getWeather(req);
+
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
 	}
 
 }

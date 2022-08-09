@@ -22,6 +22,7 @@ import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
@@ -36,22 +37,22 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 @Service("ClientService")
 @Lazy
 public class ClientService implements IClientService {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ClientService.class);	
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(ClientService.class);
+
 	@Autowired
 	private ClientDao clientDao;
 
 	@Autowired
 	private HotelDao hotelDao;
 
-
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult clientQuery(Map<String, Object> keyMap, List<String> attrList) throws OntimizeJEERuntimeException {
+	public EntityResult clientQuery(Map<String, Object> keyMap, List<String> attrList)
+			throws OntimizeJEERuntimeException {
 		return this.daoHelper.query(this.clientDao, keyMap, attrList);
 
 	}
@@ -59,33 +60,36 @@ public class ClientService implements IClientService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult clientInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
+		if (attrMap.containsKey(ClientDao.ATTR_EMAIL)
+				&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
 			LOG.info(MsgLabels.CLIENT_MAIL_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_MAIL_FORMAT);
-			
+
 		}
 		try {
 			return this.daoHelper.insert(this.clientDao, attrMap);
 		} catch (DuplicateKeyException e) {
 			LOG.info(MsgLabels.CLIENT_MAIL_EXISTS);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_EXISTS);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_MAIL_EXISTS);
 		}
 
 	}
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult clientUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		if(attrMap.containsKey(ClientDao.ATTR_EMAIL)&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
+	public EntityResult clientUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
+			throws OntimizeJEERuntimeException {
+		if (attrMap.containsKey(ClientDao.ATTR_EMAIL)
+				&& !Utils.checkEmail(attrMap.get(ClientDao.ATTR_EMAIL).toString())) {
 			LOG.info(MsgLabels.CLIENT_MAIL_FORMAT);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_MAIL_FORMAT);
 		}
 		try {
 			return this.daoHelper.update(this.clientDao, attrMap, keyMap);
 
 		} catch (DuplicateKeyException e) {
 			LOG.info(MsgLabels.CLIENT_MAIL_EXISTS);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.CLIENT_MAIL_EXISTS);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_MAIL_EXISTS);
 		}
 
 	}
@@ -114,16 +118,16 @@ public class ClientService implements IClientService {
 
 	public EntityResult getClientsDate(Map<String, Object> req) {
 		List<String> columns = new ArrayList<String>();
-		Map<String, Object> filter = new HashMap<String,Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
 		try {
-			if(!req.containsKey(Utils.COLUMNS)) {
+			if (!req.containsKey(Utils.COLUMNS)) {
 				LOG.info(MsgLabels.COLUMNS_MANDATORY);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.COLUMNS_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.COLUMNS_MANDATORY);
 			}
 			columns = (List<String>) req.get(Utils.COLUMNS);
-			if(!req.containsKey(Utils.FILTER)) {
+			if (!req.containsKey(Utils.FILTER)) {
 				LOG.info(MsgLabels.FILTER_MANDATORY);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,12,MsgLabels.FILTER_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.FILTER_MANDATORY);
 			}
 			filter = (Map<String, Object>) req.get(Utils.FILTER);
 			Date date = null;
@@ -167,7 +171,7 @@ public class ClientService implements IClientService {
 			EntityResult existsHotel = daoHelper.query(hotelDao, keyMapHotel, attrList);
 			if (existsHotel.calculateRecordNumber() == 0) {
 				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,MsgLabels.HOTEL_NOT_EXIST);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.HOTEL_NOT_EXIST);
 			}
 
 			// if Hotel exists
@@ -189,7 +193,7 @@ public class ClientService implements IClientService {
 
 		} catch (Exception e) {
 			LOG.error(MsgLabels.ERROR);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG,0,"");
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, "");
 		}
 	}
 
@@ -207,13 +211,17 @@ public class ClientService implements IClientService {
 		}
 
 		Map<String, Object> filter = (Map<String, Object>) req.get("filter");
-		String date = (String) filter.get("qry_date");
-		String nameJSON = "Exceptions-Hotels_clients_" + date + "_.json";
 
+		String date = (String) filter.get("qry_date");
+		String subject = "Exceptions Hotels customer relationship";
+		String mailText = "In the following email we attach in a json file the list of clients requested for the date "
+				+ date + "\n" + "\n" + "\n" + " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ";
+		String nameJSON = "Exceptions-Hotels_clients_" + date + "_.json";
+		String receiverMail = CredentialUtils.receiver;
 		Utils.createJSONClients(er, nameJSON);
 
 		try {
-			Utils.sendMail(date, nameJSON);
+			Utils.sendMail(receiverMail, subject, mailText, nameJSON);
 		} catch (Exception ex) {
 			LOG.error(MsgLabels.ERROR_SENDING_MAIL);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_SENDING_MAIL);
@@ -241,7 +249,8 @@ public class ClientService implements IClientService {
 		BasicExpression bexpFechaPasadaEnMedio = new BasicExpression(bexp1, BasicOperator.AND_OP, bexp2);
 
 		// tema fechas, enlazadas con or
-		BasicExpression bexpFechas = new BasicExpression(bexpFechaEntradaIgualPasada, BasicOperator.OR_OP,bexpFechaPasadaEnMedio);
+		BasicExpression bexpFechas = new BasicExpression(bexpFechaEntradaIgualPasada, BasicOperator.OR_OP,
+				bexpFechaPasadaEnMedio);
 
 		// devuelvo ID + fechas con AND
 		return new BasicExpression(bexpId, BasicOperator.AND_OP, bexpFechas);

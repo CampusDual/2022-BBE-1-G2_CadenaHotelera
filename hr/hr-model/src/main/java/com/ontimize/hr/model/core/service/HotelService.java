@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -10,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.impl.client.CloseableHttpClient;	
+import javax.json.JsonObject;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ontimize.hr.api.core.service.IHotelService;
 import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
@@ -418,8 +422,13 @@ public class HotelService implements IHotelService {
 	
 	
 	@Override
+<<<<<<< HEAD
 	// @Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getRecommendations(Map<String, Object> req) {
+=======
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException {
+>>>>>>> 2c691f53fab1ed44985f8a44fb14b93610b30802
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
 
@@ -528,5 +537,86 @@ public class HotelService implements IHotelService {
 		};
 		
 	}
+	
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult getWeather(Map<String, Object> req) throws OntimizeJEERuntimeException {
+		
+		if (!req.containsKey(HotelDao.ATTR_ID)) {
+			LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+		}
+
+		Integer idHotel;
+		try {
+			idHotel = Integer.parseInt(req.get(HotelDao.ATTR_ID).toString());
+		} catch (NumberFormatException e) {
+			LOG.info(MsgLabels.HOTEL_ID_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
+		}
+		if (!utils.hotelExists(idHotel)) {
+			LOG.info(MsgLabels.HOTEL_NOT_EXIST);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
+		}
+		
+		// get latitude/longitude hotel
+				List<String> attrList = new ArrayList<>();
+				attrList.add(HotelDao.ATTR_LATITUDE);
+				attrList.add(HotelDao.ATTR_LONGITUDE);
+
+				Map<String, Object> keyMap = new HashMap<String, Object>();
+				keyMap.put(HotelDao.ATTR_ID, idHotel);
+
+				EntityResult coordinateHotelER = this.daoHelper.query(this.hotelDao, keyMap, attrList);
+				if (coordinateHotelER.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+					if (coordinateHotelER.calculateRecordNumber() == 0) {
+						LOG.info(MsgLabels.HOTEL_NOT_FOUND);
+						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND);
+					}
+				} else {
+					LOG.info(MsgLabels.HOTEL_QUERY_ERROR);
+					return coordinateHotelER;
+				}
+
+				String latitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LATITUDE).toString();
+				String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString();
+				
+				if(!Utils.checkCoordinate(latitudeHotel)) {
+					LOG.info(MsgLabels.HOTEL_FORMAT_LATITUDE);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LATITUDE);
+				}
+				
+				if(!Utils.checkCoordinate(longitudeHotel)) {
+					LOG.info(MsgLabels.HOTEL_FORMAT_LONGITUDE);
+					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LONGITUDE);
+				}
+				
+				String geo = latitudeHotel+","+longitudeHotel;
+				
+				List<Object> listDays = null;
+				JsonObject jObject = null;
+				String ubicationKey = null;
+				
+				//Obtenemos los datos, enviando a la api la key y las cordenadas
+				ubicationKey=utils.geoPosition(geo,Utils.WEATHER_API_KEY);
+				jObject=utils.getWeather(Utils.WEATHER_API_KEY,ubicationKey);
+				//guardamos los datos en un String
+				String weatherJson = (jObject.get("DailyForecasts").toString());
+
+				Gson gson = new Gson();
+				final Type tipoLista = new TypeToken<List<Object>>(){}.getType();
+				//obtenemos los datos a una lista de objetos
+				listDays=gson.fromJson(weatherJson, tipoLista);
+				
+				// return weather
+				Map<String, Object> mapWeather = new HashMap<>();
+				mapWeather.put("Weather", listDays);
+				
+				EntityResult result = new EntityResultMapImpl();
+				result.addRecord(mapWeather);
+				result.setCode(EntityResult.OPERATION_SUCCESSFUL);
+		
+		return result;
+	}	
 
 }
