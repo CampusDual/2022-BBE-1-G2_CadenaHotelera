@@ -37,7 +37,7 @@ import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.hr.model.core.service.utils.entitys.Season;
+import com.ontimize.hr.model.core.service.utils.entities.Season;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;

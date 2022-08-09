@@ -1,9 +1,13 @@
 package com.ontimize.hr.model.core.service.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +21,19 @@ import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferCodeDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
+import com.ontimize.hr.model.core.service.exception.FillException;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.entities.OfferCondition;
+import com.ontimize.hr.model.core.service.utils.entities.OfferProduct;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
+import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.tools.BasicExpressionTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -365,6 +376,166 @@ public class EntityUtils {
 		} else {
 			throw new OntimizeJEERuntimeException();
 		}
+	}
+	
+	/**
+	 * Checks if the offer is stackable
+	 * @param specialOfferId id of the offer
+	 * @return returns true if the offer is stackable,false otherwise even when the offer is not found
+	 */
+	public boolean isOfferStackable(Integer specialOfferId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(SpecialOfferDao.ATTR_ID, specialOfferId);
+		EntityResult res = daoHelper.query(specialOfferCodeDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_STACKABLE));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if(res.calculateRecordNumber()==1) {
+				return Boolean.parseBoolean((String)res.getRecordValues(0).get(SpecialOfferCodeDao.ATTR_OFFER_ID));
+			}
+			else {
+				return false;
+			}
+
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+	
+	
+	public EntityResult ErrorResult(String message) {
+		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
+	}
+	
+	public OfferCondition fillCondition(Map<String, Object>conditionMap,boolean fillID) {
+		OfferCondition result = new OfferCondition();
+		if(conditionMap==null ||conditionMap.isEmpty()) throw new FillException(MsgLabels.CONDITION_EMPTY);
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_HOTEL_ID)){
+			try {
+			result.setHotelId(Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_HOTEL_ID).toString()));
+			}catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.HOTEL_ID_FORMAT);
+			}	
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_OFFER_ID)){
+			try {
+				result.setOfferId(Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_OFFER_ID).toString()));				
+			}
+			catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+			}
+		}
+		if (fillID && conditionMap.containsKey(SpecialOfferConditionDao.ATTR_ID)) {
+			try {
+				result.setConditionId(Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_ID).toString()));
+			} catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.CONDITION_ID_FORMAT);
+			}
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_TYPE_ID)) {
+			try {
+				result.setRoomType(Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_TYPE_ID).toString())); 				
+			} catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.ROOM_TYPE_FORMAT);
+			}
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_START)) {
+			try {
+				result.setStartBookingOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(conditionMap.get(SpecialOfferConditionDao.ATTR_START).toString()));
+			}catch(ParseException e ) {
+				throw new FillException(MsgLabels.CONDITION_BOOKING_START_FORMAT);
+			}
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_END)) {
+			try {
+				result.setEndBookingOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(conditionMap.get(SpecialOfferConditionDao.ATTR_END).toString()));
+			}catch(ParseException e) {
+				throw new FillException(MsgLabels.CONDITION_BOOKING_END_FORMAT);
+			}
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_DAYS)) {
+			try {
+				result.setMinimumNights(Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_DAYS).toString()));
+			}catch(NumberFormatException e) {
+				throw new FillException(MsgLabels.CONDITION_DAYS_FORMAT);
+			}
+		}
+		
+		if (conditionMap.containsKey(SpecialOfferDao.ATTR_START)) {
+			try {
+				result.setStartActiveOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(conditionMap.get(SpecialOfferDao.ATTR_START).toString()));
+			}catch (ParseException e) {
+				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
+			}
+		}
+		if (conditionMap.containsKey(SpecialOfferDao.ATTR_END)) {
+			try {
+				result.setEndActiveOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(conditionMap.get(SpecialOfferDao.ATTR_END).toString()));
+			}catch (ParseException e) {
+				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
+			}
+		}
+		
+		
+		return result;
+	}
+	
+	public OfferCondition fillCondition(Map<String, Object>conditionMap) {
+		return fillCondition(conditionMap, false);
+	}
+	
+	public OfferProduct fillProduct(Map<String, Object>productMap) {
+		return fillProduct(productMap,false);
+	}
+	
+	public OfferProduct fillProduct(Map<String, Object>productMap,boolean fillOfferId) {
+		OfferProduct product = new OfferProduct();
+		if (productMap==null || productMap.isEmpty())
+			throw new FillException(MsgLabels.PRODUCT_EMPTY);
+		if (fillOfferId && productMap.containsKey(SpecialOfferProductDao.ATTR_OFFER_ID)) {
+			try {
+				product.setSpecialOfferId(Integer.parseInt(productMap.get(SpecialOfferProductDao.ATTR_OFFER_ID).toString()));
+			} catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+			}
+		}
+		
+		if (productMap.containsKey(SpecialOfferProductDao.ATTR_DET_ID)) {
+			try {
+				product.setDetId(Integer.parseInt(productMap.get(SpecialOfferProductDao.ATTR_DET_ID).toString()));
+			} catch (NumberFormatException e) {
+				throw new FillException(MsgLabels.DETAILS_TYPE_ID_FORMAT);
+			}
+		}
+		
+		if (productMap.containsKey(SpecialOfferProductDao.ATTR_PERCENT)) {
+			try {
+				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_PERCENT).toString()));
+			}catch (NumberFormatException | NullPointerException e) {
+				throw new FillException(MsgLabels.PRODUCT_PERCENT_DISCOUNT_FORMAT);
+			}
+		}
+		
+		if (productMap.containsKey(SpecialOfferProductDao.ATTR_FLAT)) {
+			try {
+				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_FLAT).toString()));
+			}catch (NumberFormatException | NullPointerException e) {
+				throw new FillException(MsgLabels.PRODUCT_FLAT_DISCOUNT_FORMAT);
+			}
+		}
+		
+		if (productMap.containsKey(SpecialOfferProductDao.ATTR_SWAP)) {
+			try {
+				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_SWAP).toString()));
+			}catch (NumberFormatException | NullPointerException e) {
+				throw new FillException(MsgLabels.PRODUCT_SWAP_DISCOUNT_FORMAT);
+			}
+		}
+		return product;
 	}
 	
 }

@@ -23,7 +23,7 @@ import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.hr.model.core.service.utils.entitys.RoomStatus;
+import com.ontimize.hr.model.core.service.utils.entities.RoomStatus;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;

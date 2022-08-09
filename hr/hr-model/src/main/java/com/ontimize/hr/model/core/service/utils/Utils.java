@@ -30,7 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
-import com.ontimize.hr.model.core.service.utils.entitys.Client;
+import com.ontimize.hr.model.core.service.utils.entities.Client;
 import com.ontimize.jee.common.dto.EntityResult;
 
 public class Utils {

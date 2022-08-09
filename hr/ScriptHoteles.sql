@@ -196,6 +196,29 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsAdd');
 
 
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeDelete');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionDelete');
+
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductDelete');
+
+
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
 INSERT INTO TSETTING VALUES(1,'mail_port','587','Puerto del servidor de email');
 INSERT INTO TSETTING VALUES(2,'mail_protocol','smtp','Protocolo de env\u005cu00edo de mails');
@@ -294,6 +317,23 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,8
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,85);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,86);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,87);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,88);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,89);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,90);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,91);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,92);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,93);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,94);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,95);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,96);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,97);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,98);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,99);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,100);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,101);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,102);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,103);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,104);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t

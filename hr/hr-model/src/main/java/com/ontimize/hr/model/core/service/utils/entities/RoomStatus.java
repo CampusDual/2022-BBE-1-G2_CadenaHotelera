@@ -1,4 +1,4 @@
-package com.ontimize.hr.model.core.service.utils.entitys;
+package com.ontimize.hr.model.core.service.utils.entities;
 
 public class RoomStatus {
 	public static final Integer MAINTENANCE = 1;

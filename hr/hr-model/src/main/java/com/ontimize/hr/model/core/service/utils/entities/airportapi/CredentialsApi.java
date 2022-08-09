@@ -1,4 +1,4 @@
-package com.ontimize.hr.model.core.service.utils.entitys.airportapi;
+package com.ontimize.hr.model.core.service.utils.entities.airportapi;
 
 public class CredentialsApi {
 	public static final String URL_AUTH = "https://test.api.amadeus.com/v1/security/oauth2/token";
