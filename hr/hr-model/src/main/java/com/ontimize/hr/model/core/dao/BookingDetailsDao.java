@@ -17,5 +17,8 @@ public class BookingDetailsDao extends OntimizeJdbcDaoSupport{
 	public static final String ATTR_NOMINAL_PRICE ="bok_det_nominal_price";
 	public static final String ATTR_DATE = "bok_det_date";
 	public static final String ATTR_PAID = "bok_det_paid";
+	public static final String ATTR_DISCOUNT_REASON = "bok_det_discount_reason";
+	
+	public static final String QUERY_DETAILS_BY_BOK = "detailsByBok";
 
 }

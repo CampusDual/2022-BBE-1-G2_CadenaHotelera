@@ -51,4 +51,34 @@ public class HotelRestController extends ORestController<IHotelService> {
 		}
 		
 	}
+	
+
+	
+	@PostMapping(value = "getRecommendations/search", produces = MediaType.APPLICATION_JSON_VALUE )
+	public EntityResult getRecommendations(@RequestBody Map<String,Object> req) {
+		try {
+			return this.hotelService.getRecommendations(req);
+		}catch (Exception e) {
+
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+			}
+		
+		
+		}
+
+	@PostMapping(value = "getWeather/search", produces = MediaType.APPLICATION_JSON_VALUE )
+	public EntityResult getWeather(@RequestBody Map<String,Object> req) {
+		try {
+			return this.hotelService.getWeather(req);
+		} catch (Exception e) {
+			e.printStackTrace();
+			EntityResult res = new EntityResultMapImpl();
+			res.setCode(EntityResult.OPERATION_WRONG);
+			return res;
+		}
+		
+	}
 }

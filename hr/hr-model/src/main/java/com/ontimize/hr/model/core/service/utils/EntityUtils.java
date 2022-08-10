@@ -1,6 +1,9 @@
 package com.ontimize.hr.model.core.service.utils;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -10,6 +13,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -378,6 +390,68 @@ public class EntityUtils {
 		}
 	}
 	
+	public String geoPosition(String q, String apikey) {
+		// get CloseableHttpClient
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://dataservice.accuweather.com/locations/v1/cities/geoposition/search");
+		httpGet.addHeader("Accept-Encoding", "gzip");
+		URI uri = null;
+		CloseableHttpResponse response = null;
+		JsonObject airObject = null;
+		String ubi;
+		try {
+			uri = new URIBuilder(httpGet.getURI())
+					.addParameter("apikey", "EilzAT5liHyfuAjfFaaoUnTPTw4W8ZmB")
+					.addParameter("q", q)
+					.build();
+			
+			((HttpRequestBase) httpGet).setURI(uri);
+			
+			response = client.execute(httpGet);
+			
+			airObject = Json.createReader(response.getEntity().getContent()).readObject();
+			
+			response.close();
+			client.close();
+			
+		} catch (UnsupportedOperationException | IOException  | URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		ubi = airObject.getString("Key", "0").toString();
+		return ubi;	
+	}
+	
+	public JsonObject getWeather(String apikey,String key) {
+		// get CloseableHttpClient
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://dataservice.accuweather.com/forecasts/v1/daily/5day"+"/"+key);
+		httpGet.addHeader("Accept-Encoding", "gzip");
+		URI uri = null;
+		CloseableHttpResponse response = null;
+		JsonObject airObject = null;
+		try {
+			uri = new URIBuilder(httpGet.getURI())
+					.addParameter("apikey", "EilzAT5liHyfuAjfFaaoUnTPTw4W8ZmB")
+					.addParameter("metric", "true")
+					.build();
+			
+			((HttpRequestBase) httpGet).setURI(uri);
+			
+			response = client.execute(httpGet);
+			
+			airObject = Json.createReader(response.getEntity().getContent()).readObject();
+			
+			response.close();
+			client.close();
+			
+		} catch (UnsupportedOperationException | IOException  | URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return airObject;		
+	}
+	
+}
 	/**
 	 * Checks if the offer is stackable
 	 * @param specialOfferId id of the offer

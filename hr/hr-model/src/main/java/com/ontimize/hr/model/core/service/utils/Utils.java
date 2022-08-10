@@ -2,6 +2,8 @@ package com.ontimize.hr.model.core.service.utils;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,6 +15,8 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -25,6 +29,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +50,7 @@ public class Utils {
 	public static final String DATA = "data";
 	public static final String COLUMNS = "columns";
 	public static final String FILTER = "filter";
+	public static final String WEATHER_API_KEY= "EilzAT5liHyfuAjfFaaoUnTPTw4W8ZmB";
 
 	private Utils() {
 
@@ -112,7 +124,7 @@ public class Utils {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 	}
 
-	public static void sendMail(String date, String nameJSON) throws MessagingException, AddressException {
+	public static void sendMail(String receiver,String subject, String text, String nameAttachedFile) throws MessagingException, AddressException {
 
 		Properties props = new Properties();
 
@@ -136,24 +148,22 @@ public class Utils {
 
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(CredentialUtils.sender));
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(CredentialUtils.receiver));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
 
-		message.setSubject("Exceptions Hotels customer relationship");
+		message.setSubject(subject);
 
 		BodyPart messageBodyPart = new MimeBodyPart();
 
-		messageBodyPart.setText(
-				"In the following email we attach in a json file the list of clients requested for the date " + date
-						+ "\n" + "\n" + "\n" + " *  *  *  *  *    E X C E P T I O N S  H O T E L S    *  *  *  *  * ");
+		messageBodyPart.setText(text);
 
 		Multipart multipart = new MimeMultipart();
 		multipart.addBodyPart(messageBodyPart);
 
 		messageBodyPart = new MimeBodyPart();
 
-		DataSource source = new FileDataSource(nameJSON);
+		DataSource source = new FileDataSource(nameAttachedFile);
 		messageBodyPart.setDataHandler(new DataHandler(source));
-		messageBodyPart.setFileName(nameJSON);
+		messageBodyPart.setFileName(nameAttachedFile);
 		multipart.addBodyPart(messageBodyPart);
 
 		message.setContent(multipart);
@@ -187,5 +197,5 @@ public class Utils {
 		}
 
 	}
-
+	
 }

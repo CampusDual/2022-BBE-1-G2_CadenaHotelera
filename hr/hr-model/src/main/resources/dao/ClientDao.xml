@@ -28,5 +28,18 @@
 			   ]]>
    			</Sentence>
 		</Query>
+		<Query id="infoClientHotelByBok">
+			<Sentence>
+			   <![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.client c
+			    inner join public.booking b on c.cli_id = b.bok_cli_id
+    			inner join public.hotel h on b.bok_htl_id = h.htl_id
+			     #WHERE#
+			   ]]>
+   			</Sentence>
+		</Query>
 	</Queries>
 </JdbcEntitySetup>

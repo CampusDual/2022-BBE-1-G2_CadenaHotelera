@@ -237,6 +237,8 @@ public class MsgLabels {
 	public static final String FETCHING_ERROR = "ERROR_WHILE_CHECKING_FOR_RECORDS";
 	public static final String DATE_BEFORE_TODAY="DATE_BEFORE_TODAY";
 	
+	// RECOMMENDATIONS
+	public static final String NO_RECOMMENDATIONS_IN_RADIUS ="NO_RECOMMENDATIONS_IN_RADIUS";
 	
 	
 	
