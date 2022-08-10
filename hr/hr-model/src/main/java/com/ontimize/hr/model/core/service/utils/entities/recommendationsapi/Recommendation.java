@@ -1,9 +1,9 @@
-package com.ontimize.hr.model.core.service.utils.entitys.recommendationsapi;
+package com.ontimize.hr.model.core.service.utils.entities.recommendationsapi;
 
 import java.util.List;
 
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.Distance;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.GeoCode;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.Distance;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.GeoCode;
 
 public class Recommendation {
 	

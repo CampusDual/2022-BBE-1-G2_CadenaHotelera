@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +37,7 @@ import com.ontimize.hr.model.core.dao.SpecialOfferCodeDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
+import com.ontimize.hr.model.core.service.exception.FetchException;
 import com.ontimize.hr.model.core.service.exception.FillException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.entities.OfferCondition;
@@ -76,6 +78,9 @@ public class EntityUtils {
 	
 	@Autowired
 	private SpecialOfferDao specialOfferDao;
+	
+	@Autowired
+	private SpecialOfferConditionDao specialOfferConditionDao;
 	
 	@Autowired
 	private SpecialOfferCodeDao specialOfferCodeDao;
@@ -359,7 +364,7 @@ public class EntityUtils {
 	public boolean specialOfferExists(Integer specialOfferId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(SpecialOfferDao.ATTR_ID, specialOfferId);
-		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(BookingDao.ATTR_BOK_OFFER_ID));
+		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_ID));
 		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
 			return res.calculateRecordNumber()==1;
 
@@ -451,7 +456,7 @@ public class EntityUtils {
 		return airObject;		
 	}
 	
-}
+
 	/**
 	 * Checks if the offer is stackable
 	 * @param specialOfferId id of the offer
@@ -460,10 +465,10 @@ public class EntityUtils {
 	public boolean isOfferStackable(Integer specialOfferId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(SpecialOfferDao.ATTR_ID, specialOfferId);
-		EntityResult res = daoHelper.query(specialOfferCodeDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_STACKABLE));
+		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_STACKABLE));
 		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
 			if(res.calculateRecordNumber()==1) {
-				return Boolean.parseBoolean((String)res.getRecordValues(0).get(SpecialOfferCodeDao.ATTR_OFFER_ID));
+				return Boolean.parseBoolean((String)res.getRecordValues(0).get(SpecialOfferDao.ATTR_ID));
 			}
 			else {
 				return false;
@@ -474,8 +479,37 @@ public class EntityUtils {
 		}
 	}
 	
+	/**
+	 * Check if the hotel passed as parameter is affected by a concrete special offer
+	 * @param offerId id of the offer
+	 * @param hotelId id of the hotel to check
+	 * @return true if the offer exist and it affects the specified hotel, false in every other case including not existing offers or hotels
+	 */
+	public boolean isOfferInHotel(Integer offerId, Integer hotelId) {		
+		Map<String, Object> queryMap =  new HashMap<String, Object>();
+		queryMap.put(SpecialOfferConditionDao.ATTR_OFFER_ID, offerId);
+		EntityResult res = daoHelper.query(specialOfferConditionDao, queryMap, new ArrayList<String>(Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID,SpecialOfferConditionDao.ATTR_HOTEL_ID)));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if (res.calculateRecordNumber()==0) {
+				return specialOfferExists(offerId);					
+			}
+			else {
+				boolean allHotelsNull = true;
+				boolean found = false;
+				for(int i = 0 ; i <res.calculateRecordNumber();i++) {					
+					Integer auxHotelid = (Integer) res.getRecordValues(i).get(SpecialOfferConditionDao.ATTR_HOTEL_ID);
+					allHotelsNull &= auxHotelid==null;
+					found |= auxHotelid!=null && auxHotelid.equals(hotelId);
+				}
+				return allHotelsNull ||found;
+			}
+		}else {
+			throw new FetchException();
+		}
+	}
 	
-	public EntityResult ErrorResult(String message) {
+	
+	public static final EntityResult errorResult(String message) {
 		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
 	}
 	
@@ -612,13 +646,26 @@ public class EntityUtils {
 		return product;
 	}
 	
-	public Map<String, Object> fillConditionMap(OfferCondition condition){
+	
+	
+	public Map<String, Object> fillConditionMap(OfferCondition condition,boolean putConditionId,boolean putOfferId){
 		Map<String, Object> result = new HashMap<>();
-		if (condition.getConditionId()!=null) result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
+		if (putConditionId && condition.getConditionId()!=null) result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
+		if (putOfferId && condition.getOfferId()!=null)result.put(SpecialOfferConditionDao.ATTR_OFFER_ID,condition.getOfferId());
 		if (condition.getHotelId()!=null) result.put(SpecialOfferConditionDao.ATTR_HOTEL_ID, condition.getHotelId());
 		if (condition.getRoomType()!=null) result.put(SpecialOfferConditionDao.ATTR_TYPE_ID, condition.getRoomType());
 		if (condition.getStartBookingOffer()!=null) result.put(SpecialOfferCodeDao.ATTR_START, condition.getStartBookingOffer());
 		if (condition.getEndBookingOffer()!=null) result.put(SpecialOfferConditionDao.ATTR_END, condition.getEndBookingOffer());
+		return result;
+	}
+	
+	public Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId){
+		Map<String, Object> result = new HashMap<>();
+		if(putOfferId && product.getSpecialOfferId()!=null) result.put(SpecialOfferProductDao.ATTR_OFFER_ID, product.getSpecialOfferId());
+		if(product.getDetId()!=null) result.put(SpecialOfferProductDao.ATTR_DET_ID, product.getDetId());
+		if(product.getPercent()!=null) result.put(SpecialOfferProductDao.ATTR_PERCENT, product.getPercent());
+		if(product.getFlat()!=null) result.put(SpecialOfferProductDao.ATTR_FLAT, product.getFlat());
+		if(product.getSwap()!=null) result.put(SpecialOfferProductDao.ATTR_SWAP, product.getSwap());
 		return result;
 	}
 	

@@ -74,6 +74,9 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 		return daoHelper.delete(specialOfferConditionDao, keyMap);
 	}
 
+	
+	
+	
 	/**
 	 * Checks if the offer is applicable with the given parameters
 	 * 
@@ -110,23 +113,32 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			Date auxBookingStart = (Date) condition.get(SpecialOfferConditionDao.ATTR_START);
 			Date auxBookingEnd = (Date) condition.get(SpecialOfferConditionDao.ATTR_END);
 			Integer auxDays = (Integer) condition.get(SpecialOfferConditionDao.ATTR_DAYS);
-			Integer calculatedDays = (int) ChronoUnit.DAYS.between(auxBookingStart.toInstant(),
-					auxBookingEnd.toInstant());
+			Integer calculatedDays = null;
+			if (auxBookingStart!=null &&auxBookingEnd!=null) {
+				calculatedDays= (int) ChronoUnit.DAYS.between(auxBookingStart.toInstant(),
+						auxBookingEnd.toInstant());				
+			}
 			conditionChecks &= (auxHotelId == null || hotelid.equals(auxHotelId));
 			conditionChecks &= (auxRoomType == null || roomType.equals(auxRoomType));
 			conditionChecks &= (auxBookingStart == null
 					|| (startDate.equals(auxBookingStart) || startDate.after(auxBookingStart)));
 			conditionChecks &= (auxBookingEnd == null
 					|| (endDate.equals(auxBookingEnd) || endDate.before(auxBookingEnd)));
-			conditionChecks &= (auxDays == null || auxDays <= calculatedDays);
+			conditionChecks &= (auxDays == null || calculatedDays==null || auxDays <= calculatedDays);
 			if (conditionChecks)
 				return true;
 		}
 		return false;
 	}
 
+	
+	/**
+	 * Method not exposed to the public to insert from other services
+	 * @param condition condition object to insert
+	 * @return returns an entityResult with the id of the condition if it succeeds or one with the error
+	 */
 	public EntityResult insertCondition(OfferCondition condition) {
-		return daoHelper.insert(specialOfferConditionDao, entityUtils.fillConditionMap(condition));
+		return daoHelper.insert(specialOfferConditionDao, entityUtils.fillConditionMap(condition,true,true));
 	}
 	
 	/**

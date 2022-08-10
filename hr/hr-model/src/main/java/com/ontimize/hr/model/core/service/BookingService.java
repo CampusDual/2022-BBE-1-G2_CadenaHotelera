@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.mail.MessagingException;
 
@@ -37,6 +38,7 @@ import com.ontimize.hr.model.core.dao.OffersDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
@@ -113,6 +115,9 @@ public class BookingService implements IBookingService {
 	@Autowired
 	private SpecialOfferService specialOfferService;
 
+	@Autowired
+	private SpecialOfferProductService specialOfferProductService;
+	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -630,14 +635,21 @@ public class BookingService implements IBookingService {
 			LOG.info(MsgLabels.ROOM_TYPE_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_FORMAT);
 		}
-
-		if(parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
-			LOG.info(MsgLabels.BOOKING_USED_OFFER_ID_INSTEAD_CODE);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
-					MsgLabels.BOOKING_USED_OFFER_ID_INSTEAD_CODE);
-		}
 		
 		Integer offerID = null;
+		if(parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
+			try {
+				offerID = Integer.parseInt(parameters.get(BookingDao.ATTR_BOK_OFFER_ID).toString());
+			} catch (NumberFormatException e) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+			}
+			if (offerID!=null && !entityUtils.specialOfferExists(offerID)) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+			}
+		}
+		
 		if (parameters.containsKey("qry_code")) {
 				offerID = entityUtils.getSpecialOfferIdFromCode(parameters.get("qry_code").toString());
 				if(offerID==-1) {
@@ -684,25 +696,25 @@ public class BookingService implements IBookingService {
 		insert.put(BookingDao.ATTR_CLI_ID, cliId);
 		insert.put(BookingDao.ATTR_DEPARTURE_DATE, departureDate);
 		insert.put(BookingDao.ATTR_BOK_COMMENTS, comments);
+		insert.put(BookingDao.ATTR_BOK_OFFER_ID, offerID);
 
 		try {
 			EntityResult result = this.bookingInsert(insert);
 			result.put(BookingDao.ATTR_ROM_NUMBER, roomid);
 			if (result.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
-				Map<Date, Double> prices = priceByDay(auxHotelID, roomType, entryDate, departureDate);
-				prices.forEach((day, price) -> {
-					daoHelper.insert(bookingDetailsDao, new HashMap<String, Object>() {
-						{
-							put(BookingDetailsDao.ATTR_BOOKING_ID, result.get(BookingDao.ATTR_ID));
-							put(BookingDetailsDao.ATTR_DATE, day);
-							put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID,  1);
-							put(BookingDetailsDao.ATTR_PAID, false);
-							put(BookingDetailsDao.ATTR_PRICE, price);
-							put(BookingDetailsDao.ATTR_NOMINAL_PRICE,price);
-						}
-					});
-				});
-
+				boolean discardNormalOffers= false;
+				if(offerID!=null)discardNormalOffers = !entityUtils.isOfferStackable(offerID);
+				Map<Date, Double> prices = priceByDay(auxHotelID, roomType, entryDate, departureDate,!discardNormalOffers);
+				for (Entry<Date, Double> priceEntry : prices.entrySet()) {
+					Map<String, Object> detailMap = new HashMap<>();
+					detailMap.put(BookingDetailsDao.ATTR_BOOKING_ID, result.get(BookingDao.ATTR_ID));
+					detailMap.put(BookingDetailsDao.ATTR_DATE, priceEntry.getKey());
+					detailMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1 );
+					detailMap.put(BookingDetailsDao.ATTR_PAID, false);
+					detailMap.put(BookingDetailsDao.ATTR_PRICE, specialOfferProductService.getFinalPrice(offerID, 1, priceEntry.getValue(), discardNormalOffers));
+					detailMap.put(BookingDetailsDao.ATTR_NOMINAL_PRICE,priceEntry.getValue());
+					daoHelper.insert(bookingDetailsDao, detailMap);
+				}
 			}
 			return result;
 		} catch (DuplicateKeyException e) {
@@ -1335,7 +1347,12 @@ public class BookingService implements IBookingService {
 	 * Method to get a budget.
 	 * 
 	 */
-	public Map<Date, Double> priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate)
+	public Map<Date, Double>priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate)throws OntimizeJEERuntimeException{
+		return priceByDay(hotelId, roomTypeId, startDate, endDate, true);
+	}
+	
+	
+	public Map<Date, Double> priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate, boolean checkOffer)
 			throws OntimizeJEERuntimeException {
 
 		Map<Date, Double> mapPrices = new HashMap<>();
@@ -1401,7 +1418,7 @@ public class BookingService implements IBookingService {
 		for (int i = 0; i < differenceDays; i++) {
 			day = Utils.sumarDiasAFecha(startDate, i);
 			// primero compruebo si hay oferta ese día
-			if (pricesOffer.containsKey(day)) {
+			if (pricesOffer.containsKey(day) && checkOffer) {
 				mapPrices.put(day, pricesOffer.get(day));
 			}
 			// si no hay oferta
