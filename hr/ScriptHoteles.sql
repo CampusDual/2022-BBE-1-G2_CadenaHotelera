@@ -202,6 +202,7 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferUpdate');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDelete');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAll');
 
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeQuery');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeInsert');
@@ -335,6 +336,7 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,1
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,102);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,103);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,104);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,105);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t
@@ -549,7 +551,7 @@ create table if not exists special_offer_product(
     sopt_sofr_id integer,
     sopt_percent decimal(10,2),
     sopt_flat decimal(10,2),
-    spot_swap decimal(10,2),
+    sopt_swap decimal(10,2),
     CONSTRAINT pk_special_offer_product PRIMARY KEY (sopt_det_id,sopt_sofr_id),
     CONSTRAINT fk_sopt_det FOREIGN KEY (sopt_det_id) REFERENCES details_type(det_id),
     CONSTRAINT fk_sopt_sofr FOREIGN KEY (sopt_sofr_id) REFERENCES special_offer(sofr_id)

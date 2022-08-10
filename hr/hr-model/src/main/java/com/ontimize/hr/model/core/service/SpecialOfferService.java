@@ -1,10 +1,8 @@
 package com.ontimize.hr.model.core.service;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ontimize.hr.api.core.service.ISpecialOffersService;
 import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferDao;
+import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
 import com.ontimize.hr.model.core.service.exception.FillException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
@@ -41,6 +41,7 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.gui.SearchValue;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.common.tools.BasicExpressionTools;
+import com.ontimize.jee.common.tools.EntityResultTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 /**
@@ -63,6 +64,12 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 	@Autowired
 	private SpecialOfferDao specialOfferDao;
+
+	@Autowired
+	private SpecialOfferConditionDao specialOfferConditionDao;
+
+	@Autowired
+	private SpecialOfferProductDao specialOfferProductDao;
 
 	@Autowired
 	private SpecialOfferConditionService conditionService;
@@ -264,7 +271,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 	}
 
-	public EntityResult listAllOffers(Map<String, Object> keyMap) {
+	public EntityResult specialOfferListAll(Map<String, Object> keyMap) {
 		Date start = null;
 		Date end = null;
 		if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
@@ -296,14 +303,61 @@ public class SpecialOfferService implements ISpecialOffersService {
 			LOG.info(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
 			return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
 		}
-		Map<String, Object> query = new HashMap<String, Object>();
+		Map<String, Object> query = new HashMap<>();
 		if (start != null && end != null) {
 			BasicExpression where = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_START),
 					new SearchValue(SearchValue.BETWEEN, new ArrayList<Date>(Arrays.asList(start, end))), false);
 			query.put(Utils.BASIC_EXPRESSION, where);
 		}
-		EntityResult offers= daoHelper.query(specialOfferDao, keyMap, new ArrayList<String>(
+		EntityResult offers = daoHelper.query(specialOfferDao, query, new ArrayList<>(
 				Arrays.asList(SpecialOfferDao.ATTR_ID, SpecialOfferDao.ATTR_START, SpecialOfferDao.ATTR_END)));
+		if (!offers.isWrong() && offers.calculateRecordNumber() > 0) {
+			EntityResultTools.addColumn(offers, "conditions", null);
+			EntityResultTools.addColumn(offers, "products", null);
+
+			List<Integer> offersId = (List<Integer>) offers.get(SpecialOfferDao.ATTR_ID);
+			Map<String, Object> queryConditions = new HashMap<>();
+			queryConditions.put(Utils.BASIC_EXPRESSION,
+					new BasicExpression(new BasicField(SpecialOfferConditionDao.ATTR_OFFER_ID),
+							new SearchValue(SearchValue.IN, offersId), false));
+
+			List<String> conditionsColumns = new ArrayList<>(Arrays.asList(SpecialOfferConditionDao.ATTR_ID,
+					SpecialOfferConditionDao.ATTR_OFFER_ID, SpecialOfferConditionDao.ATTR_HOTEL_ID,
+					SpecialOfferConditionDao.ATTR_TYPE_ID, SpecialOfferConditionDao.ATTR_START,
+					SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_DAYS));
+
+			EntityResult conditions = daoHelper.query(specialOfferConditionDao, queryConditions, conditionsColumns);
+
+			Map<String, Object> queryProducts = new HashMap<>();
+			queryProducts.put(Utils.BASIC_EXPRESSION,
+					new BasicExpression(new BasicField(SpecialOfferProductDao.ATTR_OFFER_ID),
+							new SearchValue(SearchValue.IN, offersId), false));
+			List<String> productsColumns = new ArrayList<>(Arrays.asList(SpecialOfferProductDao.ATTR_OFFER_ID,
+					SpecialOfferProductDao.ATTR_DET_ID, SpecialOfferProductDao.ATTR_PERCENT,
+					SpecialOfferProductDao.ATTR_FLAT, SpecialOfferProductDao.ATTR_SWAP));
+			EntityResult products = daoHelper.query(specialOfferProductDao, queryProducts, productsColumns);
+
+			for (int i = 0; i < offers.calculateRecordNumber(); i++) {
+				Integer id = (Integer) offers.getRecordValues(i).get(SpecialOfferDao.ATTR_ID);
+				List<Map<String, Object>> conditionList = new ArrayList<>();
+				for (int j = 0; j < conditions.calculateRecordNumber(); j++) {
+					if(id.equals((Integer)conditions.getRecordValues(j).get(SpecialOfferConditionDao.ATTR_OFFER_ID))) {
+						conditionList.add((Map<String, Object>)conditions.getRecordValues(j));
+					}
+				}
+				
+				List<Map<String, Object>> productList = new ArrayList<>();
+				for (int j = 0; j < products.calculateRecordNumber(); j++) {
+					if(id.equals((Integer)products.getRecordValues(j).get(SpecialOfferProductDao.ATTR_OFFER_ID))) {
+						productList.add((Map<String, Object>)products.getRecordValues(j));
+					}
+				}
+				Map<String, Object> offer =(Map<String, Object>)offers.getRecordValues(i);
+				offer.put("conditions", conditionList);
+				offer.put("products", productList);
+				EntityResultTools.updateRecordValues(offers, offer, i);
+			}
+		}
 		return offers;
 	}
 

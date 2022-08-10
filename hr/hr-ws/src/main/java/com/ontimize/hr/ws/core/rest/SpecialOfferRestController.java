@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ontimize.hr.api.core.service.ISpecialOffersService;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.rest.ORestController;
@@ -46,5 +47,17 @@ public class SpecialOfferRestController extends ORestController<ISpecialOffersSe
 			LOG.error(MsgLabels.ERROR,e);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR);
 		}
+		
+	}
+	
+	@PostMapping(value ="specialOfferListAll" ,produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult listAllOffers(@RequestBody Map<String, Object>keyMap) {
+		Map<String, Object> filter = null;
+		try {
+			filter = (Map<String, Object>) keyMap.get(Utils.FILTER);			
+		} catch (Exception e) {
+			return EntityUtils.errorResult(MsgLabels.FILTER_MANDATORY);
+		}
+		return specialOfferService.specialOfferListAll(filter);
 	}
 }
