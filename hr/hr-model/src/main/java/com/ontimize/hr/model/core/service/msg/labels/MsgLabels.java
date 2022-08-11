@@ -180,11 +180,21 @@ public class MsgLabels {
 	public static final String SEASON_MULTIPLIER_BLANK = "SEASON_MULTIPLIER_IS_BLANK";
 	public static final String SEASON_DUPLICATE_NAME = "SEASON_NAME_DUPLICATED";
 
+	//PICTURES
+	public static final String PICTURE_NAME_BLANK = "PICTURE_NAME_IS_BLANK";
+	public static final String PICTURE_WRONG_FORMAT = "PICTURE_FORMAT_WORNG_USE_JPG";
+	public static final String PICTURE_NAME_MANDATORY = "PICTURE_NAME_IS_MANDATORY";
+	public static final String PICTURE_ID_MANDATORY = "PICTURE_ID_IS_MANDATORY";
+	public static final String PICTURE_ID_FORMAT = "PICTURE_ID_WRONG_FORMAT";
+	public static final String PICTURE_MANDATORY = "PICTURE_IS_MANDATORY";
+	public static final String PICTURE_NOT_EXISTS = "PICTURE_NOT_EXISTS";
+	
 	// FILTERS,COLUMNS,DATA
 	public static final String FILTER_MANDATORY = "FILTER_IS_MANDATORY";
 	public static final String COLUMNS_MANDATORY = "COLUMNS_IS_MANDATORY";
 	public static final String DATA_MANDATORY = "DATA_IS_MANDATORY";
 	public static final String EMPTY_FILTER = "EMPTY_FILTER";
+
 
 	// GENERAL ERRORS
 	public static final String BAD_DATA = "BAD_DATA_PLEASE_CHECK_VALUES_AND_COLUMN_NAMES";
@@ -199,7 +209,6 @@ public class MsgLabels {
 	
 	// RECOMMENDATIONS
 	public static final String NO_RECOMMENDATIONS_IN_RADIUS ="NO_RECOMMENDATIONS_IN_RADIUS";
-	
 	
 	
 	private MsgLabels() {
