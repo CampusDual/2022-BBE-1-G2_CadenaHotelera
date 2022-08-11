@@ -136,6 +136,19 @@
 			   ]]>
    			</Sentence>
   		</Query>
-  		
+  		<Query id="getNightsHotel">
+      		<Sentence>
+			   <![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     FROM
+			     	PUBLIC.booking b
+			     inner join booking_details bd on b.bok_id = bd.bok_det_bok_id
+			     inner join room r on b.bok_rom_number = r.rom_number and b.bok_htl_id = r.rom_htl_id			     	
+			    #WHERE#
+			    ORDER BY bd.bok_det_date
+			   ]]>
+   			</Sentence>
+  		</Query>
 	</Queries>
 </JdbcEntitySetup>
