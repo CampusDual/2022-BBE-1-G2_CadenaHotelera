@@ -400,6 +400,24 @@ public class EntityUtils {
 		}
 	}
 	
+	/**
+	 * Searches the id of the specialOffer from one of its conditions 
+	 * @param conditionId if of the condition
+	 * @return id of the offer null if the condition does not exist
+	 */
+	public Integer getSpecialOfferIDFromCondition(Integer conditionId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(SpecialOfferConditionDao.ATTR_ID, conditionId);
+		EntityResult res = daoHelper.query(specialOfferConditionDao, keyMap, new ArrayList<String>(Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID)));
+		if (res.getCode()==EntityResult.OPERATION_SUCCESSFUL) {
+			if (res.calculateRecordNumber()!=1) return null;
+			return (Integer) res.getRecordValues(0).get(SpecialOfferConditionDao.ATTR_OFFER_ID);
+		}
+		else {
+			throw new FetchException();
+		}
+	}
+	
 	public String geoPosition(String q, String apikey) {
 		// get CloseableHttpClient
 		CloseableHttpClient client = HttpClients.createDefault();
