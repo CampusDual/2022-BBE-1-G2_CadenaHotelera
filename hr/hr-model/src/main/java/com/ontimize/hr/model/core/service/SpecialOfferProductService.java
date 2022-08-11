@@ -133,7 +133,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				throw new FetchException(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 			}
 			
-			
+			return price;
 		} catch (Exception e) {
 			if (returnPriceOnError)
 			{
@@ -143,7 +143,6 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS, e);				
 			}
 		}
-		return price;
 	}
 
 	public Double getFinalPrice(Integer specialOfferId, Integer detailId, Double price) throws FetchException{

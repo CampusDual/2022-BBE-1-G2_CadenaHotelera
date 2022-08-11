@@ -88,7 +88,12 @@ public class EntityUtils {
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 	
-	
+	/**
+	 * Checks if the hotel exists
+	 * @param hotelId id of the hotel to check
+	 * @return True if the hotel exists, false otherwise
+	 * @throws OntimizeJEERuntimeException if there are any problems fetching from database
+	 */
 	public boolean hotelExists(Integer hotelId)
 	{
 		Map<String, Object> keyMap = new HashMap<>();
@@ -486,9 +491,9 @@ public class EntityUtils {
 	 * @return true if the offer exist and it affects the specified hotel, false in every other case including not existing offers or hotels
 	 */
 	public boolean isOfferInHotel(Integer offerId, Integer hotelId) {		
-		Map<String, Object> queryMap =  new HashMap<String, Object>();
+		Map<String, Object> queryMap =  new HashMap<>();
 		queryMap.put(SpecialOfferConditionDao.ATTR_OFFER_ID, offerId);
-		EntityResult res = daoHelper.query(specialOfferConditionDao, queryMap, new ArrayList<String>(Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID,SpecialOfferConditionDao.ATTR_HOTEL_ID)));
+		EntityResult res = daoHelper.query(specialOfferConditionDao, queryMap, new ArrayList<>(Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID,SpecialOfferConditionDao.ATTR_HOTEL_ID)));
 		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
 			if (res.calculateRecordNumber()==0) {
 				return specialOfferExists(offerId);					
@@ -506,6 +511,56 @@ public class EntityUtils {
 		}else {
 			throw new FetchException();
 		}
+	}
+	/**
+	 * Checks if the offer passed as parameter is the ONLY affected by a concrete special offer
+	 * @param offerId id of the offer
+	 * @param hotelid id of the hotel to check
+	 * @return true if the offer exists and it affects only the specified hotel, false in every other case including non existing offer and hotel 
+	 */
+	public boolean isOfferFromHotelOnly(Integer offerId,Integer hotelId) {
+		Map<String, Object> queryMap =  new HashMap<>();
+		queryMap.put(SpecialOfferConditionDao.ATTR_OFFER_ID, offerId);
+		EntityResult res = daoHelper.query(specialOfferConditionDao, queryMap, new ArrayList<>(Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID,SpecialOfferConditionDao.ATTR_HOTEL_ID)));
+		if(res.getCode()== EntityResult.OPERATION_SUCCESSFUL) {
+			if (res.calculateRecordNumber()==0) {
+				return false;
+			}
+			else {
+				boolean onlyThisHotel = true;
+				for(int i = 0 ; i <res.calculateRecordNumber();i++) {					
+					Integer auxHotelid = (Integer) res.getRecordValues(i).get(SpecialOfferConditionDao.ATTR_HOTEL_ID);
+					onlyThisHotel &= auxHotelid!=null && auxHotelid.equals(hotelId);
+				}
+				return onlyThisHotel;
+			}
+		}else {
+			throw new FetchException();
+		}
+	}
+	
+	/**
+	 * Search the assigned offer to a booking
+	 * @param bookingId
+	 * @return the offerId if the booking is found and it has an offer applied, null if the booking has no offer or the booking is not found
+	 */
+	public Integer getSpecialOfferBooking(Integer bookingId) {
+		if(bookingId==null) return null;
+		Map<String,Object> queryMap = new HashMap<>();
+		queryMap.put(BookingDao.ATTR_ID, bookingId);
+		EntityResult res = daoHelper.query(bookingDao, queryMap, new ArrayList<>(Arrays.asList(BookingDao.ATTR_BOK_OFFER_ID)));
+		if (res.getCode()==EntityResult.OPERATION_SUCCESSFUL) {
+			if (res.calculateRecordNumber()==1) {
+				return (Integer) res.getRecordValues(0).get(BookingDao.ATTR_BOK_OFFER_ID);
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			throw new FetchException();
+		}
+		
 	}
 	
 	
