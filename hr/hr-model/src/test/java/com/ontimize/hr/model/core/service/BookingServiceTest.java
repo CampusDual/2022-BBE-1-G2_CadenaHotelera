@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
@@ -12,11 +11,14 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,39 +27,30 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.ontimize.hr.model.core.dao.DatesSeasonDao;
-import com.ontimize.hr.model.core.dao.DetailsTypeDao;
-import com.ontimize.hr.model.core.dao.HotelDao;
-
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.GregorianCalendar;
-import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsBookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
+import com.ontimize.hr.model.core.dao.ClientDao;
+import com.ontimize.hr.model.core.dao.DatesSeasonDao;
+import com.ontimize.hr.model.core.dao.DetailsTypeDao;
+import com.ontimize.hr.model.core.dao.HotelDao;
 import com.ontimize.hr.model.core.dao.OffersDao;
+import com.ontimize.hr.model.core.dao.RoomDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
 import com.ontimize.hr.model.core.dao.SeasonDao;
+import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
+import com.ontimize.jee.common.services.user.UserInformation;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-
-import com.ontimize.hr.model.core.dao.ClientDao;
-import com.ontimize.hr.model.core.dao.RoomDao;
-import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
-import com.ontimize.hr.model.core.service.utils.CredentialUtils;
-import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.jee.common.services.user.UserInformation;
 
 
 @ExtendWith(MockitoExtension.class)

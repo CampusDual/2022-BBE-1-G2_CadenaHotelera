@@ -1077,7 +1077,7 @@ public class BookingService implements IBookingService {
 			// entramos aqui si NO se cambia el tipo de habitacion
 			((freeRoomsEntryFilter.calculateRecordNumber() != 0
 					&& freeRoomsDepartureFilter.calculateRecordNumber() != 0)
-					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0
+					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0	
 							&& (oldDepartureDate.equals(newDepartureDate)))
 					|| (oldEntryDate.equals(newEntryDate) && freeRoomsDepartureFilter.calculateRecordNumber() != 0)
 					|| ((oldEntryDate.equals(newEntryDate) || freeRoomsEntryFilter.calculateRecordNumber() != 0)
@@ -1924,6 +1924,7 @@ public class BookingService implements IBookingService {
 	 * @return pdf report
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public byte[] getPdfReport(int booking) {
 		Integer bookingId = booking;
 

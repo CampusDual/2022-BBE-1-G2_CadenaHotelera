@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<JdbcEntitySetup
-	xmlns="http://www.ontimize.com/schema/jdbc"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
-	catalog="" schema="${mainschema}" table="dates_season"
-	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+<JdbcEntitySetup xmlns="http://www.ontimize.com/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd" catalog="" schema="${mainschema}" table="dates_season" datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
 		<Column>dts_id</Column>
 	</DeleteKeys>
@@ -15,7 +10,7 @@
 	<Queries>
 		<Query id="getMultiplierByDatesSeason">
 			<Sentence>
-			   <![CDATA[
+				<![CDATA[
 			     SELECT
 			     	#COLUMNS#
 			     FROM
@@ -23,7 +18,21 @@
 			     INNER JOIN PUBLIC.season s ON d.dts_sea_id = s.sea_id		     	
 			    #WHERE# 
 			   ]]>
-   			</Sentence>
+			</Sentence>
+		</Query>
+		<Query id="getDaysHighSeason">
+			<Sentence>
+				<![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     from PUBLIC.dates_season ds
+				inner join PUBLIC.hotel h on h.htl_id = ds.dts_htl_id
+				inner join PUBLIC.room r on h.htl_id = r.rom_htl_id
+				inner join PUBLIC.booking b on r.rom_number = b.bok_rom_number and r.rom_htl_id = b.bok_htl_id
+				inner join PUBLIC.booking_details bd on b.bok_id = bd.bok_det_bok_id	     	
+			    #WHERE# 
+			   ]]>
+			</Sentence>
 		</Query>
 	</Queries>
 </JdbcEntitySetup>
