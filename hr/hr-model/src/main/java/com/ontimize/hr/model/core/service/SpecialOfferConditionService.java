@@ -1,12 +1,9 @@
 package com.ontimize.hr.model.core.service;
 
 import java.time.Clock;
-import java.time.LocalDate;
-import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +28,6 @@ import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.entities.OfferCondition;
 import com.ontimize.jee.common.dto.EntityResult;
-import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -136,22 +132,22 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			return EntityUtils.errorResult(MsgLabels.DATA_MANDATORY);
 		}
 		try {
-			OfferCondition modifiedCondition = EntityUtils.fillCondition(attrMap, false);
-			OfferCondition filterCondition = EntityUtils.fillCondition(keyMap, true);
+			OfferCondition modifiedCondition = EntityUtils.fillCondition(attrMap, false,true);
+			OfferCondition filterCondition = EntityUtils.fillCondition(keyMap, true,false);
 			OfferCondition baseCondition = null;
 			OfferCondition mergedCondition = null;
-			if (filterCondition.getOfferId() == null) {
+			if (filterCondition.getConditionId() == null) {
 				LOG.info(MsgLabels.CONDITION_ID_MANDATORY);
-				EntityUtils.errorResult(MsgLabels.CONDITION_ID_MANDATORY);
+				return  EntityUtils.errorResult(MsgLabels.CONDITION_ID_MANDATORY);
 			}
 			EntityResult resQuery = daoHelper.query(specialOfferConditionDao,
-					EntityUtils.fillConditionMap(filterCondition, true, true), EntityUtils.getAllConditionColumns());
+					EntityUtils.fillConditionMap(filterCondition, true, true,false), EntityUtils.getAllConditionColumns());
 			if (!resQuery.isWrong()) {
 				if (resQuery.isEmpty()) {
 					LOG.info(MsgLabels.CONDITION_NOT_EXISTS);
 					return EntityUtils.errorResult(MsgLabels.CONDITION_NOT_EXISTS);
 				}
-				baseCondition = EntityUtils.fillCondition((Map<String, Object>) resQuery.getRecordValues(0), true);
+				baseCondition = EntityUtils.fillCondition((Map<String, Object>) resQuery.getRecordValues(0), true,false);
 			} else {
 				throw new FetchException("ERROR FETCHING BASE CONDITION FROM DATABASE");
 			}
@@ -165,9 +161,9 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 				LOG.info(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
 				return EntityUtils.errorResult(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
 			}
-			return daoHelper.update(specialOfferConditionDao,
-					EntityUtils.fillConditionMap(mergedCondition, false, false),
-					EntityUtils.fillConditionMap(filterCondition, true, false));
+			Map<String, Object> auxMerged = EntityUtils.fillConditionMap(mergedCondition, false, false,true);
+			Map<String, Object> auxCondition =EntityUtils.fillConditionMap(filterCondition, true, false,false);
+			return daoHelper.update(specialOfferConditionDao,auxMerged,auxCondition);
 		} catch (ValidationException e) {
 			LOG.info(e.getMessage());
 			return EntityUtils.errorResult(e.getMessage());
@@ -304,7 +300,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	 *         or one with the error
 	 */
 	public EntityResult insertCondition(OfferCondition condition) {
-		return daoHelper.insert(specialOfferConditionDao, EntityUtils.fillConditionMap(condition, true, true));
+		return daoHelper.insert(specialOfferConditionDao, EntityUtils.fillConditionMap(condition, true, true,false));
 	}
 
 	/**

@@ -227,6 +227,9 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionInsert');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionUpdate');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionAdd');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionModify');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionRemove');
 
 
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductQuery');
@@ -360,6 +363,14 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,1
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,112);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,113);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,114);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,115);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,116);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,117);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,118);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,119);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,120);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,121);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,122);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t
