@@ -39,6 +39,7 @@ import com.ontimize.hr.model.core.dao.SpecialOfferDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
 import com.ontimize.hr.model.core.service.exception.FetchException;
 import com.ontimize.hr.model.core.service.exception.FillException;
+import com.ontimize.hr.model.core.service.exception.MergeException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.entities.OfferCondition;
 import com.ontimize.hr.model.core.service.utils.entities.OfferProduct;
@@ -87,6 +88,13 @@ public class EntityUtils {
 	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
+	
+	
+	private static final String[] ALL_CONDITION_COLUMNS = {SpecialOfferConditionDao.ATTR_ID,SpecialOfferConditionDao.ATTR_OFFER_ID,SpecialOfferConditionDao.ATTR_HOTEL_ID,SpecialOfferConditionDao.ATTR_TYPE_ID,SpecialOfferConditionDao.ATTR_START,SpecialOfferConditionDao.ATTR_END,SpecialOfferConditionDao.ATTR_DAYS};
+	public static final List<String> getAllConditionColumns(){
+		return  Arrays.asList(ALL_CONDITION_COLUMNS.clone());
+	}
+	
 	
 	/**
 	 * Checks if the hotel exists
@@ -533,7 +541,7 @@ public class EntityUtils {
 	/**
 	 * Checks if the offer passed as parameter is the ONLY affected by a concrete special offer
 	 * @param offerId id of the offer
-	 * @param hotelid id of the hotel to check
+	 * @param hotelId id of the hotel to check
 	 * @return true if the offer exists and it affects only the specified hotel, false in every other case including non existing offer and hotel 
 	 */
 	public boolean isOfferFromHotelOnly(Integer offerId,Integer hotelId) {
@@ -582,11 +590,65 @@ public class EntityUtils {
 	}
 	
 	
-	public static final EntityResult errorResult(String message) {
+	public static EntityResult errorResult(String message) {
 		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
 	}
 	
-	public OfferCondition fillCondition(Map<String, Object>conditionMap,boolean fillID) {
+	/**
+	 * Merges the conditions from the modifiedCondition into the baseCondition keeping all the base properties that are null on the modified one
+	 * The checked id's are only for validation purposes. The merged condition always keeps the condition and offer id from the base condition 
+	 * @param baseCondition base condition to modify
+	 * @param modifiedCondition condition with the changes to apply
+	 * @return an OfferCondition object with the applied changes
+	 * @throws MergeException if the offer or condition id are different
+	 */
+	public static OfferCondition mergeConditions (OfferCondition baseCondition,OfferCondition modifiedCondition) throws MergeException {
+		return mergeConditions(baseCondition,modifiedCondition,true,true);
+	}
+	
+	/**
+	 * Merges the conditions from the modifiedCondition into the baseCondition keeping all the base properties that are null on the modified one
+	 * The checked id's are only for validation purposes. The merged condition always keeps the condition and offer id from the base condition 
+	 * @param baseCondition base condition to modify
+	 * @param modifiedCondition condition with the changes to apply
+	 * @param checkConditionId checks if the condition id is the same if the modified condition has this property set
+	 * @param checkOfferId checks if the offer id is the same if the modified condition has this property set
+	 * @return an OfferCondition object with the applied changes
+	 * @throws MergeException if some of the id checks are enabled and failed
+	 */
+	public static OfferCondition mergeConditions(OfferCondition baseCondition, OfferCondition modifiedCondition,
+			boolean checkConditionId, boolean checkOfferId) throws MergeException {
+		OfferCondition result = new OfferCondition();
+		result.setConditionId(baseCondition.getConditionId());
+		result.setOfferId(baseCondition.getOfferId());
+		if (modifiedCondition.isEmpty() && baseCondition.isEmpty()) {
+			return result;			
+		}
+		else {
+			if (checkConditionId && modifiedCondition.getConditionId()!=null && !modifiedCondition.getConditionId().equals(baseCondition.getConditionId())) {
+				throw new MergeException(MsgLabels.CONDITION_FAILED_MERGE_CONDITION_ID_MISMATCH);
+			}
+			if (checkOfferId && modifiedCondition.getOfferId()!=null && !modifiedCondition.getOfferId().equals(baseCondition.getOfferId())) {
+				throw new MergeException(MsgLabels.CONDITION_FAILED_MERGE_SPECIAL_OFFER_ID_MISMATCH);
+			}			
+			result.setHotelId(modifiedCondition.getHotelId()!=null?modifiedCondition.getHotelId():baseCondition.getHotelId());
+			result.setRoomType(modifiedCondition.getRoomType()!=null?modifiedCondition.getRoomType():baseCondition.getRoomType());
+			result.setStartBookingOffer(modifiedCondition.getStartBookingOffer()!=null?modifiedCondition.getStartBookingOffer():baseCondition.getStartBookingOffer());
+			result.setEndBookingOffer(modifiedCondition.getEndBookingOffer()!=null?modifiedCondition.getEndBookingOffer():baseCondition.getEndBookingOffer());
+			result.setStartActiveOffer (modifiedCondition.getStartActiveOffer()!=null?modifiedCondition.getStartActiveOffer():baseCondition.getStartActiveOffer());
+			result.setEndActiveOffer(modifiedCondition.getEndActiveOffer()!=null?modifiedCondition.getEndActiveOffer():baseCondition.getEndActiveOffer());
+			result.setMinimumNights(modifiedCondition.getMinimumNights()!=null?modifiedCondition.getMinimumNights():baseCondition.getMinimumNights());
+			return result;
+		}		
+	}
+
+	/**
+	 * Fills an OfferCondition object with a condition map
+	 * @param conditionMap condition map with the data
+	 * @param fillID Enables the filling of the condition id
+	 * @return A new OfferCondition object with the data from the map
+	 */
+	public static OfferCondition fillCondition(Map<String, Object>conditionMap,boolean fillID) {
 		OfferCondition result = new OfferCondition();
 		if(conditionMap==null ||conditionMap.isEmpty()) throw new FillException(MsgLabels.CONDITION_EMPTY);
 		
@@ -665,15 +727,15 @@ public class EntityUtils {
 		return result;
 	}
 	
-	public OfferCondition fillCondition(Map<String, Object>conditionMap) {
+	public static OfferCondition fillCondition(Map<String, Object>conditionMap) {
 		return fillCondition(conditionMap, false);
 	}
 	
-	public OfferProduct fillProduct(Map<String, Object>productMap) {
+	public static OfferProduct fillProduct(Map<String, Object>productMap) {
 		return fillProduct(productMap,false);
 	}
 	
-	public OfferProduct fillProduct(Map<String, Object>productMap,boolean fillOfferId) {
+	public static OfferProduct fillProduct(Map<String, Object>productMap,boolean fillOfferId) {
 		OfferProduct product = new OfferProduct();
 		if (productMap==null || productMap.isEmpty())
 			throw new FillException(MsgLabels.PRODUCT_EMPTY);
@@ -720,19 +782,26 @@ public class EntityUtils {
 	}
 	
 	
-	
-	public Map<String, Object> fillConditionMap(OfferCondition condition,boolean putConditionId,boolean putOfferId){
+	/**
+	 * Fills a condition map with the data from an OfferCondition object.
+	 * @param condition Condition with the data to fill into the map
+	 * @param fillConditionId Enables the filling of the condition id
+	 * @param fillOfferId Enables the filling of the offer id
+	 * @return returns a map filled with the data from the OfferCondition object. It strips the activeOffer properties. 
+	 */
+	public static Map<String, Object> fillConditionMap(OfferCondition condition,boolean fillConditionId,boolean fillOfferId){
 		Map<String, Object> result = new HashMap<>();
-		if (putConditionId && condition.getConditionId()!=null) result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
-		if (putOfferId && condition.getOfferId()!=null)result.put(SpecialOfferConditionDao.ATTR_OFFER_ID,condition.getOfferId());
+		if (fillConditionId && condition.getConditionId()!=null) result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
+		if (fillOfferId && condition.getOfferId()!=null)result.put(SpecialOfferConditionDao.ATTR_OFFER_ID,condition.getOfferId());
 		if (condition.getHotelId()!=null) result.put(SpecialOfferConditionDao.ATTR_HOTEL_ID, condition.getHotelId());
 		if (condition.getRoomType()!=null) result.put(SpecialOfferConditionDao.ATTR_TYPE_ID, condition.getRoomType());
-		if (condition.getStartBookingOffer()!=null) result.put(SpecialOfferCodeDao.ATTR_START, condition.getStartBookingOffer());
+		if (condition.getStartBookingOffer()!=null) result.put(SpecialOfferConditionDao.ATTR_START, condition.getStartBookingOffer());
 		if (condition.getEndBookingOffer()!=null) result.put(SpecialOfferConditionDao.ATTR_END, condition.getEndBookingOffer());
+		if (condition.getMinimumNights()!=null)result.put(SpecialOfferConditionDao.ATTR_DAYS, condition.getMinimumNights());
 		return result;
 	}
 	
-	public Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId){
+	public static Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId){
 		Map<String, Object> result = new HashMap<>();
 		if(putOfferId && product.getSpecialOfferId()!=null) result.put(SpecialOfferProductDao.ATTR_OFFER_ID, product.getSpecialOfferId());
 		if(product.getDetId()!=null) result.put(SpecialOfferProductDao.ATTR_DET_ID, product.getDetId());

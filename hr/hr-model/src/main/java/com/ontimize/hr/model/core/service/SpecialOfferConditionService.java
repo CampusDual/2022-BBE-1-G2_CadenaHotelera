@@ -25,6 +25,7 @@ import com.ontimize.hr.api.core.service.ISpecialOffersConditionsService;
 import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.service.exception.FetchException;
 import com.ontimize.hr.model.core.service.exception.FillException;
+import com.ontimize.hr.model.core.service.exception.ValidationException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
@@ -83,53 +84,49 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	}
 
 	@Override
-	@Secured({PermissionsProviderSecured.SECURED})
-	public EntityResult specialOfferConditionAdd(Map<String,Object>attrMap) throws OntimizeJEERuntimeException{
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferConditionAdd(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		if (attrMap == null || attrMap.isEmpty()) {
 			LOG.info(MsgLabels.DATA_MANDATORY);
 			return EntityUtils.errorResult(MsgLabels.DATA_MANDATORY);
 		}
 		OfferCondition condition = null;
-		if(attrMap.get(SpecialOfferConditionDao.ATTR_OFFER_ID)==null) {
+		if (attrMap.get(SpecialOfferConditionDao.ATTR_OFFER_ID) == null) {
 			LOG.info(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
 			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
 		}
 		try {
-			condition = entityUtils.fillCondition(attrMap);
-		}
-		catch (FillException e) {
+			condition = EntityUtils.fillCondition(attrMap);
+		} catch (FillException e) {
 			LOG.info(e.getMessage());
 			return EntityUtils.errorResult(e.getMessage());
 		}
 		Integer hotelid = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-		if (hotelid ==-1) {
-			String errorString = checkConditionValid(condition,null,false);
-			if (errorString!=null) {
+		if (hotelid == -1) {
+			String errorString = checkConditionValid(condition, null, false);
+			if (errorString != null) {
 				LOG.info(errorString);
 				return EntityUtils.errorResult(errorString);
 			}
 			return insertCondition(condition);
-		}
-		else {
-			String errorString = checkConditionValid(condition,hotelid,false);
-			if (errorString!=null) {
+		} else {
+			String errorString = checkConditionValid(condition, hotelid, false);
+			if (errorString != null) {
 				LOG.info(errorString);
 				return EntityUtils.errorResult(errorString);
 			}
-			if (entityUtils.isOfferFromHotelOnly(condition.getOfferId(), hotelid))
-			{
+			if (entityUtils.isOfferFromHotelOnly(condition.getOfferId(), hotelid)) {
 				return insertCondition(condition);
-			}
-			else {
+			} else {
 				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 			}
 		}
 	}
-	
+
 	@Override
-	@Secured({PermissionsProviderSecured.SECURED})
-	public EntityResult specialOfferConditionModify(Map<String, Object>attrMap,Map<String, Object>keyMap) {
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferConditionModify(Map<String, Object> attrMap, Map<String, Object> keyMap) {
 		if (keyMap == null || keyMap.isEmpty()) {
 			LOG.info(MsgLabels.FILTER_MANDATORY);
 			return EntityUtils.errorResult(MsgLabels.FILTER_MANDATORY);
@@ -139,17 +136,51 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			return EntityUtils.errorResult(MsgLabels.DATA_MANDATORY);
 		}
 		try {
+			OfferCondition modifiedCondition = EntityUtils.fillCondition(attrMap, false);
+			OfferCondition filterCondition = EntityUtils.fillCondition(keyMap, true);
+			OfferCondition baseCondition = null;
+			OfferCondition mergedCondition = null;
+			if (filterCondition.getOfferId() == null) {
+				LOG.info(MsgLabels.CONDITION_ID_MANDATORY);
+				EntityUtils.errorResult(MsgLabels.CONDITION_ID_MANDATORY);
+			}
+			EntityResult resQuery = daoHelper.query(specialOfferConditionDao,
+					EntityUtils.fillConditionMap(filterCondition, true, true), EntityUtils.getAllConditionColumns());
+			if (!resQuery.isWrong()) {
+				if (resQuery.isEmpty()) {
+					LOG.info(MsgLabels.CONDITION_NOT_EXISTS);
+					return EntityUtils.errorResult(MsgLabels.CONDITION_NOT_EXISTS);
+				}
+				baseCondition = EntityUtils.fillCondition((Map<String, Object>) resQuery.getRecordValues(0), true);
+			} else {
+				throw new FetchException("ERROR FETCHING BASE CONDITION FROM DATABASE");
+			}
 
-			Integer conditionId = null;
-			return new EntityResultMapImpl();
+			Integer hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			mergedCondition = EntityUtils.mergeConditions(baseCondition, modifiedCondition);
+			String errorString = checkConditionValid(mergedCondition, hotelId == -1 ? null : hotelId, false);
+			if (errorString != null)
+				throw new ValidationException(errorString);
+			if (hotelId != -1 && !entityUtils.isOfferFromHotelOnly(mergedCondition.getOfferId(), hotelId)) {
+				LOG.info(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
+				return EntityUtils.errorResult(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
+			}
+			return daoHelper.update(specialOfferConditionDao,
+					EntityUtils.fillConditionMap(mergedCondition, false, false),
+					EntityUtils.fillConditionMap(filterCondition, true, false));
+		} catch (ValidationException e) {
+			LOG.info(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		} catch (BadSqlGrammarException e) {
+			LOG.error(MsgLabels.BAD_DATA,e);
+			return EntityUtils.errorResult(MsgLabels.BAD_DATA);
 		} catch (Exception e) {
-			LOG.error(e.getMessage(),e);
+			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
-		
+
 	}
-	
-	
+
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferConditionRemove(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
@@ -199,17 +230,14 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 				return EntityUtils.errorResult(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
 			}
 
-		} 
-		catch (BadSqlGrammarException e) {
+		} catch (BadSqlGrammarException e) {
 			LOG.error("Error deleting condition", e);
 			return EntityUtils.errorResult(MsgLabels.BAD_DATA);
-		}
-		catch (FetchException e) {
+		} catch (FetchException e) {
 			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.FETCHING_ERROR);
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(),e);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
 
@@ -276,7 +304,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	 *         or one with the error
 	 */
 	public EntityResult insertCondition(OfferCondition condition) {
-		return daoHelper.insert(specialOfferConditionDao, entityUtils.fillConditionMap(condition, true, true));
+		return daoHelper.insert(specialOfferConditionDao, EntityUtils.fillConditionMap(condition, true, true));
 	}
 
 	/**
@@ -290,7 +318,6 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	public String checkConditionValid(OfferCondition condition) {
 		return checkConditionValid(condition, null, true);
 	}
-
 
 	/**
 	 * Checks if the condition is valid. Always checks that all dates are not in the
@@ -309,8 +336,9 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	 * Checks if the condition is valid.Check for past dates can be disabled
 	 * 
 	 * @param condition
-	 * @param hotelToEnforce if not null check if the hotel in the condition is the same
-	 * @param checkToday Checks if the days active or offered are in the past
+	 * @param hotelToEnforce if not null check if the hotel in the condition is the
+	 *                       same
+	 * @param checkToday     Checks if the days active or offered are in the past
 	 * @return null if the condition is valid or an error string of the first error
 	 *         found
 	 */
