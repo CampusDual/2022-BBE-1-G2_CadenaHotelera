@@ -1988,7 +1988,7 @@ public class BookingService implements IBookingService {
 
 			String subjectMail = "Expense report";
 			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
-			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf");
+			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf",null);
 
 		} catch (JRException | MessagingException e) {
 			LOG.error(e.getMessage());

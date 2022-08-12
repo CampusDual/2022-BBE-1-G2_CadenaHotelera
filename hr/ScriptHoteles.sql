@@ -381,6 +381,7 @@ CREATE TABLE if not exists client(
     cli_identification varchar(20) not null,
     cli_phone varchar(20),
     cli_email varchar(150),
+    cli_email_subscription boolean DEFAULT true,
     CONSTRAINT CK_client_cli_name CHECK (ltrim(rtrim(client.cli_name))<>''),
     CONSTRAINT CK_client_cli_surname1 CHECK (ltrim(rtrim(client.cli_surname1))<>''),
     CONSTRAINT UQ_client_cli_birthday_cli_identification UNIQUE (cli_identification,cli_birthday),
