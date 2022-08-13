@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.sql.Types;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 
@@ -96,6 +98,14 @@ public class EntityUtils {
 
 	public static final List<String> getAllConditionColumns() {
 		return Arrays.asList(ALL_CONDITION_COLUMNS.clone());
+	}
+
+	private static final String[] ALL_PRODUCT_COLUMNS = { SpecialOfferProductDao.ATTR_DET_ID,
+			SpecialOfferProductDao.ATTR_OFFER_ID, SpecialOfferProductDao.ATTR_PERCENT, SpecialOfferProductDao.ATTR_FLAT,
+			SpecialOfferProductDao.ATTR_SWAP };
+
+	public static final List<String> getAllProductColumns() {
+		return Arrays.asList(ALL_PRODUCT_COLUMNS.clone());
 	}
 
 	/**
@@ -681,16 +691,83 @@ public class EntityUtils {
 			return result;
 		}
 	}
+
 	
-	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct) {
-		throw new UnsupportedOperationException();
-//		OfferProduct result = new OfferProduct();
-//		if (baseProduct ==null || modifiedProduct ==null) {
-//			throw new MergeException(MsgLabels.PRODUCT_EMPTY);
-//		}
-//		return result;
+	/**
+	 * Merges the modified product into the base product into a new product object.
+	 * If either of them are null or empty it returns an empty product object.
+	 * 
+	 * 
+	 * @param baseProduct     OfferProduct object with the base data
+	 * @param modifiedProduct OfferProduct object with the modified data
+	 * @return a new OfferProduct object with the merged data.
+	 */
+	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct) {
+		return mergeProducts(baseProduct, modifiedProduct, false);
+
 	}
-	
+
+	/**
+	 * Merges the modified product into the base product into a new product object.
+	 * If either of them are null or empty it returns an empty product object.
+	 * 
+	 * 
+	 * @param baseProduct     OfferProduct object with the base data
+	 * @param modifiedProduct OfferProduct object with the modified data
+	 * @param mergeKeyIds     If set the modified id values are copied into the
+	 *                        merge if they are not null
+	 * @return a new OfferProduct object with the merged data.
+	 */
+	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
+			boolean mergeKeyIds) {
+		return mergeProducts(baseProduct, modifiedProduct, mergeKeyIds, false);
+	}
+
+	/**
+	 * Merges the modified product into the base product into a new product object.
+	 * If either of them are null or empty it returns an empty product object.
+	 * 
+	 * 
+	 * @param baseProduct     OfferProduct object with the base data
+	 * @param modifiedProduct OfferProduct object with the modified data
+	 * @param mergeKeyIds     If set the modified id values are copied into the
+	 *                        merge if they are not null
+	 * @param setNullValues   If set transfers the modified null values flagged as
+	 *                        present into the merged results.
+	 * @return a new OfferProduct object with the merged data.
+	 */
+	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
+			boolean mergeKeyIds, boolean setNullValues) {
+		OfferProduct result = new OfferProduct();
+		if ((baseProduct == null || baseProduct.isEmpty()) && (modifiedProduct == null || modifiedProduct.isEmpty()))
+			return result;
+		result.setDetId(baseProduct.getDetId());
+		result.setSpecialOfferId(baseProduct.getSpecialOfferId());
+		result.setPercent(baseProduct.getPercent());
+		result.setFlat(baseProduct.getFlat());
+		result.setSwap(baseProduct.getSwap());
+		result.setSetPresenceFlags(true);
+
+		if (mergeKeyIds) {
+			if (modifiedProduct.getDetId() != null)
+				result.setDetId(modifiedProduct.getDetId());
+			if (modifiedProduct.getSpecialOfferId() != null)
+				result.setSpecialOfferId(modifiedProduct.getSpecialOfferId());
+		}
+
+		if (setNullValues && modifiedProduct.getPercentPresent() || modifiedProduct.getPercent() != null)
+			result.setPercent(modifiedProduct.getPercent());
+
+		if (setNullValues && modifiedProduct.getFlatPresent() || modifiedProduct.getFlat() != null)
+			result.setFlat(modifiedProduct.getFlat());
+
+		if (setNullValues && modifiedProduct.getSwapPresent() || modifiedProduct.getSwap() != null)
+			result.setSwap(modifiedProduct.getSwap());
+
+		result.setSetPresenceFlags(false);
+
+		return result;
+	}
 
 	/**
 	 * Fills an OfferCondition object with a condition map
@@ -825,17 +902,30 @@ public class EntityUtils {
 	}
 
 	public static OfferProduct fillProduct(Map<String, Object> productMap) {
-		return fillProduct(productMap, false);
+		return fillProduct(productMap, false, false);
 	}
 
-	public static OfferProduct fillProduct(Map<String, Object> productMap, boolean fillOfferId) {
-		OfferProduct product = new OfferProduct();
+	/**
+	 * Fills a new OfferProduct object with the data from the map
+	 * 
+	 * @param productMap  map that contains the data
+	 * @param fillOfferId If enabled it fills the offerID from the map if exists
+	 * @param setPresent  If enabled it sets the present flag if the property exists
+	 *                    in the map even if its null.
+	 * @return a new OfferProduct object filled with the data from the map
+	 */
+	public static OfferProduct fillProduct(Map<String, Object> productMap, boolean fillOfferId, boolean setPresent) {
+		OfferProduct product = new OfferProduct(setPresent);
 		if (productMap == null || productMap.isEmpty())
 			throw new FillException(MsgLabels.PRODUCT_EMPTY);
 		if (fillOfferId && productMap.containsKey(SpecialOfferProductDao.ATTR_OFFER_ID)) {
 			try {
-				product.setSpecialOfferId(
-						Integer.parseInt(productMap.get(SpecialOfferProductDao.ATTR_OFFER_ID).toString()));
+				Object aux = productMap.get(SpecialOfferProductDao.ATTR_OFFER_ID);
+				if (aux == null) {
+					product.setSpecialOfferId(null);
+				} else {
+					product.setSpecialOfferId(Integer.parseInt(aux.toString()));
+				}
 			} catch (NumberFormatException e) {
 				throw new FillException(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
 			}
@@ -843,7 +933,13 @@ public class EntityUtils {
 
 		if (productMap.containsKey(SpecialOfferProductDao.ATTR_DET_ID)) {
 			try {
-				product.setDetId(Integer.parseInt(productMap.get(SpecialOfferProductDao.ATTR_DET_ID).toString()));
+				Object aux = productMap.get(SpecialOfferProductDao.ATTR_DET_ID);
+				if (aux == null) {
+					product.setDetId(null);
+				} else {
+					product.setDetId(Integer.parseInt(aux.toString()));
+				}
+
 			} catch (NumberFormatException e) {
 				throw new FillException(MsgLabels.DETAILS_TYPE_ID_FORMAT);
 			}
@@ -851,7 +947,12 @@ public class EntityUtils {
 
 		if (productMap.containsKey(SpecialOfferProductDao.ATTR_PERCENT)) {
 			try {
-				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_PERCENT).toString()));
+				Object aux = productMap.get(SpecialOfferProductDao.ATTR_PERCENT);
+				if (aux == null) {
+					product.setPercent(null);
+				} else {
+					product.setPercent(Double.parseDouble(aux.toString()));
+				}
 			} catch (NumberFormatException | NullPointerException e) {
 				throw new FillException(MsgLabels.PRODUCT_PERCENT_DISCOUNT_FORMAT);
 			}
@@ -859,7 +960,12 @@ public class EntityUtils {
 
 		if (productMap.containsKey(SpecialOfferProductDao.ATTR_FLAT)) {
 			try {
-				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_FLAT).toString()));
+				Object aux = productMap.get(SpecialOfferProductDao.ATTR_FLAT);
+				if (aux == null) {
+					product.setFlat(null);
+				} else {
+					product.setFlat(Double.parseDouble(aux.toString()));
+				}
 			} catch (NumberFormatException | NullPointerException e) {
 				throw new FillException(MsgLabels.PRODUCT_FLAT_DISCOUNT_FORMAT);
 			}
@@ -867,7 +973,12 @@ public class EntityUtils {
 
 		if (productMap.containsKey(SpecialOfferProductDao.ATTR_SWAP)) {
 			try {
-				product.setPercent(Double.parseDouble(productMap.get(SpecialOfferProductDao.ATTR_SWAP).toString()));
+				Object aux = productMap.get(SpecialOfferProductDao.ATTR_SWAP);
+				if (aux == null) {
+					product.setSwap(null);
+				} else {
+					product.setSwap(Double.parseDouble(aux.toString()));
+				}
 			} catch (NumberFormatException | NullPointerException e) {
 				throw new FillException(MsgLabels.PRODUCT_SWAP_DISCOUNT_FORMAT);
 			}
@@ -923,18 +1034,41 @@ public class EntityUtils {
 		return result;
 	}
 
-	public static Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId) {
+	/**
+	 * Fills a new productMap with the data from the OfferProduct
+	 * 
+	 * @param product               OfferProduct Object with the data
+	 * @param putOfferId            If not set the offer id property is not put into
+	 *                              the map
+	 * @param setNullValueIfPresent If enabled it sets the null Properties with the
+	 *                              present flag to NullValue objects
+	 * @return a new map with the data from the product
+	 */
+	public static Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId,
+			boolean setNullValueIfPresent) {
 		Map<String, Object> result = new HashMap<>();
 		if (putOfferId && product.getSpecialOfferId() != null)
 			result.put(SpecialOfferProductDao.ATTR_OFFER_ID, product.getSpecialOfferId());
 		if (product.getDetId() != null)
 			result.put(SpecialOfferProductDao.ATTR_DET_ID, product.getDetId());
-		if (product.getPercent() != null)
+		if (product.getPercent() != null) {
 			result.put(SpecialOfferProductDao.ATTR_PERCENT, product.getPercent());
+		} else {
+			if (setNullValueIfPresent && product.getPercentPresent())
+				result.put(SpecialOfferProductDao.ATTR_PERCENT, new NullValue(Types.DOUBLE));
+		}
 		if (product.getFlat() != null)
 			result.put(SpecialOfferProductDao.ATTR_FLAT, product.getFlat());
+		else {
+			if (setNullValueIfPresent && product.getFlatPresent())
+				result.put(SpecialOfferProductDao.ATTR_FLAT, new NullValue(Types.DOUBLE));
+		}
 		if (product.getSwap() != null)
 			result.put(SpecialOfferProductDao.ATTR_SWAP, product.getSwap());
+		else {
+			if (setNullValueIfPresent && product.getSwapPresent())
+				result.put(SpecialOfferProductDao.ATTR_SWAP, new NullValue(Types.DOUBLE));
+		}
 		return result;
 	}
 

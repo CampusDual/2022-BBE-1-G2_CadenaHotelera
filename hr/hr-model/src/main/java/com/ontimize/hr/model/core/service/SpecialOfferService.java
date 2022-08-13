@@ -171,7 +171,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 				}
 				for (Map<String, Object> mapCondition : auxConditions) {
 					try {
-						OfferCondition condition = entityUtils.fillCondition(mapCondition);
+						OfferCondition condition = EntityUtils.fillCondition(mapCondition);
 						if (start != null)
 							condition.setStartActiveOffer(start);
 						if (end != null)
@@ -218,7 +218,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 				}
 				for (Map<String, Object> mapProduct : auxProducts) {
 					try {
-						OfferProduct product = entityUtils.fillProduct(mapProduct);
+						OfferProduct product = EntityUtils.fillProduct(mapProduct);
 						products.add(product);
 					} catch (FillException e) {
 						LOG.info(e.getMessage());
@@ -271,6 +271,52 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 	}
 
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferDisable(Map<String, Object> keyMap) {
+		try {
+			if (keyMap == null || keyMap.isEmpty()) {
+				LOG.info(MsgLabels.FILTER_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.FILTER_MANDATORY);
+			}
+			Object aux = keyMap.get(SpecialOfferDao.ATTR_ID);
+			Integer offerId = null;
+			if (aux == null) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+			} else {
+				try {
+					offerId = Integer.parseInt(aux.toString());
+				} catch (NumberFormatException e) {
+					LOG.info(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+					return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+				}
+			}
+
+			if (!entityUtils.specialOfferExists(offerId)) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+			}
+			Integer userHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			if (userHotelId != -1 && entityUtils.isOfferFromHotelOnly(offerId, userHotelId)) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+			}
+
+			Map<String, Object> attrMap = new HashMap<String, Object>();
+			attrMap.put(SpecialOfferDao.ATTR_ACTIVE, false);
+			Map<String, Object> filterMap = new HashMap<String, Object>();
+			filterMap.put(SpecialOfferDao.ATTR_ID, offerId);
+			return daoHelper.update(specialOfferConditionDao, attrMap, filterMap);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
+		}
+
+	}
+
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferListAll(Map<String, Object> keyMap) {
 		Date start = null;
 		Date end = null;
@@ -341,18 +387,18 @@ public class SpecialOfferService implements ISpecialOffersService {
 				Integer id = (Integer) offers.getRecordValues(i).get(SpecialOfferDao.ATTR_ID);
 				List<Map<String, Object>> conditionList = new ArrayList<>();
 				for (int j = 0; j < conditions.calculateRecordNumber(); j++) {
-					if(id.equals((Integer)conditions.getRecordValues(j).get(SpecialOfferConditionDao.ATTR_OFFER_ID))) {
-						conditionList.add((Map<String, Object>)conditions.getRecordValues(j));
+					if (id.equals(conditions.getRecordValues(j).get(SpecialOfferConditionDao.ATTR_OFFER_ID))) {
+						conditionList.add((Map<String, Object>) conditions.getRecordValues(j));
 					}
 				}
-				
+
 				List<Map<String, Object>> productList = new ArrayList<>();
 				for (int j = 0; j < products.calculateRecordNumber(); j++) {
-					if(id.equals((Integer)products.getRecordValues(j).get(SpecialOfferProductDao.ATTR_OFFER_ID))) {
-						productList.add((Map<String, Object>)products.getRecordValues(j));
+					if (id.equals(products.getRecordValues(j).get(SpecialOfferProductDao.ATTR_OFFER_ID))) {
+						productList.add((Map<String, Object>) products.getRecordValues(j));
 					}
 				}
-				Map<String, Object> offer =(Map<String, Object>)offers.getRecordValues(i);
+				Map<String, Object> offer = (Map<String, Object>) offers.getRecordValues(i);
 				offer.put("conditions", conditionList);
 				offer.put("products", productList);
 				EntityResultTools.updateRecordValues(offers, offer, i);
@@ -373,10 +419,12 @@ public class SpecialOfferService implements ISpecialOffersService {
 		BasicField offer = new BasicField(SpecialOfferDao.ATTR_ID);
 		BasicField start = new BasicField(SpecialOfferDao.ATTR_START);
 		BasicField end = new BasicField(SpecialOfferDao.ATTR_END);
+		BasicField active = new BasicField(SpecialOfferDao.ATTR_ACTIVE);
 		BasicExpression expOffer = new BasicExpression(offer, BasicOperator.EQUAL_OP, offerId);
 		BasicExpression expStart = new BasicExpression(start, BasicOperator.LESS_EQUAL_OP, bookingDate);
 		BasicExpression expEnd = new BasicExpression(end, BasicOperator.MORE_EQUAL_OP, bookingDate);
-		BasicExpression where = BasicExpressionTools.combineExpression(expOffer, expStart, expEnd);
+		BasicExpression expActive = new BasicExpression(active, BasicOperator.EQUAL_OP, true);
+		BasicExpression where = BasicExpressionTools.combineExpression(expOffer, expStart, expEnd, expActive);
 		keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, where);
 		EntityResult res = daoHelper.query(specialOfferDao, keyMap,
 				new ArrayList<>(Arrays.asList(SpecialOfferDao.ATTR_ID)));

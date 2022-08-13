@@ -1,5 +1,6 @@
 package com.ontimize.hr.ws.core.rest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -48,6 +49,17 @@ public class SpecialOfferRestController extends ORestController<ISpecialOffersSe
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR);
 		}
 		
+	}
+	
+	@PostMapping(value="specialOfferDisable",produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult specialOffersDisable(@RequestBody Map<String, Object> req) {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		try {
+			keyMap = (Map<String, Object>) req.get(Utils.FILTER);
+		} catch (Exception e) {
+			// To shut Up sonarLint
+		}
+		return specialOfferService.specialOfferDisable(keyMap);
 	}
 	
 	@PostMapping(value ="specialOfferListAll" ,produces = MediaType.APPLICATION_JSON_VALUE)

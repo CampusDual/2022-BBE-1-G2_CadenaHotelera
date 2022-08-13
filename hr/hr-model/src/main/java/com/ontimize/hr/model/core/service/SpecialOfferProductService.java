@@ -18,12 +18,19 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.ISpecialOffersProductsService;
 import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
 import com.ontimize.hr.model.core.service.exception.FetchException;
+import com.ontimize.hr.model.core.service.exception.FillException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.hr.model.core.service.utils.entities.OfferProduct;
+import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
+import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.gui.SearchValue;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
+import com.ontimize.jee.common.tools.BasicExpressionTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 /**
@@ -40,6 +47,9 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 
 	@Autowired
 	EntityUtils entityUtils;
+	
+	@Autowired
+	CredentialUtils credentialUtils;
 
 	@Autowired
 	SpecialOfferProductDao specialOfferProductDao;
@@ -70,8 +80,178 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 		return daohelper.delete(specialOfferProductDao, keyMap);
 	}
 
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferProductAdd(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
+		try {
+			OfferProduct product = EntityUtils.fillProduct(attrMap, true,false);
+			String errorString = isProductValid(product);
+			if (errorString!=null) {
+				LOG.info(errorString);
+				return EntityUtils.errorResult(errorString);
+			}
+			Integer userHotel = credentialUtils.getHotelFromUser(daohelper.getUser().getUsername());
+			if (userHotel!=-1 && !entityUtils.isOfferFromHotelOnly(product.getSpecialOfferId(), userHotel)){
+				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+			}
+			
+			Map<String, Object> productQuery = new HashMap<>();
+			productQuery.put(SpecialOfferProductDao.ATTR_OFFER_ID,product.getSpecialOfferId());
+			productQuery.put(SpecialOfferProductDao.ATTR_DET_ID, product.getDetId());
+			
+			EntityResult res= daohelper.query(specialOfferProductDao,productQuery, Arrays.asList(SpecialOfferProductDao.ATTR_DET_ID));
+			if(res.isWrong()) throw new FetchException(res.getMessage());
+			if(!res.isEmpty()) {
+				LOG.info(MsgLabels.PRODUCT_DUPLICATED_PRODUCT);
+				return EntityUtils.errorResult(MsgLabels.PRODUCT_DUPLICATED_PRODUCT);
+			}
+			return productInsert(product);
+			
+		}
+		catch (FetchException e) {
+			LOG.error(e.getMessage(),e);
+			return EntityUtils.errorResult(e.getMessage());
+		}
+		catch (FillException e) {
+			LOG.info(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		}
+		catch (Exception e) {
+			LOG.error(MsgLabels.ERROR,e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
+		}
+	}
+
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferProductModify(Map<String, Object> attrMap, Map<String, Object> keyMap)
+			throws OntimizeJEERuntimeException {
+		try {
+			OfferProduct product = EntityUtils.fillProduct(attrMap, true,true);
+			OfferProduct filter = EntityUtils.fillProduct(keyMap,true,false);
+			if (filter.getDetId()==null) {
+				LOG.info(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
+			} 
+			
+			if(filter.getSpecialOfferId()==null) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+			}
+			
+			EntityResult resBase= daohelper.query(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
+			if(resBase.isWrong()) throw new FetchException("ERROR FETCHING BASE PRODUCT");
+			if(resBase.isEmpty()) {
+				if (!entityUtils.detailTypeExists(filter.getDetId())) {
+					LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS);
+					return EntityUtils.errorResult(MsgLabels.DETAILS_TYPE_NOT_EXISTS);
+				}
+				if( !entityUtils.specialOfferExists(filter.getSpecialOfferId())) {
+					LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+					return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+				}
+				LOG.info(MsgLabels.PRODUCT_NOT_EXISTS);
+				return EntityUtils.errorResult(MsgLabels.PRODUCT_NOT_EXISTS);
+			}
+
+			OfferProduct baseProduct = EntityUtils.fillProduct((Map<String, Object>)resBase.getRecordValues(0), true, false);
+			OfferProduct mergeProduct = EntityUtils.mergeProducts(baseProduct, product, false, true);
+			String errorString = isProductValid(mergeProduct);
+			if (errorString!=null) {
+				LOG.info(errorString);
+				return EntityUtils.errorResult(errorString);
+			}
+			Integer userHotel = credentialUtils.getHotelFromUser(daohelper.getUser().getUsername());
+			if (userHotel!=-1 && !entityUtils.isOfferFromHotelOnly(product.getSpecialOfferId(), userHotel)){
+				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+			}
+			
+			Map<String, Object> filterKeyMap = new HashMap<>();
+			filterKeyMap .put(SpecialOfferProductDao.ATTR_OFFER_ID,mergeProduct.getSpecialOfferId());
+			filterKeyMap.put(SpecialOfferProductDao.ATTR_DET_ID, mergeProduct.getDetId());
+			Map<String, Object> finalProduct = EntityUtils.fillProductMap(mergeProduct, true, true);
+			return daohelper.update(specialOfferProductDao, finalProduct , filterKeyMap);
+			
+		}
+		catch (FetchException e) {
+			LOG.error(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		}
+		catch (FillException e) {
+			LOG.info(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		}
+		catch (Exception e) {
+			LOG.error(MsgLabels.ERROR,e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
+		}
+	}
+
+	private BasicExpression othersFilter(Integer offerId,Integer detId) {
+		BasicField detField= new BasicField(SpecialOfferProductDao.ATTR_DET_ID);
+		BasicField offerField = new BasicField(SpecialOfferProductDao.ATTR_OFFER_ID);
+		BasicExpression detExpression = new BasicExpression(detField, new SearchValue(SearchValue.NOT_EQUAL, detId), false);
+		BasicExpression offerExpression = new BasicExpression(offerField, new SearchValue(SearchValue.EQUAL, offerId), false);
+		return BasicExpressionTools.combineExpression(detExpression,offerExpression);
+	}
+	
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferProductRemove(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
+		try {
+			OfferProduct filter = EntityUtils.fillProduct(keyMap, true, false);
+			if(filter.getSpecialOfferId()==null) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
+			}
+			if(filter.getDetId()==null) {
+				LOG.info(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
+			}
+			
+			EntityResult res = daohelper.query(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
+			if (res.isWrong()) throw new FetchException(MsgLabels.ERROR_FETCHING_PRODUCT_TO_REMOVE);
+			if (res.isEmpty()) {
+				LOG.info(MsgLabels.PRODUCT_NOT_EXISTS);
+				return EntityUtils.errorResult(MsgLabels.PRODUCT_NOT_EXISTS);
+			}
+			
+			Integer userHotel = credentialUtils.getHotelFromUser(daohelper.getUser().getUsername());
+			if(userHotel !=-1 && !entityUtils.isOfferFromHotelOnly(filter.getSpecialOfferId(), userHotel)){
+				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
+			}
+			
+			Map<String, Object> filterMap = new HashMap<>();
+			filterMap.put(Utils.BASIC_EXPRESSION, othersFilter(filter.getSpecialOfferId(), filter.getDetId()));
+			EntityResult resOthers = daohelper.query(specialOfferProductDao, filterMap, EntityUtils.getAllProductColumns());
+			if(resOthers.isWrong()) throw new FetchException(MsgLabels.ERROR_FETCHING_PRODUCTS);
+			if(resOthers.isEmpty()) {
+				LOG.info(MsgLabels.PRODUCT_LAST_PRODUCT);
+				return EntityUtils.errorResult(MsgLabels.PRODUCT_LAST_PRODUCT);
+			}
+			
+			return daohelper.delete(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false));
+		}
+		catch (FetchException e) {
+			LOG.error(e.getMessage(),e);
+			return EntityUtils.errorResult(e.getMessage());
+		}
+		catch (FillException e) {
+			LOG.info(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		} 
+		catch (Exception e) {
+			LOG.error(MsgLabels.ERROR, e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
+		}
+			
+	}
+
 	public EntityResult productInsert(OfferProduct product) {
-		return daohelper.insert(specialOfferProductDao, entityUtils.fillProductMap(product, true));
+		return daohelper.insert(specialOfferProductDao, EntityUtils.fillProductMap(product, true,false));
 	}
 
 	/**
@@ -86,7 +266,8 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	 *         normal price if the offer does not include the product.
 	 * 
 	 */
-	public Double getFinalPrice(Integer specialOfferId, Integer detailId, Double price, boolean returnPriceOnError)throws FetchException {
+	public Double getFinalPrice(Integer specialOfferId, Integer detailId, Double price, boolean returnPriceOnError)
+			throws FetchException {
 		try {
 			if (detailId == null) {
 				LOG.info(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
@@ -102,60 +283,71 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 				throw new NullPointerException(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
 			}
-			
+
 			Map<String, Object> productQuery = new HashMap<>();
 			productQuery.put(SpecialOfferProductDao.ATTR_DET_ID, detailId);
 			productQuery.put(SpecialOfferProductDao.ATTR_OFFER_ID, specialOfferId);
-			EntityResult res = daohelper.query(specialOfferProductDao, productQuery, new ArrayList<>(Arrays.asList(SpecialOfferProductDao.ATTR_DET_ID,SpecialOfferProductDao.ATTR_OFFER_ID,SpecialOfferProductDao.ATTR_PERCENT,SpecialOfferProductDao.ATTR_FLAT,SpecialOfferProductDao.ATTR_PERCENT)));
-			if ( res.getCode()==EntityResult.OPERATION_SUCCESSFUL) {
-				if(res.calculateRecordNumber() ==1) {
-					OfferProduct product = entityUtils.fillProduct(res.getRecordValues(0), true);
-					if(product.getFlat()!=null) return price-product.getFlat()>0?price-product.getFlat():0;
-					if(product.getSwap()!=null) return product.getSwap();
-					if(product.getPercent()!=null) return (price * (100.0-product.getPercent())/100.0);
-				}else {
+			EntityResult res = daohelper.query(specialOfferProductDao, productQuery,
+					new ArrayList<>(Arrays.asList(SpecialOfferProductDao.ATTR_DET_ID,
+							SpecialOfferProductDao.ATTR_OFFER_ID, SpecialOfferProductDao.ATTR_PERCENT,
+							SpecialOfferProductDao.ATTR_FLAT, SpecialOfferProductDao.ATTR_PERCENT)));
+			if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+				if (res.calculateRecordNumber() == 1) {
+					OfferProduct product = EntityUtils.fillProduct(res.getRecordValues(0), true,false);
+					if (product.getFlat() != null)
+						return price - product.getFlat() > 0 ? price - product.getFlat() : 0;
+					if (product.getSwap() != null)
+						return product.getSwap();
+					if (product.getPercent() != null)
+						return (price * (100.0 - product.getPercent()) / 100.0);
+				} else {
 					LOG.info(MsgLabels.PRODUCT_NOT_EXISTS);
-					throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS);						
+					throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS);
 				}
-			}
-			else {
+			} else {
 				LOG.info(MsgLabels.PRODUCT_NOT_EXISTS);
-				throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS);				
+				throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS);
 			}
-			
+
 			if (!entityUtils.detailTypeExists(detailId)) {
 				LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS);
 				throw new FetchException(MsgLabels.DETAILS_TYPE_NOT_EXISTS);
 			}
-			
+
 			if (!entityUtils.specialOfferExists(specialOfferId)) {
 				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 				throw new FetchException(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 			}
-			
 			return price;
 		} catch (Exception e) {
-			if (returnPriceOnError)
-			{
+			if (returnPriceOnError) {
 				return price;
-			}
-			else {
-				throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS, e);				
+			} else {
+				throw new FetchException(MsgLabels.PRODUCT_NOT_EXISTS, e);
 			}
 		}
 	}
 
-	public Double getFinalPrice(Integer specialOfferId, Integer detailId, Double price) throws FetchException{
-			return getFinalPrice(specialOfferId, detailId, price, true);			
+	public Double getFinalPrice(Integer specialOfferId, Integer detailId, Double price) throws FetchException {
+		return getFinalPrice(specialOfferId, detailId, price, true);
+	}
+	public String isProductValid(OfferProduct product) {
+		return isProductValid(product, false);
 	}
 
-	public String isProductValid(OfferProduct product) {
+	public String isProductValid(OfferProduct product,boolean checkOfferId) {
 		if (product.isEmpty())
 			return MsgLabels.PRODUCT_EMPTY;
 		if (product.getDetId() == null)
 			return MsgLabels.DETAILS_TYPE_ID_MANDATORY;
 		if (!entityUtils.detailTypeExists(product.getDetId()))
 			return MsgLabels.DETAILS_TYPE_NOT_EXISTS;
+		if (product.getSpecialOfferId() == null) {
+			if (checkOfferId) return MsgLabels.SPECIAL_OFFER_ID_MANDATORY;
+		}
+		else {
+			if (checkOfferId && !entityUtils.specialOfferExists(product.getSpecialOfferId())) return MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST;
+		}
 		if (product.getFlat() == null && product.getPercent() == null && product.getSwap() == null)
 			return MsgLabels.PRODUCT_WITHOUT_DISCOUNT;
 		if ((product.getFlat() != null && product.getPercent() != null)
