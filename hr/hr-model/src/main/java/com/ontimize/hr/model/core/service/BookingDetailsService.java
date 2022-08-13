@@ -397,6 +397,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 		if(queryGift!=null) {
 			price=0.0;
 			discountReason="Gift";
+			paid=true;
 		}else{
 			Integer specialOfferId = entityUtils.getSpecialOfferBooking(bookingId);
 			if (specialOfferId!=null) {

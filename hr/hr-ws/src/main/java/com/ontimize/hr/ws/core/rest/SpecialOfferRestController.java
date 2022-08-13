@@ -53,7 +53,7 @@ public class SpecialOfferRestController extends ORestController<ISpecialOffersSe
 	
 	@PostMapping(value="specialOfferDisable",produces = MediaType.APPLICATION_JSON_VALUE)
 	public EntityResult specialOffersDisable(@RequestBody Map<String, Object> req) {
-		Map<String, Object> keyMap = new HashMap<String, Object>();
+		Map<String, Object> keyMap = new HashMap<>();
 		try {
 			keyMap = (Map<String, Object>) req.get(Utils.FILTER);
 		} catch (Exception e) {

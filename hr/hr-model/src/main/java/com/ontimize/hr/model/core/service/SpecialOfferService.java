@@ -303,9 +303,9 @@ public class SpecialOfferService implements ISpecialOffersService {
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 			}
 
-			Map<String, Object> attrMap = new HashMap<String, Object>();
+			Map<String, Object> attrMap = new HashMap<>();
 			attrMap.put(SpecialOfferDao.ATTR_ACTIVE, false);
-			Map<String, Object> filterMap = new HashMap<String, Object>();
+			Map<String, Object> filterMap = new HashMap<>();
 			filterMap.put(SpecialOfferDao.ATTR_ID, offerId);
 			return daoHelper.update(specialOfferConditionDao, attrMap, filterMap);
 		} catch (Exception e) {
