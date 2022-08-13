@@ -263,7 +263,7 @@ public class CancellationsService implements ICancellationsService {
 		};
 		List<String> attrList = Arrays.asList(BookingDao.ATTR_HTL_ID, BookingDetailsDao.ATTR_ID,
 				BookingDetailsDao.ATTR_TYPE_DETAILS_ID, BookingDetailsDao.ATTR_PRICE, BookingDetailsDao.ATTR_DATE,
-				RoomDao.ATTR_TYPE_ID);
+				RoomDao.ATTR_TYPE_ID, BookingDao.ATTR_BOK_STATUS_CODE);
 		EntityResult bookingDetailsER = this.daoHelper.query(this.bookingDao, keyMap, attrList,
 				BookingDao.QUERY_GET_NIGHTS);
 
@@ -271,6 +271,19 @@ public class CancellationsService implements ICancellationsService {
 			LOG.info(MsgLabels.BOOKING_NIGHTS_NOT_FOUND);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.BOOKING_NIGHTS_NOT_FOUND);
 		}
+
+		// booking already cancelled?
+		if (bookingDetailsER.getRecordValues(0).get(BookingDao.ATTR_BOK_STATUS_CODE).toString().equals("C")) {
+			LOG.info(MsgLabels.BOOKING_ALREADY_CANCELLED);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.BOOKING_ALREADY_CANCELLED);
+		}
+
+		// booking finished
+		if (bookingDetailsER.getRecordValues(0).get(BookingDao.ATTR_BOK_STATUS_CODE).toString().equals("F")) {
+			LOG.info(MsgLabels.BOOKING_ALREADY_FINISHED);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.BOOKING_ALREADY_FINISHED);
+		}
+
 		nNightsBok = bookingDetailsER.calculateRecordNumber();
 
 		hotelId = Integer.parseInt(bookingDetailsER.getRecordValues(0).get(BookingDao.ATTR_HTL_ID).toString());

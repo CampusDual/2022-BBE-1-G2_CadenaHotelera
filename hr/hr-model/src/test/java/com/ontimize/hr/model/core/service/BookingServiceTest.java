@@ -2129,7 +2129,7 @@ class BookingServiceTest {
 	@DisplayName("Fails when sending email")
 	void testGetPdfReportFailSendMail() {
 		try (MockedStatic<Utils> mocked = mockStatic(Utils.class)) {
-			mocked.when(() -> Utils.sendMail(anyString(), anyString(),anyString(),anyString())).thenThrow(new MessagingException(""));
+			mocked.when(() -> Utils.sendMail(anyString(), anyString(),anyString(),anyString(),any())).thenThrow(new MessagingException(""));
 		}
 	}
 	

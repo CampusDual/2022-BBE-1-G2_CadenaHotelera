@@ -96,6 +96,7 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_DATE, "fail format");
 		mapBokDet.put(BookingDao.ATTR_HTL_ID, 1);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 		when(daoHelper.query(any(), anyMap(), anyList(), anyString())).thenReturn(erBookingDetails);
 
@@ -107,6 +108,50 @@ class CancellationsServiceTest {
 	}
 
 	@Test
+	@DisplayName("Fails when booking already cancelled")
+	void testCancelBookingAlreadyCancelled() {
+		Map<String, Object> req = new HashMap<>();
+		req.put(BookingDao.ATTR_ID, 1);
+
+		EntityResult erBookingDetails = new EntityResultMapImpl();
+		Map<String, Object> mapBokDet = new HashMap<>();
+		mapBokDet.put(BookingDetailsDao.ATTR_DATE, "2022-05-05");
+		mapBokDet.put(BookingDao.ATTR_HTL_ID, 1);
+		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "C");
+		erBookingDetails.addRecord(mapBokDet);
+		when(daoHelper.query(any(), anyMap(), anyList(), anyString())).thenReturn(erBookingDetails);
+
+		EntityResult er = service.cancelBooking(req);
+
+		assertEquals(MsgLabels.BOOKING_ALREADY_CANCELLED, er.getMessage());
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+
+	}
+	
+	@Test
+	@DisplayName("Fails when booking already finished")
+	void testCancelBookingAlreadyFinished() {
+		Map<String, Object> req = new HashMap<>();
+		req.put(BookingDao.ATTR_ID, 1);
+
+		EntityResult erBookingDetails = new EntityResultMapImpl();
+		Map<String, Object> mapBokDet = new HashMap<>();
+		mapBokDet.put(BookingDetailsDao.ATTR_DATE, "2022-05-05");
+		mapBokDet.put(BookingDao.ATTR_HTL_ID, 1);
+		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "F");
+		erBookingDetails.addRecord(mapBokDet);
+		when(daoHelper.query(any(), anyMap(), anyList(), anyString())).thenReturn(erBookingDetails);
+
+		EntityResult er = service.cancelBooking(req);
+
+		assertEquals(MsgLabels.BOOKING_ALREADY_FINISHED, er.getMessage());
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+
+	}
+	
+	@Test
 	@DisplayName("Fails when booking has already start")
 	void testCancelBookingStarted() {
 		Map<String, Object> req = new HashMap<>();
@@ -117,6 +162,7 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(new Date()));
 		mapBokDet.put(BookingDao.ATTR_HTL_ID, 1);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 		when(daoHelper.query(any(), anyMap(), anyList(), anyString())).thenReturn(erBookingDetails);
 
@@ -141,6 +187,8 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
+
 		erBookingDetails.addRecord(mapBokDet);
 
 		EntityResult isHighSeasonER = new EntityResultMapImpl();
@@ -177,6 +225,7 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 
 		EntityResult isHighSeasonER = new EntityResultMapImpl();
@@ -226,6 +275,7 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 
 		EntityResult isHighSeasonER = new EntityResultMapImpl();
@@ -275,6 +325,8 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
+
 		Map<String, Object> mapBokDet2 = new HashMap<>();
 		mapBokDet2.put(BookingDetailsDao.ATTR_DATE, "2022-08-16");
 		mapBokDet2.put(BookingDao.ATTR_HTL_ID, 1);
@@ -282,6 +334,7 @@ class CancellationsServiceTest {
 		mapBokDet2.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet2.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet2.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet2.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 		erBookingDetails.addRecord(mapBokDet2);
 
@@ -335,6 +388,7 @@ class CancellationsServiceTest {
 		mapBokDet.put(BookingDetailsDao.ATTR_ID, 13);
 		mapBokDet.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet.put(BookingDetailsDao.ATTR_PRICE, 120.0);
+		mapBokDet.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		mapBokDet.put(RoomDao.ATTR_TYPE_ID, 2);
 		Map<String, Object> mapBokDet2 = new HashMap<>();
 		mapBokDet2.put(BookingDetailsDao.ATTR_DATE, "2022-08-16");
@@ -343,6 +397,7 @@ class CancellationsServiceTest {
 		mapBokDet2.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 		mapBokDet2.put(BookingDetailsDao.ATTR_PRICE, 120.0);
 		mapBokDet2.put(RoomDao.ATTR_TYPE_ID, 2);
+		mapBokDet2.put(BookingDao.ATTR_BOK_STATUS_CODE, "A");
 		erBookingDetails.addRecord(mapBokDet);
 		erBookingDetails.addRecord(mapBokDet2);
 
