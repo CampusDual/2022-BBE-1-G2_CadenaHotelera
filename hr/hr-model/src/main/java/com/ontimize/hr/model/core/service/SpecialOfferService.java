@@ -318,6 +318,14 @@ public class SpecialOfferService implements ISpecialOffersService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferListAll(Map<String, Object> keyMap) {
+		return specialOfferListInternal(keyMap);
+	}
+	
+	public EntityResult specialOfferListInternal(Map<String, Object>keyMap) {
+		return specialOfferListInternal(keyMap, null, null, null, null);
+	}
+	
+	public EntityResult specialOfferListInternal(Map<String, Object> keyMap,Integer hotelId,Integer roomTypeId,Date startDate,Date endDate) {
 		Date start = null;
 		Date end = null;
 		if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
@@ -406,7 +414,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 		}
 		return offers;
 	}
-
+	
 	public boolean isOfferAplicable(Integer offerId, Integer hotelid, Integer roomType, Date startDate, Date endDate,
 			Date bookingDate) {
 

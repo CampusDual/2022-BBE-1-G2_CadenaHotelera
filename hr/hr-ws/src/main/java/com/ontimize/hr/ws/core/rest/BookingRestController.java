@@ -204,6 +204,7 @@ public class BookingRestController extends ORestController<IBookingService> {
 		}
 	}
 
+	
 
 	@GetMapping("bookingGetReport")
 	public ResponseEntity<byte[]> getReceipt(@RequestBody Map<String, Object> req)
