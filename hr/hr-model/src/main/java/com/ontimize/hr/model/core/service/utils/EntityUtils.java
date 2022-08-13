@@ -94,7 +94,7 @@ public class EntityUtils {
 	private static final String[] ALL_CONDITION_COLUMNS = { SpecialOfferConditionDao.ATTR_ID,
 			SpecialOfferConditionDao.ATTR_OFFER_ID, SpecialOfferConditionDao.ATTR_HOTEL_ID,
 			SpecialOfferConditionDao.ATTR_TYPE_ID, SpecialOfferConditionDao.ATTR_START,
-			SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_DAYS };
+			SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_NIGHTS };
 
 	public static final List<String> getAllConditionColumns() {
 		return Arrays.asList(ALL_CONDITION_COLUMNS.clone());
@@ -864,13 +864,13 @@ public class EntityUtils {
 			}
 		}
 
-		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_DAYS)) {
-			if (conditionMap.get(SpecialOfferConditionDao.ATTR_DAYS) == null) {
+		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_NIGHTS)) {
+			if (conditionMap.get(SpecialOfferConditionDao.ATTR_NIGHTS) == null) {
 				result.setMinimumNights(null);
 			} else {
 				try {
 					result.setMinimumNights(
-							Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_DAYS).toString()));
+							Integer.parseInt(conditionMap.get(SpecialOfferConditionDao.ATTR_NIGHTS).toString()));
 				} catch (NumberFormatException e) {
 					throw new FillException(MsgLabels.CONDITION_DAYS_FORMAT);
 				}
@@ -1027,9 +1027,9 @@ public class EntityUtils {
 			result.put(SpecialOfferConditionDao.ATTR_END, new NullValue(java.sql.Types.DATE));
 
 		if (condition.getMinimumNights() != null)
-			result.put(SpecialOfferConditionDao.ATTR_DAYS, condition.getMinimumNights());
+			result.put(SpecialOfferConditionDao.ATTR_NIGHTS, condition.getMinimumNights());
 		else if (useNullValues && condition.isMinimumNightsPresent())
-			result.put(SpecialOfferConditionDao.ATTR_DAYS, new NullValue(java.sql.Types.INTEGER));
+			result.put(SpecialOfferConditionDao.ATTR_NIGHTS, new NullValue(java.sql.Types.INTEGER));
 
 		return result;
 	}

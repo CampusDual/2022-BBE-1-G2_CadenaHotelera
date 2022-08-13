@@ -608,7 +608,7 @@ create table if not exists special_offer_condition(
     socd_sofr_id integer not null,
     socd_htl_id integer,
     socd_typ_id integer,
-    socd_days integer,
+    socd_nights integer,
     socd_start date,
     socd_end date,
     CONSTRAINT fk_socd_sofr FOREIGN KEY (socd_sofr_id) REFERENCES special_offer(sofr_id)

@@ -12,4 +12,21 @@
 		<Column>sofr_id</Column>
 	</UpdateKeys>
 	<GeneratedKey>sofr_id</GeneratedKey>
+	<Queries>
+	<Query id="idfromconditionsquery">
+	<Sentence>
+		<![CDATA[
+		SELECT 
+			DISTINCT sofrid
+		FROM
+			special_offer
+		INNER JOIN
+			special_offer_condition
+		ON
+			sofr_id = socd_sofr_id
+		#WHERE#
+		]]>
+	</Sentence>
+	</Query>
+	</Queries>
 </JdbcEntitySetup>

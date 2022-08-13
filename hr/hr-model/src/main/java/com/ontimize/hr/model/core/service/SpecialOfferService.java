@@ -20,11 +20,14 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 import com.ontimize.hr.api.core.service.ISpecialOffersService;
 import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferDao;
 import com.ontimize.hr.model.core.dao.SpecialOfferProductDao;
+import com.ontimize.hr.model.core.service.exception.FetchException;
 import com.ontimize.hr.model.core.service.exception.FillException;
+import com.ontimize.hr.model.core.service.exception.ValidationException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
@@ -315,17 +318,113 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 	}
 
+	public List<Integer> getOfferId(Date startDate, Date endDate, Integer hotelId, Integer roomType) {
+		return getOfferId(startDate, endDate, hotelId, roomType, true);
+	}
+
+	public List<Integer> getOfferId(Date startDate, Date endDate, Integer hotelId, Integer roomType,
+			boolean checkExists) {
+		if (startDate == null)
+			throw new ValidationException(MsgLabels.CONDITION_BOOKING_START_MANDATORY);
+		if (endDate == null)
+			throw new ValidationException(MsgLabels.CONDITION_BOOKING_END_MANDATORY);
+		if (hotelId == null)
+			throw new ValidationException(MsgLabels.CONDITION_HOTEL_MANDATORY);
+		if (roomType == null)
+			throw new ValidationException(MsgLabels.ROOM_TYPE_MANDATORY);
+		if (!startDate.before(endDate))
+			throw new ValidationException(MsgLabels.CONDITION_BOOKING_END_BEFORE_START);
+		if (checkExists && !entityUtils.hotelExists(hotelId))
+			throw new ValidationException(MsgLabels.HOTEL_NOT_EXIST);
+		if (checkExists && !entityUtils.roomTypeExists(roomType))
+			throw new ValidationException(MsgLabels.ROOM_TYPE_NOT_EXIST);
+		Date today = Date.from(Clock.systemUTC().instant().truncatedTo(ChronoUnit.DAYS));
+		long nights = ChronoUnit.DAYS.between(startDate.toInstant(), endDate.toInstant());
+		try {
+			BasicField startActiveField = new BasicField(SpecialOfferDao.ATTR_START);
+			BasicField endActiveField = new BasicField(SpecialOfferDao.ATTR_END);
+			BasicField activeField = new BasicField(SpecialOfferDao.ATTR_ACTIVE);
+
+			BasicField hotelField = new BasicField(SpecialOfferConditionDao.ATTR_HOTEL_ID);
+			BasicField roomTypeField = new BasicField(SpecialOfferConditionDao.ATTR_TYPE_ID);
+
+			BasicField startBookingField = new BasicField(SpecialOfferConditionDao.ATTR_START);
+			BasicField endBookingField = new BasicField(SpecialOfferConditionDao.ATTR_END);
+			BasicField nightsField = new BasicField(SpecialOfferConditionDao.ATTR_NIGHTS);
+
+			BasicExpression whereStartActive = new BasicExpression(startActiveField, BasicOperator.LESS_EQUAL_OP,
+					today);
+			BasicExpression whereStartNull = new BasicExpression(startActiveField, BasicOperator.NULL_OP, null);
+			BasicExpression whereStartActiveNull = BasicExpressionTools.combineExpressionOr(whereStartActive,
+					whereStartNull);
+			BasicExpression whereEndActive = new BasicExpression(endActiveField, BasicOperator.MORE_EQUAL_OP, today);
+			BasicExpression whereEndNull = new BasicExpression(endActiveField, BasicOperator.NULL_OP, null);
+			BasicExpression whereEndActiveNull = BasicExpressionTools.combineExpressionOr(whereEndActive, whereEndNull);
+			BasicExpression whereActiveField = new BasicExpression(activeField, BasicOperator.EQUAL_OP, true);
+			BasicExpression whereActive = BasicExpressionTools.combineExpression(whereStartActiveNull,
+					whereEndActiveNull, whereActiveField);
+
+			BasicExpression whereHotel = new BasicExpression(hotelField, BasicOperator.EQUAL_OP, hotelId);
+			BasicExpression whereHotelNull = new BasicExpression(hotelField, BasicOperator.NULL_OP, null);
+			BasicExpression whereHotelFullNull = BasicExpressionTools.combineExpressionOr(whereHotel, whereHotelNull);
+			BasicExpression whereRoomType = new BasicExpression(roomTypeField, BasicOperator.EQUAL_OP, roomType);
+			BasicExpression whereRoomTypeNull = new BasicExpression(roomTypeField, BasicOperator.NULL_OP, null);
+			BasicExpression whereRoomTypeFullNull = BasicExpressionTools.combineExpressionOr(whereRoomType,
+					whereRoomTypeNull);
+			BasicExpression whereHotelRoomType = BasicExpressionTools.combineExpression(whereHotelFullNull,
+					whereRoomTypeFullNull);
+
+			BasicExpression whereStartBooking = new BasicExpression(startBookingField, BasicOperator.LESS_EQUAL_OP,
+					startDate);
+			BasicExpression whereStartBookingNull = new BasicExpression(startBookingField, BasicOperator.NULL_OP, null);
+			BasicExpression whereStartBookingFullNull = BasicExpressionTools.combineExpressionOr(whereStartBooking,
+					whereStartBookingNull);
+			BasicExpression whereEndBooking = new BasicExpression(endBookingField, BasicOperator.MORE_EQUAL_OP,
+					endDate);
+			BasicExpression whereEndBookingNull = new BasicExpression(endBookingField, BasicOperator.NULL_OP, null);
+			BasicExpression whereEndBookingFullNull = BasicExpressionTools.combineExpressionOr(whereEndBooking,
+					whereEndBookingNull);
+			BasicExpression whereNights = new BasicExpression(nightsField, BasicOperator.LESS_EQUAL_OP, nights);
+			BasicExpression whereNightsNull = new BasicExpression(nightsField, BasicOperator.NULL_OP, null);
+			BasicExpression whereNightsFullNull = BasicExpressionTools.combineExpressionOr(whereNights,
+					whereNightsNull);
+
+			BasicExpression whereBooking = BasicExpressionTools.combineExpression(whereStartBookingFullNull,
+					whereEndBookingFullNull, whereNightsFullNull);
+
+			BasicExpression where = BasicExpressionTools.combineExpression(whereActive, whereBooking,
+					whereHotelRoomType);
+
+			Map<String, Object> keyMap = new HashMap<>();
+			keyMap.put(Utils.BASIC_EXPRESSION, where);
+			List<String> columns = Arrays.asList(SpecialOfferDao.ATTR_ID);
+			EntityResult res = daoHelper.query(specialOfferDao, keyMap, columns,
+					SpecialOfferDao.QUERY_OFFER_CONDITIONS);
+			if (res.isWrong())
+				throw new FetchException(MsgLabels.ERROR_FETCHING_SPECIAL_OFFERS);
+			if (res.isEmpty())
+				return new ArrayList<>();
+
+			return (List<Integer>) res.get(SpecialOfferDao.ATTR_ID);
+
+		} catch (Exception e) {
+			throw new FetchException(MsgLabels.FETCHING_ERROR, e);
+		}
+
+	}
+
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferListAll(Map<String, Object> keyMap) {
 		return specialOfferListInternal(keyMap);
 	}
-	
-	public EntityResult specialOfferListInternal(Map<String, Object>keyMap) {
-		return specialOfferListInternal(keyMap, null, null, null, null);
+
+	public EntityResult specialOfferListInternal(Map<String, Object> keyMap) {
+		return specialOfferListInternal(keyMap, false, null, null, null, null);
 	}
-	
-	public EntityResult specialOfferListInternal(Map<String, Object> keyMap,Integer hotelId,Integer roomTypeId,Date startDate,Date endDate) {
+
+	public EntityResult specialOfferListInternal(Map<String, Object> keyMap, boolean stripActive, Integer hotelId,
+			Integer roomTypeId, Date startDate, Date endDate) {
 		Date start = null;
 		Date end = null;
 		if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
@@ -348,6 +447,13 @@ public class SpecialOfferService implements ISpecialOffersService {
 			}
 		}
 
+		Boolean active = null;
+		if (keyMap.containsKey(SpecialOfferDao.ATTR_ACTIVE) && !stripActive) {
+			Object aux = keyMap.get(SpecialOfferDao.ATTR_ACTIVE);
+			if (aux != null)
+				active = Boolean.parseBoolean(aux.toString());
+		}
+
 		if ((start != null) != (end != null)) {
 			LOG.info(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
 			return EntityUtils.errorResult(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
@@ -358,11 +464,24 @@ public class SpecialOfferService implements ISpecialOffersService {
 			return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
 		}
 		Map<String, Object> query = new HashMap<>();
+		BasicExpression where = null;
 		if (start != null && end != null) {
-			BasicExpression where = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_START),
+			where = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_START),
 					new SearchValue(SearchValue.BETWEEN, new ArrayList<Date>(Arrays.asList(start, end))), false);
-			query.put(Utils.BASIC_EXPRESSION, where);
 		}
+		if (active != null) {
+			BasicExpression whereActive = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ACTIVE),
+					BasicOperator.EQUAL_OP, active);
+			if (where == null)
+				where = whereActive;
+			else {
+				where = BasicExpressionTools.combineExpression(where, whereActive);
+			}
+
+		}
+		if (where != null)
+			query.put(Utils.BASIC_EXPRESSION, where);
+
 		EntityResult offers = daoHelper.query(specialOfferDao, query, new ArrayList<>(
 				Arrays.asList(SpecialOfferDao.ATTR_ID, SpecialOfferDao.ATTR_START, SpecialOfferDao.ATTR_END)));
 		if (!offers.isWrong() && offers.calculateRecordNumber() > 0) {
@@ -378,7 +497,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			List<String> conditionsColumns = new ArrayList<>(Arrays.asList(SpecialOfferConditionDao.ATTR_ID,
 					SpecialOfferConditionDao.ATTR_OFFER_ID, SpecialOfferConditionDao.ATTR_HOTEL_ID,
 					SpecialOfferConditionDao.ATTR_TYPE_ID, SpecialOfferConditionDao.ATTR_START,
-					SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_DAYS));
+					SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_NIGHTS));
 
 			EntityResult conditions = daoHelper.query(specialOfferConditionDao, queryConditions, conditionsColumns);
 
@@ -414,7 +533,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 		}
 		return offers;
 	}
-	
+
 	public boolean isOfferAplicable(Integer offerId, Integer hotelid, Integer roomType, Date startDate, Date endDate,
 			Date bookingDate) {
 
@@ -433,7 +552,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 		BasicExpression expEnd = new BasicExpression(end, BasicOperator.MORE_EQUAL_OP, bookingDate);
 		BasicExpression expActive = new BasicExpression(active, BasicOperator.EQUAL_OP, true);
 		BasicExpression where = BasicExpressionTools.combineExpression(expOffer, expStart, expEnd, expActive);
-		keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, where);
+		keyMap.put(Utils.BASIC_EXPRESSION, where);
 		EntityResult res = daoHelper.query(specialOfferDao, keyMap,
 				new ArrayList<>(Arrays.asList(SpecialOfferDao.ATTR_ID)));
 		if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {

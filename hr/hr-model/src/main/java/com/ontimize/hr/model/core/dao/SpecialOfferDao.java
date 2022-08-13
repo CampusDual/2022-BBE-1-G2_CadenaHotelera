@@ -17,5 +17,6 @@ public class SpecialOfferDao extends OntimizeJdbcDaoSupport {
 	public static final String ATTR_ACTIVE = "sofr_active";
 	public static final String ATTR_STACKABLE ="sofr_stackable";
 	
+	public static final String QUERY_OFFER_CONDITIONS ="idfromconditionsquery";
 	
 }

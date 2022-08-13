@@ -258,7 +258,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 				new ArrayList<>(
 						Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID, SpecialOfferConditionDao.ATTR_HOTEL_ID,
 								SpecialOfferConditionDao.ATTR_TYPE_ID, SpecialOfferConditionDao.ATTR_START,
-								SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_DAYS)));
+								SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_NIGHTS)));
 		if (res.isWrong()) {
 			LOG.error(MsgLabels.FETCHING_ERROR);
 			throw new FetchException(MsgLabels.FETCHING_ERROR);
@@ -274,7 +274,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			Integer auxRoomType = (Integer) condition.get(SpecialOfferConditionDao.ATTR_TYPE_ID);
 			Date auxBookingStart = (Date) condition.get(SpecialOfferConditionDao.ATTR_START);
 			Date auxBookingEnd = (Date) condition.get(SpecialOfferConditionDao.ATTR_END);
-			Integer auxDays = (Integer) condition.get(SpecialOfferConditionDao.ATTR_DAYS);
+			Integer auxDays = (Integer) condition.get(SpecialOfferConditionDao.ATTR_NIGHTS);
 			Integer calculatedDays = null;
 			if (auxBookingStart != null && auxBookingEnd != null) {
 				calculatedDays = (int) ChronoUnit.DAYS.between(auxBookingStart.toInstant(), auxBookingEnd.toInstant());

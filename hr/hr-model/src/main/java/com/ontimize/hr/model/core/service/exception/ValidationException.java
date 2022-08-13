@@ -1,6 +1,6 @@
 package com.ontimize.hr.model.core.service.exception;
 
-public class ValidationException extends Exception {
+public class ValidationException extends RuntimeException {
 
 	/**
 	 * 
