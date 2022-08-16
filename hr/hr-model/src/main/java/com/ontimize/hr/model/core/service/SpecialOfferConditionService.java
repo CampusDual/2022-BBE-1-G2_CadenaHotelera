@@ -22,6 +22,7 @@ import com.ontimize.hr.api.core.service.ISpecialOffersConditionsService;
 import com.ontimize.hr.model.core.dao.SpecialOfferConditionDao;
 import com.ontimize.hr.model.core.service.exception.FetchException;
 import com.ontimize.hr.model.core.service.exception.FillException;
+import com.ontimize.hr.model.core.service.exception.MergeException;
 import com.ontimize.hr.model.core.service.exception.ValidationException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
@@ -92,7 +93,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
 		}
 		try {
-			condition = EntityUtils.fillCondition(attrMap);
+			condition = entityUtils.fillCondition(attrMap);
 		} catch (FillException e) {
 			LOG.info(e.getMessage());
 			return EntityUtils.errorResult(e.getMessage());
@@ -132,28 +133,30 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			return EntityUtils.errorResult(MsgLabels.DATA_MANDATORY);
 		}
 		try {
-			OfferCondition modifiedCondition = EntityUtils.fillCondition(attrMap, false,true);
-			OfferCondition filterCondition = EntityUtils.fillCondition(keyMap, true,false);
+			OfferCondition modifiedCondition = entityUtils.fillCondition(attrMap, false, true);
+			OfferCondition filterCondition = entityUtils.fillCondition(keyMap, true, false);
 			OfferCondition baseCondition = null;
 			OfferCondition mergedCondition = null;
 			if (filterCondition.getConditionId() == null) {
 				LOG.info(MsgLabels.CONDITION_ID_MANDATORY);
-				return  EntityUtils.errorResult(MsgLabels.CONDITION_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.CONDITION_ID_MANDATORY);
 			}
 			EntityResult resQuery = daoHelper.query(specialOfferConditionDao,
-					EntityUtils.fillConditionMap(filterCondition, true, true,false), EntityUtils.getAllConditionColumns());
+					entityUtils.fillConditionMap(filterCondition, true, true, false),
+					EntityUtils.getAllConditionColumns());
 			if (!resQuery.isWrong()) {
 				if (resQuery.isEmpty()) {
 					LOG.info(MsgLabels.CONDITION_NOT_EXISTS);
 					return EntityUtils.errorResult(MsgLabels.CONDITION_NOT_EXISTS);
 				}
-				baseCondition = EntityUtils.fillCondition((Map<String, Object>) resQuery.getRecordValues(0), true,false);
+				baseCondition = entityUtils.fillCondition((Map<String, Object>) resQuery.getRecordValues(0), true,
+						false);
 			} else {
-				throw new FetchException("ERROR FETCHING BASE CONDITION FROM DATABASE");
+				throw new FetchException(MsgLabels.ERROR_FETCHING_BASE_CONDITION_FROM_DATABASE);
 			}
 
 			Integer hotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			mergedCondition = EntityUtils.mergeConditions(baseCondition, modifiedCondition);
+			mergedCondition = entityUtils.mergeConditions(baseCondition, modifiedCondition);
 			String errorString = checkConditionValid(mergedCondition, hotelId == -1 ? null : hotelId, false);
 			if (errorString != null)
 				throw new ValidationException(errorString);
@@ -161,16 +164,19 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 				LOG.info(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
 				return EntityUtils.errorResult(MsgLabels.CONDITION_READ_ONLY_FOR_USER);
 			}
-			Map<String, Object> auxMerged = EntityUtils.fillConditionMap(mergedCondition, false, false,true);
-			Map<String, Object> auxCondition =EntityUtils.fillConditionMap(filterCondition, true, false,false);
-			return daoHelper.update(specialOfferConditionDao,auxMerged,auxCondition);
+			Map<String, Object> auxMerged = entityUtils.fillConditionMap(mergedCondition, false, false, true);
+			Map<String, Object> auxCondition = entityUtils.fillConditionMap(filterCondition, true, false, false);
+			return daoHelper.update(specialOfferConditionDao, auxMerged, auxCondition);
 		} catch (ValidationException e) {
 			LOG.info(e.getMessage());
 			return EntityUtils.errorResult(e.getMessage());
 		} catch (BadSqlGrammarException e) {
-			LOG.error(MsgLabels.BAD_DATA,e);
+			LOG.error(MsgLabels.BAD_DATA, e);
 			return EntityUtils.errorResult(MsgLabels.BAD_DATA);
-		} catch (Exception e) {
+		} catch (FetchException |MergeException e) {
+			LOG.error(e.getMessage(), e);
+			return EntityUtils.errorResult(e.getMessage());
+		}catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
@@ -251,21 +257,21 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	 *         not exist.
 	 */
 	public boolean isApplicable(Integer offerId, Integer hotelid, Integer roomType, Date startDate, Date endDate) {
+		return firstConditionApplicable(offerId, hotelid, roomType, startDate, endDate) != null;
+	}
+
+	public OfferCondition firstConditionApplicable(Integer offerId, Integer hotelid, Integer roomType, Date startDate,
+			Date endDate) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(SpecialOfferConditionDao.ATTR_OFFER_ID, offerId);
 
-		EntityResult res = daoHelper.query(specialOfferConditionDao, keyMap,
-				new ArrayList<>(
-						Arrays.asList(SpecialOfferConditionDao.ATTR_OFFER_ID, SpecialOfferConditionDao.ATTR_HOTEL_ID,
-								SpecialOfferConditionDao.ATTR_TYPE_ID, SpecialOfferConditionDao.ATTR_START,
-								SpecialOfferConditionDao.ATTR_END, SpecialOfferConditionDao.ATTR_NIGHTS)));
+		EntityResult res = daoHelper.query(specialOfferConditionDao, keyMap, EntityUtils.getAllConditionColumns());
 		if (res.isWrong()) {
 			LOG.error(MsgLabels.FETCHING_ERROR);
 			throw new FetchException(MsgLabels.FETCHING_ERROR);
 		}
-		if (res.isEmpty()) {
-			return entityUtils.specialOfferExists(offerId);
-		}
+		if (res.isEmpty())
+			return null;
 
 		for (int i = 0; i < res.calculateRecordNumber(); i++) {
 			boolean conditionChecks = true;
@@ -287,9 +293,9 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 					|| (endDate.equals(auxBookingEnd) || endDate.before(auxBookingEnd)));
 			conditionChecks &= (auxDays == null || calculatedDays == null || auxDays <= calculatedDays);
 			if (conditionChecks)
-				return true;
+				return entityUtils.fillCondition(condition, true, false);
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -300,7 +306,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 	 *         or one with the error
 	 */
 	public EntityResult insertCondition(OfferCondition condition) {
-		return daoHelper.insert(specialOfferConditionDao, EntityUtils.fillConditionMap(condition, true, true,false));
+		return daoHelper.insert(specialOfferConditionDao, entityUtils.fillConditionMap(condition, true, true, false));
 	}
 
 	/**
@@ -353,7 +359,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 		if (offerId != null && !entityUtils.specialOfferExists(offerId))
 			return MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST;
 
-		if (hotelToEnforce != null && hotelToEnforce.equals(hotelId))
+		if (hotelToEnforce != null && !hotelToEnforce.equals(hotelId))
 			return MsgLabels.CONDITION_HOTEL_MANDATORY;
 
 		if (hotelId != null && !entityUtils.hotelExists(hotelId))
@@ -381,17 +387,17 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 
 		if (startBookingOffer != null && endBookingOffer != null) {
 			if (startBookingOffer.after(endBookingOffer))
-				return MsgLabels.DATE_BEFORE_GENERIC;
+				return MsgLabels.CONDITION_BOOKING_END_BEFORE_START;
 			if (checkToday) {
 				if (startBookingOffer.toInstant().isBefore(Clock.systemUTC().instant().truncatedTo(ChronoUnit.DAYS)))
-					return MsgLabels.DATE_BEFORE_TODAY;
+					return MsgLabels.CONDITION_BOOKING_DATE_START_BEFORE_TODAY;
 				if (endBookingOffer.toInstant().isBefore(Clock.systemUTC().instant().truncatedTo(ChronoUnit.DAYS)))
-					return MsgLabels.DATE_BEFORE_TODAY;
+					return MsgLabels.CONDITION_BOOKING_DATE_END_BEFORE_TODAY;
 			}
 		}
 
 		if (startActiveOffer != null && startBookingOffer != null && startBookingOffer.before(startActiveOffer))
-			return MsgLabels.CONDITION_OFFER_ACTIVE_AFTER_BOOKING_DATES;
+			return MsgLabels.CONDITION_OFFER_STARTS_AFTER_BOOKING_DATES;
 
 		if (endActiveOffer != null && endBookingOffer != null && endBookingOffer.before(endActiveOffer))
 			return MsgLabels.CONDITION_OFFER_ENDS_AFTER_BOOKING_DATES;

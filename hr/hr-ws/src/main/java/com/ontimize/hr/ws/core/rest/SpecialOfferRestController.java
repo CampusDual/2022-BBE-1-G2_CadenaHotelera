@@ -63,13 +63,24 @@ public class SpecialOfferRestController extends ORestController<ISpecialOffersSe
 	}
 	
 	@PostMapping(value ="specialOfferListAll" ,produces = MediaType.APPLICATION_JSON_VALUE)
-	public EntityResult listAllOffers(@RequestBody Map<String, Object>keyMap) {
-		Map<String, Object> filter = null;
+	public EntityResult listAllOffers(@RequestBody Map<String, Object>req) {
+		Map<String, Object> keyMap = null;
 		try {
-			filter = (Map<String, Object>) keyMap.get(Utils.FILTER);			
+			keyMap = (Map<String, Object>) req.get(Utils.FILTER);			
 		} catch (Exception e) {
 			return EntityUtils.errorResult(MsgLabels.FILTER_MANDATORY);
 		}
-		return specialOfferService.specialOfferListAll(filter);
+		return specialOfferService.specialOfferListAll(keyMap);
+	}
+	
+	@PostMapping(value="specialOfferListAlternatives", produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult listAlternatives (@RequestBody Map<String, Object>req) {
+		Map<String, Object> keyMap =null;
+		try {
+			keyMap = (Map<String, Object>) req.get(Utils.FILTER);
+		} catch (Exception e) {
+			// To shut Up sonarLint
+		}
+		return specialOfferService.specialOfferListAlternatives(keyMap);
 	}
 }

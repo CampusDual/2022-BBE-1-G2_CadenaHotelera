@@ -17,7 +17,7 @@
 	<Sentence>
 		<![CDATA[
 		SELECT 
-			DISTINCT sofrid
+			DISTINCT sofr_id
 		FROM
 			special_offer
 		INNER JOIN

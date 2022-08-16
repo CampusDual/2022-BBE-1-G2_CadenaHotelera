@@ -84,7 +84,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferProductAdd(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
 		try {
-			OfferProduct product = EntityUtils.fillProduct(attrMap, true,false);
+			OfferProduct product = entityUtils.fillProduct(attrMap, true,false);
 			String errorString = isProductValid(product);
 			if (errorString!=null) {
 				LOG.info(errorString);
@@ -128,8 +128,8 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	public EntityResult specialOfferProductModify(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 		try {
-			OfferProduct product = EntityUtils.fillProduct(attrMap, true,true);
-			OfferProduct filter = EntityUtils.fillProduct(keyMap,true,false);
+			OfferProduct product = entityUtils.fillProduct(attrMap, true,true);
+			OfferProduct filter = entityUtils.fillProduct(keyMap,true,false);
 			if (filter.getDetId()==null) {
 				LOG.info(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
 				return EntityUtils.errorResult(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
@@ -140,7 +140,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
 			}
 			
-			EntityResult resBase= daohelper.query(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
+			EntityResult resBase= daohelper.query(specialOfferProductDao, entityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
 			if(resBase.isWrong()) throw new FetchException("ERROR FETCHING BASE PRODUCT");
 			if(resBase.isEmpty()) {
 				if (!entityUtils.detailTypeExists(filter.getDetId())) {
@@ -155,8 +155,8 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				return EntityUtils.errorResult(MsgLabels.PRODUCT_NOT_EXISTS);
 			}
 
-			OfferProduct baseProduct = EntityUtils.fillProduct((Map<String, Object>)resBase.getRecordValues(0), true, false);
-			OfferProduct mergeProduct = EntityUtils.mergeProducts(baseProduct, product, false, true);
+			OfferProduct baseProduct = entityUtils.fillProduct((Map<String, Object>)resBase.getRecordValues(0), true, false);
+			OfferProduct mergeProduct = entityUtils.mergeProducts(baseProduct, product, false, true);
 			String errorString = isProductValid(mergeProduct);
 			if (errorString!=null) {
 				LOG.info(errorString);
@@ -171,7 +171,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 			Map<String, Object> filterKeyMap = new HashMap<>();
 			filterKeyMap .put(SpecialOfferProductDao.ATTR_OFFER_ID,mergeProduct.getSpecialOfferId());
 			filterKeyMap.put(SpecialOfferProductDao.ATTR_DET_ID, mergeProduct.getDetId());
-			Map<String, Object> finalProduct = EntityUtils.fillProductMap(mergeProduct, true, true);
+			Map<String, Object> finalProduct = entityUtils.fillProductMap(mergeProduct, true, true);
 			return daohelper.update(specialOfferProductDao, finalProduct , filterKeyMap);
 			
 		}
@@ -201,7 +201,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferProductRemove(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		try {
-			OfferProduct filter = EntityUtils.fillProduct(keyMap, true, false);
+			OfferProduct filter = entityUtils.fillProduct(keyMap, true, false);
 			if(filter.getSpecialOfferId()==null) {
 				LOG.info(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_MANDATORY);
@@ -211,7 +211,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				return EntityUtils.errorResult(MsgLabels.DETAILS_TYPE_ID_MANDATORY);
 			}
 			
-			EntityResult res = daohelper.query(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
+			EntityResult res = daohelper.query(specialOfferProductDao, entityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
 			if (res.isWrong()) throw new FetchException(MsgLabels.ERROR_FETCHING_PRODUCT_TO_REMOVE);
 			if (res.isEmpty()) {
 				LOG.info(MsgLabels.PRODUCT_NOT_EXISTS);
@@ -233,7 +233,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				return EntityUtils.errorResult(MsgLabels.PRODUCT_LAST_PRODUCT);
 			}
 			
-			return daohelper.delete(specialOfferProductDao, EntityUtils.fillProductMap(filter, true, false));
+			return daohelper.delete(specialOfferProductDao, entityUtils.fillProductMap(filter, true, false));
 		}
 		catch (FetchException e) {
 			LOG.error(e.getMessage(),e);
@@ -251,7 +251,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	}
 
 	public EntityResult productInsert(OfferProduct product) {
-		return daohelper.insert(specialOfferProductDao, EntityUtils.fillProductMap(product, true,false));
+		return daohelper.insert(specialOfferProductDao, entityUtils.fillProductMap(product, true,false));
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 	 * @param specialOfferId     id of the offer to apply.
 	 * @param detailId           id of the type of product
 	 * @param price              normal price without discount
-	 * @param returnPriceOnError return the price passed as parameter as error
+	 * @param returnPriceOnError return the price passed as parameter on error
 	 * @return Returns the adjusted price after applying the discount. Returns the
 	 *         normal price if the offer does not include the product.
 	 * 
@@ -293,7 +293,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 							SpecialOfferProductDao.ATTR_FLAT, SpecialOfferProductDao.ATTR_PERCENT)));
 			if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 				if (res.calculateRecordNumber() == 1) {
-					OfferProduct product = EntityUtils.fillProduct(res.getRecordValues(0), true,false);
+					OfferProduct product = entityUtils.fillProduct(res.getRecordValues(0), true,false);
 					if (product.getFlat() != null)
 						return price - product.getFlat() > 0 ? price - product.getFlat() : 0;
 					if (product.getSwap() != null)

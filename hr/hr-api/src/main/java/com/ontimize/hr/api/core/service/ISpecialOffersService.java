@@ -14,5 +14,6 @@ public interface ISpecialOffersService {
 	 public EntityResult specialOfferCreate(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 	 public EntityResult specialOfferListAll(Map<String, Object> keyMap);
 	 public EntityResult specialOfferDisable(Map<String, Object> keyMap)throws OntimizeJEERuntimeException;
+	 public EntityResult specialOfferListAlternatives(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 
 }

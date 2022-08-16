@@ -1,14 +1,19 @@
 package com.ontimize.hr.model.core.service;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -111,165 +116,181 @@ public class SpecialOfferService implements ISpecialOffersService {
 	@Secured({ PermissionsProviderSecured.SECURED })
 	@Transactional(rollbackFor = Exception.class)
 	public EntityResult specialOfferCreate(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
-		Map<String, Object> insertMap = new HashMap<>();
-		if (keyMap == null || keyMap.isEmpty()) {
-			LOG.info(MsgLabels.DATA_MANDATORY);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
-		}
-
-		Date start = null;
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
-			try {
-				start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
-				insertMap.put(SpecialOfferDao.ATTR_START, start);
-			} catch (ParseException e) {
-				LOG.info(MsgLabels.DATE_FORMAT);
-				return EntityUtils.errorResult(MsgLabels.DATE_FORMAT);
+		try {
+			Map<String, Object> insertMap = new HashMap<>();
+			if (keyMap == null || keyMap.isEmpty()) {
+				LOG.info(MsgLabels.DATA_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
 			}
 
-		}
-
-		Date end = null;
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
-			try {
-				end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
-				insertMap.put(SpecialOfferDao.ATTR_END, end);
-			} catch (ParseException e) {
-				LOG.info(MsgLabels.DATE_FORMAT);
-				return EntityUtils.errorResult(MsgLabels.DATE_FORMAT);
-			}
-		}
-
-		if ((start != null) != (end != null)) {
-			LOG.info(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
-		}
-
-		if (start != null && start.toInstant().isBefore(Clock.systemUTC().instant().truncatedTo(ChronoUnit.DAYS))) {
-			LOG.info(MsgLabels.CONDITION_ACTIVE_DATE_START_BEFORE_TODAY);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_DATE_START_BEFORE_TODAY);
-		}
-		if (end != null && end.toInstant().isBefore(Clock.systemUTC().instant().truncatedTo(ChronoUnit.DAYS))) {
-			LOG.info(MsgLabels.CONDITION_ACTIVE_DATE_END_BEFORE_TODAY);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_DATE_END_BEFORE_TODAY);
-		}
-
-		Boolean stackable = null;
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_STACKABLE)) {
-			stackable = Boolean.parseBoolean(keyMap.get(SpecialOfferDao.ATTR_STACKABLE).toString());
-			insertMap.put(SpecialOfferDao.ATTR_STACKABLE, stackable);
-		}
-
-		ArrayList<OfferCondition> conditions = new ArrayList<>();
-		if (keyMap.containsKey("conditions")) {
-			if (keyMap.get("conditions") instanceof ArrayList<?>) {
-				ArrayList<Map<String, Object>> auxConditions = null;
+			Date start = null;
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
 				try {
-					auxConditions = (ArrayList<Map<String, Object>>) keyMap.get("conditions");
-				} catch (Exception e) {
+					start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+							.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
+					insertMap.put(SpecialOfferDao.ATTR_START, start);
+				} catch (ParseException e) {
+					LOG.info(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_START_DATEFORMAT);
+					return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_START_DATEFORMAT);
+				}
+
+			}
+
+			Date end = null;
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
+				try {
+					end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+							.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
+					insertMap.put(SpecialOfferDao.ATTR_END, end);
+				} catch (ParseException e) {
+					LOG.info(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_END_DATEFORMAT);
+					return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_END_DATEFORMAT);
+				}
+			}
+
+			if ((start != null) != (end != null)) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_BOTH_ACTIVE_DATES_OR_NONE);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_BOTH_ACTIVE_DATES_OR_NONE);
+			}
+
+			if (start != null && end != null && start.toInstant().isAfter(end.toInstant())) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ACTIVE_END_BEFORE_START);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ACTIVE_END_BEFORE_START);
+			}
+
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+
+			if (start != null && start.before(c.getTime())) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_ACTIVE_DATE_START_BEFORE_TODAY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ACTIVE_DATE_START_BEFORE_TODAY);
+			}
+
+			Boolean stackable = null;
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_STACKABLE)) {
+				stackable = Boolean.parseBoolean(keyMap.get(SpecialOfferDao.ATTR_STACKABLE).toString());
+				insertMap.put(SpecialOfferDao.ATTR_STACKABLE, stackable);
+			}
+
+			ArrayList<OfferCondition> conditions = new ArrayList<>();
+			if (keyMap.containsKey(Utils.CONDITIONS)) {
+				if (keyMap.get(Utils.CONDITIONS) instanceof ArrayList<?>) {
+					ArrayList<Map<String, Object>> auxConditions = null;
+					try {
+						auxConditions = (ArrayList<Map<String, Object>>) keyMap.get(Utils.CONDITIONS);
+					} catch (Exception e) {
+						LOG.info(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
+						return EntityUtils.errorResult(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
+					}
+					for (Map<String, Object> mapCondition : auxConditions) {
+						try {
+							OfferCondition condition = entityUtils.fillCondition(mapCondition);
+							if (start != null)
+								condition.setStartActiveOffer(start);
+							if (end != null)
+								condition.setEndActiveOffer(end);
+							conditions.add(condition);
+						} catch (FillException e) {
+							LOG.info(e.getMessage());
+							return EntityUtils.errorResult(e.getMessage());
+						}
+					}
+				} else {
 					LOG.info(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
-					EntityUtils.errorResult(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
+					return EntityUtils.errorResult(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
 				}
-				for (Map<String, Object> mapCondition : auxConditions) {
-					try {
-						OfferCondition condition = EntityUtils.fillCondition(mapCondition);
-						if (start != null)
-							condition.setStartActiveOffer(start);
-						if (end != null)
-							condition.setEndActiveOffer(end);
-						conditions.add(condition);
-					} catch (FillException e) {
-						LOG.info(e.getMessage());
-						return EntityUtils.errorResult(e.getMessage());
-					}
-				}
-			} else {
-				LOG.info(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
-				EntityUtils.errorResult(MsgLabels.CONDITION_CONDITIONS_NOT_ARRAY);
 			}
-		}
 
-		Integer userHotel = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-		if (userHotel != -1 && conditions.isEmpty()) {
-			LOG.info(MsgLabels.CONDITION_AT_LEAST_ONE_CONDITION);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_AT_LEAST_ONE_CONDITION);
-		}
-
-		for (OfferCondition condition : conditions) {
-			String errorString = null;
-			if (userHotel.equals(-1))
-				errorString = conditionService.checkConditionValid(condition);
-			else
-				errorString = conditionService.checkConditionValid(condition, userHotel);
-			if (errorString != null) {
-				LOG.info(errorString);
-				return EntityUtils.errorResult(errorString);
+			Integer userHotel = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
+			if (userHotel != -1 && conditions.isEmpty()) {
+				LOG.info(MsgLabels.CONDITION_AT_LEAST_ONE_CONDITION);
+				return EntityUtils.errorResult(MsgLabels.CONDITION_AT_LEAST_ONE_CONDITION);
 			}
-		}
 
-		ArrayList<OfferProduct> products = new ArrayList<>();
-		if (keyMap.containsKey("products")) {
-			if (keyMap.get("products") instanceof ArrayList<?>) {
-				ArrayList<Map<String, Object>> auxProducts = null;
-				try {
-					auxProducts = (ArrayList<Map<String, Object>>) keyMap.get("products");
-				} catch (Exception e) {
-					LOG.info(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
-					EntityUtils.errorResult(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
-				}
-				for (Map<String, Object> mapProduct : auxProducts) {
-					try {
-						OfferProduct product = EntityUtils.fillProduct(mapProduct);
-						products.add(product);
-					} catch (FillException e) {
-						LOG.info(e.getMessage());
-						return EntityUtils.errorResult(e.getMessage());
-					}
-				}
-			} else {
-				LOG.info(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
-				EntityUtils.errorResult(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
-			}
-		}
-
-		String productError = productService.areAllProductsValid(products);
-		if (productError != null) {
-			LOG.info(productError);
-			return EntityUtils.errorResult(productError);
-		}
-
-		EntityResult offer = daoHelper.insert(specialOfferDao, insertMap);
-		if (offer.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
-			Integer offerID = (Integer) offer.get(SpecialOfferDao.ATTR_ID);
-			ArrayList<Integer> conditionsId = new ArrayList<>();
 			for (OfferCondition condition : conditions) {
-				condition.setOfferId(offerID);
-				EntityResult conditionResult = conditionService.insertCondition(condition);
-				if (conditionResult.getCode() == EntityResult.OPERATION_SUCCESSFUL)
-					conditionsId.add((Integer) conditionResult.get(SpecialOfferConditionDao.ATTR_ID));
+				String errorString = null;
+				if (userHotel.equals(-1))
+					errorString = conditionService.checkConditionValid(condition);
+				else
+					errorString = conditionService.checkConditionValid(condition, userHotel);
+				if (errorString != null) {
+					LOG.info(errorString);
+					return EntityUtils.errorResult(errorString);
+				}
 			}
-			for (OfferProduct product : products) {
-				product.setSpecialOfferId(offerID);
-				productService.productInsert(product);
-			}
-			if (!conditionsId.isEmpty()) {
-				EntityResult result = new EntityResultMapImpl(
-						new ArrayList<String>(Arrays.asList(SpecialOfferDao.ATTR_ID, "conditions")));
-				result.addRecord(new HashMap<String, Object>() {
-					{
-						put(SpecialOfferDao.ATTR_ID, offerID);
-						put("conditions", conditionsId);
+
+			ArrayList<OfferProduct> products = new ArrayList<>();
+			if (keyMap.containsKey(Utils.PRODUCTS)) {
+				if (keyMap.get(Utils.PRODUCTS) instanceof ArrayList<?>) {
+					ArrayList<Map<String, Object>> auxProducts = null;
+					try {
+						auxProducts = (ArrayList<Map<String, Object>>) keyMap.get(Utils.PRODUCTS);
+					} catch (Exception e) {
+						LOG.info(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
+						return EntityUtils.errorResult(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
 					}
-				});
-				return result;
+					for (Map<String, Object> mapProduct : auxProducts) {
+						try {
+							OfferProduct product = entityUtils.fillProduct(mapProduct);
+							products.add(product);
+						} catch (FillException e) {
+							LOG.info(e.getMessage());
+							return EntityUtils.errorResult(e.getMessage());
+						}
+					}
+				} else {
+					LOG.info(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
+					return EntityUtils.errorResult(MsgLabels.PRODUCT_PRODUCT_LIST_NOT_ARRAY);
+				}
+			}
+
+			String productError = productService.areAllProductsValid(products);
+			if (productError != null) {
+				LOG.info(productError);
+				return EntityUtils.errorResult(productError);
+			}
+
+			EntityResult offer = daoHelper.insert(specialOfferDao, insertMap);
+			if (offer.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+				Integer offerID = (Integer) offer.get(SpecialOfferDao.ATTR_ID);
+				ArrayList<Integer> conditionsId = new ArrayList<>();
+				for (OfferCondition condition : conditions) {
+					condition.setOfferId(offerID);
+					EntityResult conditionResult = conditionService.insertCondition(condition);
+					if (conditionResult.getCode() == EntityResult.OPERATION_SUCCESSFUL)
+						conditionsId.add((Integer) conditionResult.get(SpecialOfferConditionDao.ATTR_ID));
+				}
+				for (OfferProduct product : products) {
+					product.setSpecialOfferId(offerID);
+					productService.productInsert(product);
+				}
+				if (!conditionsId.isEmpty()) {
+					EntityResult result = new EntityResultMapImpl(
+							new ArrayList<String>(Arrays.asList(SpecialOfferDao.ATTR_ID, Utils.CONDITIONS)));
+					result.addRecord(new HashMap<String, Object>() {
+						{
+							put(SpecialOfferDao.ATTR_ID, offerID);
+							put(Utils.CONDITIONS, conditionsId);
+						}
+					});
+					return result;
+				} else {
+					return offer;
+				}
+
 			} else {
+				LOG.error(offer.getMessage());
 				return offer;
 			}
-
-		} else {
-			return offer;
+		} catch (FillException e) {
+			LOG.info(e.getMessage());
+			return EntityUtils.errorResult(e.getMessage());
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
 
 	}
@@ -301,7 +322,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 			}
 			Integer userHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
-			if (userHotelId != -1 && entityUtils.isOfferFromHotelOnly(offerId, userHotelId)) {
+			if (userHotelId != -1 && !entityUtils.isOfferFromHotelOnly(offerId, userHotelId)) {
 				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 			}
@@ -310,7 +331,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			attrMap.put(SpecialOfferDao.ATTR_ACTIVE, false);
 			Map<String, Object> filterMap = new HashMap<>();
 			filterMap.put(SpecialOfferDao.ATTR_ID, offerId);
-			return daoHelper.update(specialOfferConditionDao, attrMap, filterMap);
+			return daoHelper.update(specialOfferDao, attrMap, filterMap);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
@@ -331,7 +352,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 		if (hotelId == null)
 			throw new ValidationException(MsgLabels.CONDITION_HOTEL_MANDATORY);
 		if (roomType == null)
-			throw new ValidationException(MsgLabels.ROOM_TYPE_MANDATORY);
+			throw new ValidationException(MsgLabels.CONDITION_ROOM_TYPE_MANDATORY);
 		if (!startDate.before(endDate))
 			throw new ValidationException(MsgLabels.CONDITION_BOOKING_END_BEFORE_START);
 		if (checkExists && !entityUtils.hotelExists(hotelId))
@@ -415,75 +436,136 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult specialOfferListAlternatives(Map<String, Object> keyMap) {
+		if (keyMap == null || keyMap.isEmpty()) {
+			LOG.info(MsgLabels.FILTER_MANDATORY);
+			return EntityUtils.errorResult(MsgLabels.FILTER_MANDATORY);
+		}
+		if (!keyMap.containsKey("offers")) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_MANDATORY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_MANDATORY);
+		}
+
+		if (keyMap.get("offers") == null) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+		}
+
+		if (!(keyMap.get("offers") instanceof ArrayList<?>)) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+		}
+		
+		List<Integer> offersList = null;
+		try {
+			offersList = (List<Integer>) keyMap.get("offers");
+		} catch (Exception e) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
+		}
+
+		if (offersList.isEmpty()) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+		}
+		try {
+			return specialOfferListInternal(offersList, true);
+		}catch (Exception e) {
+			LOG.error(MsgLabels.ERROR,e);
+			return EntityUtils.errorResult(MsgLabels.ERROR);
+		}
+	}
+
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult specialOfferListAll(Map<String, Object> keyMap) {
 		return specialOfferListInternal(keyMap);
 	}
 
 	public EntityResult specialOfferListInternal(Map<String, Object> keyMap) {
-		return specialOfferListInternal(keyMap, false, null, null, null, null);
+		return specialOfferListInternal(keyMap, false);
 	}
 
-	public EntityResult specialOfferListInternal(Map<String, Object> keyMap, boolean stripActive, Integer hotelId,
-			Integer roomTypeId, Date startDate, Date endDate) {
+	public EntityResult specialOfferListInternal(Map<String, Object> keyMap, boolean stripActive) {
+		return specialOfferListInternal(null, keyMap, stripActive);
+	}
+
+	public EntityResult specialOfferListInternal(List<Integer> offerIdList, boolean stripActive) {
+		return specialOfferListInternal(offerIdList, null, stripActive);
+	}
+	
+	public EntityResult specialOfferListInternal(List<Integer> offerIdList, Map<String, Object> keyMap,
+			boolean stripActive) {
 		Date start = null;
 		Date end = null;
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
-			try {
-				start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
-			} catch (ParseException e) {
-				LOG.info(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
-				return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
-			}
-		}
-
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
-			try {
-				end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
-			} catch (ParseException e) {
-				LOG.info(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
-				return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
-			}
-		}
-
 		Boolean active = null;
-		if (keyMap.containsKey(SpecialOfferDao.ATTR_ACTIVE) && !stripActive) {
-			Object aux = keyMap.get(SpecialOfferDao.ATTR_ACTIVE);
-			if (aux != null)
-				active = Boolean.parseBoolean(aux.toString());
-		}
-
-		if ((start != null) != (end != null)) {
-			LOG.info(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
-		}
-
-		if (start != null && end != null && start.after(end)) {
-			LOG.info(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
-			return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
-		}
 		Map<String, Object> query = new HashMap<>();
-		BasicExpression where = null;
-		if (start != null && end != null) {
-			where = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_START),
-					new SearchValue(SearchValue.BETWEEN, new ArrayList<Date>(Arrays.asList(start, end))), false);
-		}
-		if (active != null) {
-			BasicExpression whereActive = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ACTIVE),
-					BasicOperator.EQUAL_OP, active);
-			if (where == null)
-				where = whereActive;
-			else {
-				where = BasicExpressionTools.combineExpression(where, whereActive);
+		if (offerIdList == null) {
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
+				try {
+					start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+							.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
+				} catch (ParseException e) {
+					LOG.info(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
+					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
+				}
 			}
 
-		}
-		if (where != null)
-			query.put(Utils.BASIC_EXPRESSION, where);
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
+				try {
+					end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+							.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
+				} catch (ParseException e) {
+					LOG.info(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
+					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
+				}
+			}
 
-		EntityResult offers = daoHelper.query(specialOfferDao, query, new ArrayList<>(
-				Arrays.asList(SpecialOfferDao.ATTR_ID, SpecialOfferDao.ATTR_START, SpecialOfferDao.ATTR_END)));
+			if (keyMap.containsKey(SpecialOfferDao.ATTR_ACTIVE) && !stripActive) {
+				Object aux = keyMap.get(SpecialOfferDao.ATTR_ACTIVE);
+				if (aux != null)
+					active = Boolean.parseBoolean(aux.toString());
+			}
+
+			if ((start != null) != (end != null)) {
+				LOG.info(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
+				return EntityUtils.errorResult(MsgLabels.CONDITION_BOTH_ACTIVE_DATES_OR_NONE);
+			}
+
+			if (start != null && end != null && start.after(end)) {
+				LOG.info(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
+				return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_BEFORE_START);
+			}
+			BasicExpression where = null;
+			if (start != null && end != null) {
+				where = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_START),
+						new SearchValue(SearchValue.BETWEEN, new ArrayList<Date>(Arrays.asList(start, end))), false);
+			}
+			if (active != null) {
+				BasicExpression whereActive = new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ACTIVE),
+						BasicOperator.EQUAL_OP, active);
+				if (where == null)
+					where = whereActive;
+				else {
+					where = BasicExpressionTools.combineExpression(where, whereActive);
+				}
+
+			}
+			if (where != null)
+				query.put(Utils.BASIC_EXPRESSION, where);
+		} else {
+			query.put(Utils.BASIC_EXPRESSION, new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ID),
+					new SearchValue(SearchValue.IN, offerIdList), false));
+		}
+
+		if(offerIdList.isEmpty()) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+		}
+		
+		EntityResult offers = daoHelper.query(specialOfferDao, query,
+				new ArrayList<>(Arrays.asList(SpecialOfferDao.ATTR_ID, SpecialOfferDao.ATTR_START,
+						SpecialOfferDao.ATTR_END, SpecialOfferDao.ATTR_STACKABLE, SpecialOfferDao.ATTR_ACTIVE)));
 		if (!offers.isWrong() && offers.calculateRecordNumber() > 0) {
 			EntityResultTools.addColumn(offers, "conditions", null);
 			EntityResultTools.addColumn(offers, "products", null);
@@ -541,7 +623,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 				&& conditionService.isApplicable(offerId, hotelid, roomType, startDate, endDate);
 	}
 
-	private boolean isOfferActive(Integer offerId, Date bookingDate) {
+	public boolean isOfferActive(Integer offerId, Date bookingDate) {
 		Map<String, Object> keyMap = new HashMap<>();
 		BasicField offer = new BasicField(SpecialOfferDao.ATTR_ID);
 		BasicField start = new BasicField(SpecialOfferDao.ATTR_START);

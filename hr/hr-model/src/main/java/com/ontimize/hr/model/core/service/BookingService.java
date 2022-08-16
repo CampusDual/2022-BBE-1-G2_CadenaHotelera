@@ -108,7 +108,7 @@ public class BookingService implements IBookingService {
 
 	@Autowired
 	private CredentialUtils credentialUtils;
-	
+
 	@Autowired
 	private EntityUtils entityUtils;
 
@@ -117,7 +117,7 @@ public class BookingService implements IBookingService {
 
 	@Autowired
 	private SpecialOfferProductService specialOfferProductService;
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -216,7 +216,8 @@ public class BookingService implements IBookingService {
 
 		try {
 			if (credentialUtils.isUserEmployee(daoHelper.getUser().getUsername())) {
-				if(credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername())!=Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString())) {
+				if (credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername()) != Integer
+						.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString())) {
 					LOG.info(MsgLabels.NO_ACCESS_TO_HOTEL);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
 				}
@@ -635,28 +636,28 @@ public class BookingService implements IBookingService {
 			LOG.info(MsgLabels.ROOM_TYPE_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_FORMAT);
 		}
-		
+
 		Integer offerID = null;
-		if(parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
+		if (parameters.containsKey(BookingDao.ATTR_BOK_OFFER_ID)) {
 			try {
 				offerID = Integer.parseInt(parameters.get(BookingDao.ATTR_BOK_OFFER_ID).toString());
 			} catch (NumberFormatException e) {
 				LOG.info(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
 			}
-			if (offerID!=null && !entityUtils.specialOfferExists(offerID)) {
+			if (offerID != null && !entityUtils.specialOfferExists(offerID)) {
 				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 			}
 		}
-		
+
 		if (parameters.containsKey("qry_code")) {
-				offerID = entityUtils.getSpecialOfferIdFromCode(parameters.get("qry_code").toString());
-				if(offerID==-1) {
-					LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+			offerID = entityUtils.getSpecialOfferIdFromCode(parameters.get("qry_code").toString());
+			if (offerID == -1) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 						MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
-				}
+			}
 		}
 
 		if (offerID != null && offerID != -1 && !specialOfferService.isOfferAplicable(offerID, hotelId, roomType,
@@ -702,17 +703,20 @@ public class BookingService implements IBookingService {
 			EntityResult result = this.bookingInsert(insert);
 			result.put(BookingDao.ATTR_ROM_NUMBER, roomid);
 			if (result.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
-				boolean discardNormalOffers= false;
-				if(offerID!=null)discardNormalOffers = !entityUtils.isOfferStackable(offerID);
-				Map<Date, Double> prices = priceByDay(auxHotelID, roomType, entryDate, departureDate,!discardNormalOffers);
+				boolean discardNormalOffers = false;
+				if (offerID != null)
+					discardNormalOffers = !entityUtils.isOfferStackable(offerID);
+				Map<Date, Double> prices = priceByDay(auxHotelID, roomType, entryDate, departureDate,
+						!discardNormalOffers);
 				for (Entry<Date, Double> priceEntry : prices.entrySet()) {
 					Map<String, Object> detailMap = new HashMap<>();
 					detailMap.put(BookingDetailsDao.ATTR_BOOKING_ID, result.get(BookingDao.ATTR_ID));
 					detailMap.put(BookingDetailsDao.ATTR_DATE, priceEntry.getKey());
-					detailMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1 );
+					detailMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 					detailMap.put(BookingDetailsDao.ATTR_PAID, false);
-					detailMap.put(BookingDetailsDao.ATTR_PRICE, specialOfferProductService.getFinalPrice(offerID, 1, priceEntry.getValue(), discardNormalOffers));
-					detailMap.put(BookingDetailsDao.ATTR_NOMINAL_PRICE,priceEntry.getValue());
+					detailMap.put(BookingDetailsDao.ATTR_PRICE, specialOfferProductService.getFinalPrice(offerID, 1,
+							priceEntry.getValue(), discardNormalOffers));
+					detailMap.put(BookingDetailsDao.ATTR_NOMINAL_PRICE, priceEntry.getValue());
 					daoHelper.insert(bookingDetailsDao, detailMap);
 				}
 			}
@@ -1090,7 +1094,7 @@ public class BookingService implements IBookingService {
 			// entramos aqui si NO se cambia el tipo de habitacion
 			((freeRoomsEntryFilter.calculateRecordNumber() != 0
 					&& freeRoomsDepartureFilter.calculateRecordNumber() != 0)
-					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0	
+					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0
 							&& (oldDepartureDate.equals(newDepartureDate)))
 					|| (oldEntryDate.equals(newEntryDate) && freeRoomsDepartureFilter.calculateRecordNumber() != 0)
 					|| ((oldEntryDate.equals(newEntryDate) || freeRoomsEntryFilter.calculateRecordNumber() != 0)
@@ -1238,42 +1242,56 @@ public class BookingService implements IBookingService {
 		Integer roomTypeId;
 		Integer hotelId;
 		try {
-			roomTypeId = Integer.parseInt(filter.get(RoomDao.ATTR_TYPE_ID).toString());
+			Object aux = filter.get(RoomDao.ATTR_TYPE_ID);
+			if (aux == null) {
+				LOG.info(MsgLabels.ROOM_TYPE_MANDATORY);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_MANDATORY);
+			}
+			roomTypeId = Integer.parseInt(aux.toString());
 		} catch (NumberFormatException ex) {
 			LOG.info(MsgLabels.ROOM_TYPE_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_FORMAT);
 		}
 
 		try {
-			hotelId = Integer.parseInt(filter.get(BookingDao.ATTR_HTL_ID).toString());
+			Object aux = filter.get(BookingDao.ATTR_HTL_ID);
+			if (aux == null) {
+				LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+				return EntityUtils.errorResult(MsgLabels.HOTEL_ID_MANDATORY);
+			}
+			hotelId = Integer.parseInt(aux.toString());
 		} catch (NumberFormatException ex) {
 			LOG.info(MsgLabels.HOTEL_ID_FORMAT);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
 		}
 
+		Integer offerId = null;
+		boolean offerSet = filter.containsKey(SpecialOfferDao.ATTR_ID);
+		try {
+			Object aux = filter.get(SpecialOfferDao.ATTR_ID);
+			if (aux != null)
+				offerId = Integer.parseInt(aux.toString());
+		} catch (NumberFormatException e) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_ID_FORMAT);
+		}
+
 		// Compruebo hotel existe
-		Map<String, Object> filterHotel = new HashMap<>();
-		filterHotel.put(HotelDao.ATTR_ID, hotelId);
 
-		List<String> attrListHotel = new ArrayList<>();
-		attrListHotel.add(HotelDao.ATTR_NAME);
-		EntityResult existsHotelER = this.daoHelper.query(this.hotelDao, filterHotel, attrListHotel);
-
-		if (existsHotelER.calculateRecordNumber() == 0) {
+		if (!entityUtils.hotelExists(hotelId)) {
 			LOG.info(MsgLabels.HOTEL_NOT_EXIST);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
+			return EntityUtils.errorResult(MsgLabels.HOTEL_NOT_EXIST);
 		}
 
 		// Compruebo tipo habitaci�n existe
-		Map<String, Object> filterTypeRoom = new HashMap<>();
-		filterTypeRoom.put(RoomTypeDao.ATTR_ID, roomTypeId);
-
-		List<String> attrListRoomType = new ArrayList<>();
-		attrListRoomType.add(RoomTypeDao.ATTR_NAME);
-		EntityResult existsTypeRoomER = this.daoHelper.query(this.roomTypeDao, filterTypeRoom, attrListRoomType);
-		if (existsTypeRoomER.calculateRecordNumber() == 0) {
+		if (!entityUtils.roomTypeExists(roomTypeId)) {
 			LOG.info(MsgLabels.ROOM_TYPE_NOT_EXIST);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_NOT_EXIST);
+			return EntityUtils.errorResult(MsgLabels.ROOM_TYPE_NOT_EXIST);
+		}
+
+		if (offerId != null && !entityUtils.specialOfferExists(offerId)) {
+			LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
+			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST);
 		}
 
 		// Comprobamos formato fechas
@@ -1326,19 +1344,59 @@ public class BookingService implements IBookingService {
 		if (er.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 			if (er.calculateRecordNumber() == 0) {
 				LOG.info(MsgLabels.NO_FREE_ROOMS);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_FREE_ROOMS);
+				return EntityUtils.errorResult(MsgLabels.NO_FREE_ROOMS);
 			}
 		} else {
 			LOG.info(er.getMessage());
 			return er;
 		}
 
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.MILLISECOND, 0);
+
+		List<Integer> offersId = new ArrayList<>();
+
+		if (!startDate.before(c.getTime())) {
+			offersId.addAll(specialOfferService.getOfferId(startDate, endDate, hotelId, roomTypeId, false));
+		} else {
+			if (offerSet && offerId != null) {
+				LOG.info(MsgLabels.BOOKING_BUDGET_CANT_APPLY_SPECIAL_OFFERS_TO_PAST_DATES);
+				return EntityUtils.errorResult(MsgLabels.BOOKING_BUDGET_CANT_APPLY_SPECIAL_OFFERS_TO_PAST_DATES);
+			}
+		}
+
+		if (offerId != null) {
+			if (!specialOfferService.isOfferAplicable(offerId, hotelId, roomTypeId, startDate, endDate, c.getTime())) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
+			}
+		} else {
+			if (!offerSet && !offersId.isEmpty())
+				offerId = offersId.get(0);
+		}
+
 		// obtengo mapa precios/noche
-		Map<Date, Double> listPrices = priceByDay(hotelId, roomTypeId, startDate, endDate);
+		Map<Date, Double> listPrices = null;
+		if (offerId == null) {
+			listPrices = priceByDay(hotelId, roomTypeId, startDate, endDate);
+		} else {
+			listPrices = priceByDay(hotelId, roomTypeId, startDate, endDate, entityUtils.isOfferStackable(offerId));
+			for (Entry<Date, Double> entry : listPrices.entrySet()) {
+				entry.setValue(specialOfferProductService.getFinalPrice(offerId, offerId, entry.getValue(), true));
+			}
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("prices", listPrices);
+		if (!offersId.isEmpty())
+			result.put("offers", offersId);
 
 		EntityResult pricesByNightER = new EntityResultMapImpl();
 		pricesByNightER.setCode(EntityResult.OPERATION_SUCCESSFUL);
-		pricesByNightER.addRecord(listPrices);
+		pricesByNightER.addRecord(result);
 
 		return pricesByNightER;
 	}
@@ -1347,11 +1405,11 @@ public class BookingService implements IBookingService {
 	 * Method to get a budget.
 	 * 
 	 */
-	public Map<Date, Double>priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate)throws OntimizeJEERuntimeException{
+	public Map<Date, Double> priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate)
+			throws OntimizeJEERuntimeException {
 		return priceByDay(hotelId, roomTypeId, startDate, endDate, true);
 	}
-	
-	
+
 	public Map<Date, Double> priceByDay(int hotelId, int roomTypeId, Date startDate, Date endDate, boolean checkOffer)
 			throws OntimizeJEERuntimeException {
 
@@ -1978,14 +2036,14 @@ public class BookingService implements IBookingService {
 		Map<String, Object> keyMapHC = new HashMap<>();
 		keyMap.put(BookingDao.ATTR_ID, bookingId);
 		List<String> columnsHC = Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,
-				ClientDao.ATTR_EMAIL,ClientDao.ATTR_IDENTIFICATION,ClientDao.ATTR_PHONE, HotelDao.ATTR_NAME, HotelDao.ATTR_ADDRESS);
+				ClientDao.ATTR_EMAIL, ClientDao.ATTR_IDENTIFICATION, ClientDao.ATTR_PHONE, HotelDao.ATTR_NAME,
+				HotelDao.ATTR_ADDRESS);
 
 		EntityResult hotelAndClientER = this.daoHelper.query(this.clientDao, keyMapHC, columnsHC,
 				ClientDao.QUERY_CLIENT_AND_HOTEL_BY_BOK);
 		String clientName = hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_NAME).toString() + " "
 				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME1).toString() + " "
 				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME2).toString();
-		
 
 		String invoiceRoute = "src/resources/invoice.jasper";
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -2006,7 +2064,7 @@ public class BookingService implements IBookingService {
 
 			String subjectMail = "Expense report";
 			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
-			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf",null);
+			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf", null);
 
 		} catch (JRException | MessagingException e) {
 			LOG.error(e.getMessage());

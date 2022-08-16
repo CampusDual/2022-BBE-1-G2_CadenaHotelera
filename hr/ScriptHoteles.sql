@@ -217,6 +217,7 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDelete');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAll');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAlternatives');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDisable');
 
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeQuery');
@@ -378,7 +379,7 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,1
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,124);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,125);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,126);
-
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,127);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t

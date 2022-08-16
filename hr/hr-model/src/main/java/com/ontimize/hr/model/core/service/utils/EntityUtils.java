@@ -620,7 +620,7 @@ public class EntityUtils {
 	 * @return an OfferCondition object with the applied changes
 	 * @throws MergeException if the offer or condition id are different
 	 */
-	public static OfferCondition mergeConditions(OfferCondition baseCondition, OfferCondition modifiedCondition)
+	public OfferCondition mergeConditions(OfferCondition baseCondition, OfferCondition modifiedCondition)
 			throws MergeException {
 		return mergeConditions(baseCondition, modifiedCondition, true, true);
 	}
@@ -642,7 +642,7 @@ public class EntityUtils {
 	 * @return an OfferCondition object with the applied changes
 	 * @throws MergeException if some of the id checks are enabled and failed
 	 */
-	public static OfferCondition mergeConditions(OfferCondition baseCondition, OfferCondition modifiedCondition,
+	public OfferCondition mergeConditions(OfferCondition baseCondition, OfferCondition modifiedCondition,
 			boolean checkConditionId, boolean checkOfferId) throws MergeException {
 		OfferCondition result = new OfferCondition(false);
 		result.setConditionId(baseCondition.getConditionId());
@@ -702,7 +702,7 @@ public class EntityUtils {
 	 * @param modifiedProduct OfferProduct object with the modified data
 	 * @return a new OfferProduct object with the merged data.
 	 */
-	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct) {
+	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct) {
 		return mergeProducts(baseProduct, modifiedProduct, false);
 
 	}
@@ -718,7 +718,7 @@ public class EntityUtils {
 	 *                        merge if they are not null
 	 * @return a new OfferProduct object with the merged data.
 	 */
-	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
+	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
 			boolean mergeKeyIds) {
 		return mergeProducts(baseProduct, modifiedProduct, mergeKeyIds, false);
 	}
@@ -736,7 +736,7 @@ public class EntityUtils {
 	 *                        present into the merged results.
 	 * @return a new OfferProduct object with the merged data.
 	 */
-	public static OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
+	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
 			boolean mergeKeyIds, boolean setNullValues) {
 		OfferProduct result = new OfferProduct();
 		if ((baseProduct == null || baseProduct.isEmpty()) && (modifiedProduct == null || modifiedProduct.isEmpty()))
@@ -779,7 +779,7 @@ public class EntityUtils {
 	 *                      null
 	 * @return A new OfferCondition object with the data from the map
 	 */
-	public static OfferCondition fillCondition(Map<String, Object> conditionMap, boolean fillID,
+	public OfferCondition fillCondition(Map<String, Object> conditionMap, boolean fillID,
 			boolean fillIsPresent) {
 		OfferCondition result = new OfferCondition(fillIsPresent);
 		if (conditionMap == null || conditionMap.isEmpty())
@@ -897,11 +897,11 @@ public class EntityUtils {
 		return result;
 	}
 
-	public static OfferCondition fillCondition(Map<String, Object> conditionMap) {
+	public OfferCondition fillCondition(Map<String, Object> conditionMap) {
 		return fillCondition(conditionMap, false, false);
 	}
 
-	public static OfferProduct fillProduct(Map<String, Object> productMap) {
+	public OfferProduct fillProduct(Map<String, Object> productMap) {
 		return fillProduct(productMap, false, false);
 	}
 
@@ -914,7 +914,7 @@ public class EntityUtils {
 	 *                    in the map even if its null.
 	 * @return a new OfferProduct object filled with the data from the map
 	 */
-	public static OfferProduct fillProduct(Map<String, Object> productMap, boolean fillOfferId, boolean setPresent) {
+	public OfferProduct fillProduct(Map<String, Object> productMap, boolean fillOfferId, boolean setPresent) {
 		OfferProduct product = new OfferProduct(setPresent);
 		if (productMap == null || productMap.isEmpty())
 			throw new FillException(MsgLabels.PRODUCT_EMPTY);
@@ -997,7 +997,7 @@ public class EntityUtils {
 	 * @return returns a map filled with the data from the OfferCondition object. It
 	 *         strips the activeOffer properties.
 	 */
-	public static Map<String, Object> fillConditionMap(OfferCondition condition, boolean fillConditionId,
+	public Map<String, Object> fillConditionMap(OfferCondition condition, boolean fillConditionId,
 			boolean fillOfferId, boolean useNullValues) {
 		Map<String, Object> result = new HashMap<>();
 		if (fillConditionId && condition.getConditionId() != null)
@@ -1044,7 +1044,7 @@ public class EntityUtils {
 	 *                              present flag to NullValue objects
 	 * @return a new map with the data from the product
 	 */
-	public static Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId,
+	public Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId,
 			boolean setNullValueIfPresent) {
 		Map<String, Object> result = new HashMap<>();
 		if (putOfferId && product.getSpecialOfferId() != null)
