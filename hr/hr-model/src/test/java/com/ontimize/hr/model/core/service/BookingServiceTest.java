@@ -34,7 +34,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
-import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -62,16 +61,6 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
-
-import net.sf.jasperreports.engine.JasperPrint;
-
-import com.ontimize.hr.model.core.dao.ClientDao;
-import com.ontimize.hr.model.core.dao.RoomDao;
-import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
-import com.ontimize.hr.model.core.service.utils.CredentialUtils;
-import com.ontimize.hr.model.core.service.utils.EntityUtils;
-import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.jee.common.services.user.UserInformation;
 
 
 
@@ -123,10 +112,7 @@ class BookingServiceTest {
 	
 	@Mock
 	private ClientDao clientDao;
-	
-	@Mock
-	private EntityUtils entityUtils;
-	
+
 	@Mock
 	private Utils utils;
 	
@@ -458,7 +444,7 @@ class BookingServiceTest {
 		Map<String, Object> filter = new HashMap<String, Object>();
 		filter.put(RoomDao.ATTR_TYPE_ID, 1);
 		filter.put(BookingDao.ATTR_HTL_ID, 2);
-		filter.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(Date.from(Clock.systemUTC().instant())));
+		filter.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(Date.from(Clock.systemUTC().instant().plus(-2,ChronoUnit.DAYS))));
 		filter.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(Date.from(Clock.systemUTC().instant().plus(1,ChronoUnit.DAYS))));
 		filter.put(SpecialOfferDao.ATTR_ID, 3);
 		req.put(Utils.FILTER, filter);
@@ -482,7 +468,7 @@ class BookingServiceTest {
 			put(RoomDao.ATTR_TYPE_ID,1);
 			put(RoomDao.ATTR_NUMBER, 101);
 		}});
-		doReturn(freeRoomsER).when(daoHelper).query(isA(BookingDao.class), anyMap(), anyList(),anyString());
+		doReturn(freeRoomsER).when(service).bookingFreeByTypeQuery(anyMap());
 		//when(specialOfferService.isOfferAplicable(anyInt(), anyInt(), anyInt(), any(), any(),any())).thenReturn(false);
 
 		EntityResult er = service.getBudget(req);

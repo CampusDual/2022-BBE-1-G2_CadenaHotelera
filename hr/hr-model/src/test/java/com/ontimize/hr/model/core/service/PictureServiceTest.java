@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -157,7 +156,7 @@ class PictureServiceTest {
 		+ "Tjx5L/mttls21jb2iBf2a+ljvmxlMSiyqTwcdUsBQS4S2pOfJseSfL9dAxldtKRDFS1XwJzD0KDDZV9cgKEl8uSZAPfpKpEdtRy"
 		+ "cfAfeNNqSg3dWyotmqmfbR95UlyaJsdKilx1aclH6CiQodk4KST7A1NsS1i05ugOfFRXztVA3BDRfulD9q+ioYitKSRDY4/I22e"
 		+ "WCC5wClEjtXFPpGjU5Mq4Naq6kWlJZWjoZXKCi6264pxl48ChR6+XhKdUD1lKOsEDRp7ZKHEBzLPV//2Q==";
-		BufferedImage bImage = ImageIO. read(new ByteArrayInputStream(Base64.getDecoder().decode(imageStr.getBytes())));
+		BufferedImage bImage = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder().decode(imageStr.getBytes())));
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ImageIO.write(bImage, "jpg", bos );
 		bdata = bos.toByteArray();

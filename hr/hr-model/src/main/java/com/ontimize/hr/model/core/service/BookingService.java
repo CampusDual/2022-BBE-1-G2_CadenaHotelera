@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.io.Console;
 import java.math.BigDecimal;
 import java.security.Permissions;
 import java.text.ParseException;
@@ -1363,6 +1364,10 @@ public class BookingService implements IBookingService {
 
 		List<Integer> offersId = new ArrayList<>();
 
+		
+		System.out.println(startDate);
+		System.out.println(c.getTime());
+		
 		if (!startDate.before(c.getTime())) {
 			offersId.addAll(specialOfferService.getOfferId(startDate, endDate, hotelId, roomTypeId, false));
 		} else {
