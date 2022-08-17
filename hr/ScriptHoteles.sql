@@ -111,6 +111,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingFreeByCityOrHotel');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/getBudget');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingOcupiedCleanQuery');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingRoomChange');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientInsert');

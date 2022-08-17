@@ -48,4 +48,6 @@ public interface IBookingService {
 
 	byte[] getPdfReport(int booking);
 
+	public EntityResult bookingRoomChange(Map<String, Object> req) throws OntimizeJEERuntimeException;
+
 }

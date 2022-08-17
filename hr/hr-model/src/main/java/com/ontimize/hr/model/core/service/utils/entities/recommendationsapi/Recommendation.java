@@ -10,7 +10,7 @@ public class Recommendation {
 	private String name;
 	private String shortDescription;
 	private GeoCode geoCode;
-	private Distance distance;
+	private Double distance;
 	private List<String>pictures;
 	
 	
@@ -24,7 +24,7 @@ public class Recommendation {
 	
 
 
-	public Recommendation(String name, String shortDescription, GeoCode geoCode, Distance distance,
+	public Recommendation(String name, String shortDescription, GeoCode geoCode, Double distance,
 			List<String> pictures) {
 		super();
 		this.name = name;
@@ -80,14 +80,14 @@ public class Recommendation {
 
 
 
-	public Distance getDistance() {
+	public Double getDistance() {
 		return distance;
 	}
 
 
 
 
-	public void setDistance(Distance distance) {
+	public void setDistance(Double distance) {
 		this.distance = distance;
 	}
 

@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -447,7 +448,7 @@ public class HotelService implements IHotelService {
 
 		Integer radius;
 		if (!req.containsKey("radius")) {
-			radius = 50;
+			radius = 1;
 		} else {
 			try {
 				radius = Integer.parseInt(req.get("radius").toString());
@@ -455,9 +456,9 @@ public class HotelService implements IHotelService {
 				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
 			}
-			if(radius<0 || radius > 500) {
-				LOG.info(MsgLabels.RADIUS_OUT_OF_RANGE);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RADIUS_OUT_OF_RANGE);
+			if(radius<0 || radius > 20) {
+				LOG.info(MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
 			}
 		}
 
@@ -486,7 +487,7 @@ public class HotelService implements IHotelService {
 		// get CloseableHttpClient
 		CloseableHttpClient client = null;
 		try {
-			client = apiAirport.getClient();
+			client = apiRecommendation.getClient();
 		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
@@ -495,7 +496,7 @@ public class HotelService implements IHotelService {
 		//get token
 		String tokenAccess = null;
 		try {
-			tokenAccess = apiAirport.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
+			tokenAccess = apiRecommendation.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
 					CredentialsApi.CLIENT_SECRET, client);
 		} catch (IOException e) {
 			LOG.error(e.getMessage());
@@ -512,12 +513,26 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
+		
+		
+		
+		
 
 		// check there are recommendations in radius
 		if (listRecommendations.isEmpty()) {
 			LOG.info(MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 		}
+		
+		
+		for (Recommendation recommendation:listRecommendations) {
+			 Double distancia = Utils.getDistance(latitudeHotel, longitudeHotel, recommendation.getGeoCode().getLatitude().toString(),
+					 recommendation.getGeoCode().getLongitude().toString());
+			
+			 recommendation.setDistance(Math.round(distancia*100.0)/100.0);
+		}
+		
+		
 		
 		// return recommendations
 		Map<String, Object> mapRecommendations = new HashMap<>();
