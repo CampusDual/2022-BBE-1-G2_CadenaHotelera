@@ -27,7 +27,10 @@ public class BookingDao extends OntimizeJdbcDaoSupport {
 	public static final String QUERY_OCUPIED_ROOMS = "ocupiedRoomsQuery";
 	public static final String QUERY_CHECKIN_TODAY ="checkintoday";
 	public static final String QUERY_PRICE_NIGHT = "priceNightByType";
+
 	
 	public static final String QUERY_ROOM_TYPE = "getRoomTypeQuery";
+
+	public static final String QUERY_GET_NIGHTS = "getNightsHotel";
 }
 

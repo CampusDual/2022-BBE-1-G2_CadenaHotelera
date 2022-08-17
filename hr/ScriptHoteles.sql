@@ -196,6 +196,26 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsUpdate');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsDelete');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsAdd');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES ('com.ontimize.hr.api.core.service.IBookingService/getPdfReport');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ICancellationsService/cancellationsQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ICancellationsService/cancellationsInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ICancellationsService/cancellationsUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ICancellationsService/cancellationsDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ICancellationsService/cancelBooking');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/pictureQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/pictureInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/pictureUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/pictureDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/getPicture');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/postPicture');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/getPictureArray');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordSearch');
 
 
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
@@ -297,13 +317,31 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,8
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,86);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,87);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,88);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,89);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,90);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,91);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,92);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,93);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,94);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,95);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,96);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,97);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,98);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,99);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,100);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,101);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,102);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,103);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,104);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,105);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,106);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t
 --inner join TSERVER_PERMISSION TP on t.ID_SERVER_PERMISSION = TP.ID_SERVER_PERMISSION;
 --Creación de tablas de hotel--
 
-
+drop table if exists cancellations;
 drop table if exists dates_season;
 drop table if exists season;
 drop table if exists offers;
@@ -317,11 +355,14 @@ drop table if exists booking_guest;
 drop table if exists booking;
 drop table if exists special_offer;
 drop table if exists status_booking;
-drop  table if exists room;
+drop table if exists room_status_record;
+drop table if exists room;
 drop table if exists room_status;
 drop table if exists room_type;
-drop  table if exists client;
+drop table if exists client;
 drop table if exists hotel;
+drop table if exists Picture;
+
 
 CREATE TABLE if not exists hotel(
     htl_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
@@ -359,6 +400,7 @@ CREATE TABLE if not exists client(
     cli_identification varchar(20) not null,
     cli_phone varchar(20),
     cli_email varchar(150),
+    cli_email_subscription boolean DEFAULT true,
     CONSTRAINT CK_client_cli_name CHECK (ltrim(rtrim(client.cli_name))<>''),
     CONSTRAINT CK_client_cli_surname1 CHECK (ltrim(rtrim(client.cli_surname1))<>''),
     CONSTRAINT UQ_client_cli_birthday_cli_identification UNIQUE (cli_identification,cli_birthday),
@@ -551,6 +593,26 @@ create table if not exists booking_details(
     CONSTRAINT fk_details_type FOREIGN KEY (bok_det_type) REFERENCES details_type(det_id)
 );
 
+create table if not exists picture(
+pic_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
+pic_name varchar(50) not null,
+pic_desc varchar(255),
+pic bytea not null
+);
+
+create table if not exists room_status_record(
+rsr_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
+rsr_htl_id INTEGER not null,
+rsr_rom_number  varchar(15)not null,
+rsr_rom_rsts_id INTEGER,
+rsr_rom_status_date DATE not null,
+
+constraint fk_htl_status_record foreign key(rsr_htl_id) references hotel(htl_id),
+constraint fk_rom_number_status_record foreign key(rsr_rom_number,rsr_htl_id) references room(rom_number,rom_htl_id),
+constraint fk_rom_rsts_id_status_record foreign key(rsr_rom_rsts_id) references room_status(rsts_id)
+
+);
+
 
 -- PRECIOS
 
@@ -581,6 +643,20 @@ create table if not exists offers(
     CONSTRAINT fk_htl_offer FOREIGN KEY(ofe_htl_id) REFERENCES hotel(htl_id),
     CONSTRAINT fk_rom_typ_offer FOREIGN KEY (ofe_rom_typ_id) REFERENCES room_type(rtyp_id)
 );
+
+create table if not exists cancellations(
+        can_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
+        can_htl_id integer not null,
+        can_rtyp integer not null,
+        can_sea_id integer not null,
+        can_days_to_bok integer not null,
+        can_nights_to_pay integer not null,
+        CONSTRAINT  fk_can_htl FOREIGN KEY (can_htl_id) REFERENCES hotel(htl_id),
+        CONSTRAINT fk_can_rtyp FOREIGN KEY (can_rtyp) REFERENCES room_type(rtyp_id),
+        CONSTRAINT fk_can_sea FOREIGN KEY (can_sea_id) REFERENCES season(sea_id)
+);
+
+
 
 /*************************************************************************
 *        MASTER TABLES POPULATION                                        *
@@ -873,6 +949,19 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offerInsert'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingDetailsService/bookingDetailsAdd'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/getPdfReport'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsInsert'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsUpdate'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsDelete'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancelBooking'));
+
 
 --asignamos permisos a recepcionista--
 insert into trole_server_permission(id_rolename,id_server_permission)
@@ -903,6 +992,8 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/checkOut'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/getPdfReport'));
 
 --asignamos permisos a rol limpieza--
 insert into trole_server_permission(id_rolename,id_server_permission)
@@ -927,10 +1018,6 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISeasonService/seasonQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IOffersService/offersByDateRangeQuery'));
-
-
-
-
 
 --insertamos temporadas--
 insert into season(sea_name, sea_multiplier) values ('LOW',1);
@@ -960,3 +1047,35 @@ insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_
 insert into booking_details(bok_det_bok_id, bok_det_type, bok_det_date ,bok_det_price,bok_det_nominal_price,bok_det_paid) values
                             (1,2,'2022-06-27',50,50,false);
 
+-- INSERTO POLITICAS DE CANCELACION
+----------------HOTEL 1-----------------------
+-- TEMPORADA BAJA -----
+-- todas las cancelaciones gratuitas, hasta un día antes. Sino, se paga la primera noche
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(1,1,1,1,1); --doble
+insert into cancellations(can_htl_id,can_rtyp,can_sea_id,can_days_to_bok,can_nights_to_pay) values(1,2,1,1,1); --simple
+--suites se exige avisar 7 días antes,o se cobra la primera noche tb
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(1,3,1,7,1); --suite
+--TEMPORADA ALTA ----
+-- todas las cancelaciones gratuitas, hasta 7 días antes. Después se paga la primera noche, y si se avisa en los 3 últimos días se cobran las dos primeras noches(si las hay)
+-- 7 ultimos dias
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(1,1,2,7,1);
+insert into cancellations(can_htl_id,can_rtyp,can_sea_id,can_days_to_bok,can_nights_to_pay) values(1,2,2,7,1);
+-- 3 ultimos dias
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(1,1,2,3,2);
+insert into cancellations(can_htl_id,can_rtyp,can_sea_id,can_days_to_bok,can_nights_to_pay) values(1,2,2,3,2);
+-- suites se exige avisar 7 días antes,o se cobran las 3 primeras noches
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(1,3,2,7,3);
+
+----------------HOTEL 2-----------------------
+-- TEMPORADA BAJA -----
+-- todas las cancelaciones gratuitas, hasta un día antes. Sino, se paga la primera noche
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(2,1,1,1,1); --doble
+insert into cancellations(can_htl_id,can_rtyp,can_sea_id,can_days_to_bok,can_nights_to_pay) values(2,2,1,1,1); --simple
+--suites se exige avisar 7 días antes,o se cobra la primera noche tb
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(2,3,1,7,1); --suite
+--TEMPORADA ALTA ----
+-- todas las cancelaciones gratuitas, hasta 3 días antes. Sino se paga la primera noche
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(2,1,2,3,1);
+insert into cancellations(can_htl_id,can_rtyp,can_sea_id,can_days_to_bok,can_nights_to_pay) values(2,2,2,3,1);
+-- suites se exige avisar 7 días antes,o se cobran las 3 primeras noches
+insert into cancellations(can_htl_id, can_rtyp, can_sea_id, can_days_to_bok, can_nights_to_pay) values(2,3,2,7,3);

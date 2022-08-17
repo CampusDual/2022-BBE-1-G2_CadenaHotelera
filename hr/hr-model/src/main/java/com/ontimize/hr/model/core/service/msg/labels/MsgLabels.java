@@ -65,7 +65,11 @@ public class MsgLabels {
 	public static final String ROOM_TYPE_FORMAT = "WRONG_ROOM_TYPE_ID_FORMAT";
 	public static final String NO_FREE_ROOMS = "THERE_ARE_NO_FREE_ROOMS";
 	public static final String ROOM_STATUS_NOT_EXISTS= "ROOM_STATUS_NOT_EXISTS";
+
 	public static final String ROOM_OCCUPIED = "ROOM_OCCUPIED";
+
+	public static final String ROOM_STATUS_ALREADY_NORMAL= "ROOM_STATUS_ALREADY_NORMAL";
+
 	public static final String ROOM_NUMBER_BLANK ="ROOM_NUMBER_BLANK";
 	public static final String ROOM_CAPACITY ="ROOM_CAPACITY_SURPASSED";
 	
@@ -90,6 +94,8 @@ public class MsgLabels {
 	public static final String BOOKING_NOT_ACTIVE = "BOOKING NOT ACTIVE";
 	public static final String BOOKING_NOT_FROM_YOUR_HOTEL = "BOOKING NOT FROM YOUR HOTEL";
 	public static final String BOOKING_USED_OFFER_ID_INSTEAD_CODE="BOOKING_USED_OFFER_ID_INSTEAD_CODE";
+	public static final String BOOKING_ALREADY_CANCELLED = "BOOKING_ALREADY_CANCELLED";
+	public static final String BOOKING_ALREADY_FINISHED = "BOOKING_ALREADY_FINISHED";
 
 	// BOOKING_DETAILS
 	public static final String BOOKING_DETAILS_BOOKING_ID_MANDATORY = "BOK_DET_BOK_ID_MANDATORY ";
@@ -103,7 +109,7 @@ public class MsgLabels {
 	public static final String BOOKING_DETAILS_PRICE_FORMAT = "PRICE_FORMAT";
 	public static final String BOOKING_DETAILS_TYPE_FORMAT = "DETAILS_TYPE_FORMAT";
 	public static final String BOOKING_DETAILS_TYPE_NOT_EXISTS = "DETAILS_TYPE_NOT_EXISTS";
-	
+	public static final String BOOKING_NIGHTS_NOT_FOUND = "BOOKING_NIGHTS_NOT_FOUND";
 
 	// BOOKING_DETAILS_TYPE
 	public static final String DETAILS_TYPE_ID_MANDATORY= "DETAILS_TYPE_ID_MANDATORY";
@@ -179,12 +185,30 @@ public class MsgLabels {
 	public static final String SEASON_MULTIPLIER_MANDATORY = "SEASON_MULTIPLIER_MANDATORY";
 	public static final String SEASON_MULTIPLIER_BLANK = "SEASON_MULTIPLIER_IS_BLANK";
 	public static final String SEASON_DUPLICATE_NAME = "SEASON_NAME_DUPLICATED";
+	public static final String SEASON_FORMAT = "SEASON_WRONG_FORMAT";
 
+	// CANCELLATIONS
+	public static final String CANCELLATIONS_DAYS_MANDATORY = "CANCELLATIONS_DAYS_TO_BOOKING_MANDATORY";
+	public static final String CANCELLATIONS_NIGHTS_PAY_MANDATORY = "CANCELLATIONS_NIGHTS_TO_PAY_MANDATORY";
+	public static final String CANCELLATION_DAYS_FORMAT = "CANCELLATIONS_DAYS_WRONG_FORMAT";
+	public static final String CANCELLATIONS_NIGHTS_PAY_FORMAT = "CANCELLATIONS_NIGHTS_TO_PAY_WRONG_FORMAT";
+	public static final String CANCELLATIONS_ID_MANDATORY = "CANCELLATIONS_ID_MANDATORY";
+	
+	//PICTURES
+	public static final String PICTURE_NAME_BLANK = "PICTURE_NAME_IS_BLANK";
+	public static final String PICTURE_WRONG_FORMAT = "PICTURE_FORMAT_WORNG_USE_JPG";
+	public static final String PICTURE_NAME_MANDATORY = "PICTURE_NAME_IS_MANDATORY";
+	public static final String PICTURE_ID_MANDATORY = "PICTURE_ID_IS_MANDATORY";
+	public static final String PICTURE_ID_FORMAT = "PICTURE_ID_WRONG_FORMAT";
+	public static final String PICTURE_MANDATORY = "PICTURE_IS_MANDATORY";
+	public static final String PICTURE_NOT_EXISTS = "PICTURE_NOT_EXISTS";
+	
 	// FILTERS,COLUMNS,DATA
 	public static final String FILTER_MANDATORY = "FILTER_IS_MANDATORY";
 	public static final String COLUMNS_MANDATORY = "COLUMNS_IS_MANDATORY";
 	public static final String DATA_MANDATORY = "DATA_IS_MANDATORY";
 	public static final String EMPTY_FILTER = "EMPTY_FILTER";
+
 
 	// GENERAL ERRORS
 	public static final String BAD_DATA = "BAD_DATA_PLEASE_CHECK_VALUES_AND_COLUMN_NAMES";
@@ -204,7 +228,6 @@ public class MsgLabels {
 	public static final String BOOKING_SAME_ROOM = "BOOKING_SAME_ROOM";
 	public static final String BOOKING_DIFFERENT_ROOM_TYPE = "BOOKING_DIFFERENT_ROOM_TYPE";
 
-	
 	
 	private MsgLabels() {
 		

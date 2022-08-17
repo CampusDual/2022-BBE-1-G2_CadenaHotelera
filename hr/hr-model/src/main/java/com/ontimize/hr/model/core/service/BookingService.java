@@ -1082,7 +1082,7 @@ public class BookingService implements IBookingService {
 			// entramos aqui si NO se cambia el tipo de habitacion
 			((freeRoomsEntryFilter.calculateRecordNumber() != 0
 					&& freeRoomsDepartureFilter.calculateRecordNumber() != 0)
-					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0
+					|| (freeRoomsEntryFilter.calculateRecordNumber() != 0	
 							&& (oldDepartureDate.equals(newDepartureDate)))
 					|| (oldEntryDate.equals(newEntryDate) && freeRoomsDepartureFilter.calculateRecordNumber() != 0)
 					|| ((oldEntryDate.equals(newEntryDate) || freeRoomsEntryFilter.calculateRecordNumber() != 0)
@@ -1929,6 +1929,7 @@ public class BookingService implements IBookingService {
 	 * @return pdf report
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public byte[] getPdfReport(int booking) {
 		Integer bookingId = booking;
 
@@ -1992,7 +1993,7 @@ public class BookingService implements IBookingService {
 
 			String subjectMail = "Expense report";
 			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
-			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf");
+			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf",null);
 
 		} catch (JRException | MessagingException e) {
 			LOG.error(e.getMessage());

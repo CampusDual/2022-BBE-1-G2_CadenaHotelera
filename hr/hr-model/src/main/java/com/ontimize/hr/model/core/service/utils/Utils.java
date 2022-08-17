@@ -50,7 +50,11 @@ public class Utils {
 	public static final String DATA = "data";
 	public static final String COLUMNS = "columns";
 	public static final String FILTER = "filter";
-	public static final String WEATHER_API_KEY= "EilzAT5liHyfuAjfFaaoUnTPTw4W8ZmB";
+	public static final String WEATHER_API_KEY = "EilzAT5liHyfuAjfFaaoUnTPTw4W8ZmB";
+	public static final long SECOND = 1000;
+	public static final long MINUTE = SECOND * 60;
+	public static final long HOUR = MINUTE * 60;
+	public static final long DAY = HOUR * 24;
 
 	private Utils() {
 
@@ -124,7 +128,8 @@ public class Utils {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 	}
 
-	public static void sendMail(String receiver,String subject, String text, String nameAttachedFile) throws MessagingException, AddressException {
+	public static void sendMail(String receiver, String subject, String texto, String nameAttachedFile,
+			String imageInLine) throws MessagingException, AddressException {
 
 		Properties props = new Properties();
 
@@ -152,19 +157,35 @@ public class Utils {
 
 		message.setSubject(subject);
 
+		
+		//text
 		BodyPart messageBodyPart = new MimeBodyPart();
-
+		String text = "<H1>" + texto + "</H1><img src=\"cid:image\">";
 		messageBodyPart.setText(text);
-
-		Multipart multipart = new MimeMultipart();
+		messageBodyPart.setContent(text, "text/html");
+		
+		MimeMultipart multipart = new MimeMultipart();
+		
 		multipart.addBodyPart(messageBodyPart);
 
-		messageBodyPart = new MimeBodyPart();
+		if (nameAttachedFile != null) {
+			messageBodyPart = new MimeBodyPart();
 
-		DataSource source = new FileDataSource(nameAttachedFile);
-		messageBodyPart.setDataHandler(new DataHandler(source));
-		messageBodyPart.setFileName(nameAttachedFile);
-		multipart.addBodyPart(messageBodyPart);
+			DataSource source = new FileDataSource(nameAttachedFile);
+			messageBodyPart.setDataHandler(new DataHandler(source));
+			messageBodyPart.setFileName(nameAttachedFile);
+			multipart.addBodyPart(messageBodyPart);
+		}
+
+		if (imageInLine != null) {
+			messageBodyPart = new MimeBodyPart();
+			DataSource fds = new FileDataSource(imageInLine);
+			messageBodyPart.setDataHandler(new DataHandler(fds));
+			messageBodyPart.setHeader("Content-ID", "<image>");
+
+			// add image to the multipart
+			multipart.addBodyPart(messageBodyPart);
+		}
 
 		message.setContent(multipart);
 
@@ -197,5 +218,5 @@ public class Utils {
 		}
 
 	}
-	
+
 }

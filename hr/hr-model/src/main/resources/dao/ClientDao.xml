@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<JdbcEntitySetup
-	xmlns="http://www.ontimize.com/schema/jdbc"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
-	catalog="" schema="${mainschema}" table="client"
-	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+<JdbcEntitySetup xmlns="http://www.ontimize.com/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd" catalog="" schema="${mainschema}" table="client" datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
 		<Column>cli_id</Column>
 	</DeleteKeys>
@@ -15,7 +10,7 @@
 	<Queries>
 		<Query id="clientsInDateQuery">
 			<Sentence>
-			   <![CDATA[
+				<![CDATA[
 			     SELECT DISTINCT
 			     	#COLUMNS#
 			     FROM
@@ -26,11 +21,11 @@
 			     	 c.cli_id = b.bok_cli_id
 			     #WHERE#
 			   ]]>
-   			</Sentence>
+			</Sentence>
 		</Query>
 		<Query id="infoClientHotelByBok">
 			<Sentence>
-			   <![CDATA[
+				<![CDATA[
 			     SELECT
 			     	#COLUMNS#
 			     FROM
@@ -39,7 +34,19 @@
     			inner join public.hotel h on b.bok_htl_id = h.htl_id
 			     #WHERE#
 			   ]]>
-   			</Sentence>
+			</Sentence>
+		</Query>
+		<Query id="clientsBirthday">
+			<Sentence>
+				<![CDATA[
+			     SELECT
+			     	#COLUMNS#
+			     from public.client
+				where extract(DAY from cli_birthday) = extract(DAY from current_date)
+				and  extract(MONTH from cli_birthday) = extract(MONTH from current_date)
+				and cli_email_subscription = true
+			   ]]>
+			</Sentence>
 		</Query>
 	</Queries>
 </JdbcEntitySetup>

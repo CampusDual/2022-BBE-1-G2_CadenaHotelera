@@ -625,7 +625,7 @@ public class HotelService implements IHotelService {
 				EntityResult result = new EntityResultMapImpl();
 				result.addRecord(mapWeather);
 				result.setCode(EntityResult.OPERATION_SUCCESSFUL);
-		
+				
 		return result;
 	}	
 
