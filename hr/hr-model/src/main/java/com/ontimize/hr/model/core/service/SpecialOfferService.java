@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -559,7 +560,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
 			}
 			query.put(Utils.BASIC_EXPRESSION, new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ID),
-					new SearchValue(SearchValue.IN, offerIdList), false));
+					new SearchValue(SearchValue.IN, new Vector<Integer>(offerIdList)), false));
 		}
 
 		EntityResult offers = daoHelper.query(specialOfferDao, query,

@@ -163,7 +163,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 				return EntityUtils.errorResult(errorString);
 			}
 			Integer userHotel = credentialUtils.getHotelFromUser(daohelper.getUser().getUsername());
-			if (userHotel!=-1 && !entityUtils.isOfferFromHotelOnly(product.getSpecialOfferId(), userHotel)){
+			if (userHotel!=-1 && !entityUtils.isOfferFromHotelOnly(filter.getSpecialOfferId(), userHotel)){
 				LOG.info(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_READONLY_FOR_USER);
 			}
