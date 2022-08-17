@@ -505,7 +505,7 @@ public class EntityUtils {
 		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_STACKABLE));
 		if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 			if (res.calculateRecordNumber() == 1) {
-				return Boolean.parseBoolean((String) res.getRecordValues(0).get(SpecialOfferDao.ATTR_ID));
+				return (Boolean)res.getRecordValues(0).get(SpecialOfferDao.ATTR_STACKABLE);
 			} else {
 				return false;
 			}

@@ -455,7 +455,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
 			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_NOT_ARRAY);
 		}
-		
+
 		List<Integer> offersList = null;
 		try {
 			offersList = (List<Integer>) keyMap.get("offers");
@@ -470,8 +470,8 @@ public class SpecialOfferService implements ISpecialOffersService {
 		}
 		try {
 			return specialOfferListInternal(offersList, true);
-		}catch (Exception e) {
-			LOG.error(MsgLabels.ERROR,e);
+		} catch (Exception e) {
+			LOG.error(MsgLabels.ERROR, e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
 	}
@@ -493,7 +493,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 	public EntityResult specialOfferListInternal(List<Integer> offerIdList, boolean stripActive) {
 		return specialOfferListInternal(offerIdList, null, stripActive);
 	}
-	
+
 	public EntityResult specialOfferListInternal(List<Integer> offerIdList, Map<String, Object> keyMap,
 			boolean stripActive) {
 		Date start = null;
@@ -554,15 +554,14 @@ public class SpecialOfferService implements ISpecialOffersService {
 			if (where != null)
 				query.put(Utils.BASIC_EXPRESSION, where);
 		} else {
+			if (offerIdList != null && offerIdList.isEmpty()) {
+				LOG.info(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+				return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
+			}
 			query.put(Utils.BASIC_EXPRESSION, new BasicExpression(new BasicField(SpecialOfferDao.ATTR_ID),
 					new SearchValue(SearchValue.IN, offerIdList), false));
 		}
 
-		if(offerIdList.isEmpty()) {
-			LOG.info(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
-			return EntityUtils.errorResult(MsgLabels.SPECIAL_OFFER_LIST_EMPTY);
-		}
-		
 		EntityResult offers = daoHelper.query(specialOfferDao, query,
 				new ArrayList<>(Arrays.asList(SpecialOfferDao.ATTR_ID, SpecialOfferDao.ATTR_START,
 						SpecialOfferDao.ATTR_END, SpecialOfferDao.ATTR_STACKABLE, SpecialOfferDao.ATTR_ACTIVE)));

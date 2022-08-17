@@ -216,6 +216,7 @@ public class MsgLabels {
 	public static final String PRODUCT_LAST_PRODUCT="PRODUCT_LAST_PRODUCT";
 	public static final String ERROR_FETCHING_PRODUCT_TO_REMOVE= "ERROR_FETCHING_PRODUCT_TO_REMOVE";
 	public static final String ERROR_FETCHING_PRODUCTS= "ERROR_FETCHING_PRODUCTS";
+	public static final String ERROR_FETCHING_BASE_PRODUCT= "ERROR FETCHING BASE PRODUCT";
 	
 	// DATES
 	public static final String ENTRY_DATE_MANDATORY = "ENTRY_DATE_IS_MANDATORY";

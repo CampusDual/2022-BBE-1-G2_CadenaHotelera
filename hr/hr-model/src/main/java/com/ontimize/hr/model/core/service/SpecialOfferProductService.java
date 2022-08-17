@@ -141,7 +141,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 			}
 			
 			EntityResult resBase= daohelper.query(specialOfferProductDao, entityUtils.fillProductMap(filter, true, false), EntityUtils.getAllProductColumns());
-			if(resBase.isWrong()) throw new FetchException("ERROR FETCHING BASE PRODUCT");
+			if(resBase.isWrong()) throw new FetchException(MsgLabels.ERROR_FETCHING_BASE_PRODUCT);
 			if(resBase.isEmpty()) {
 				if (!entityUtils.detailTypeExists(filter.getDetId())) {
 					LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS);
@@ -290,7 +290,7 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 			EntityResult res = daohelper.query(specialOfferProductDao, productQuery,
 					new ArrayList<>(Arrays.asList(SpecialOfferProductDao.ATTR_DET_ID,
 							SpecialOfferProductDao.ATTR_OFFER_ID, SpecialOfferProductDao.ATTR_PERCENT,
-							SpecialOfferProductDao.ATTR_FLAT, SpecialOfferProductDao.ATTR_PERCENT)));
+							SpecialOfferProductDao.ATTR_FLAT, SpecialOfferProductDao.ATTR_SWAP)));
 			if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 				if (res.calculateRecordNumber() == 1) {
 					OfferProduct product = entityUtils.fillProduct(res.getRecordValues(0), true,false);

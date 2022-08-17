@@ -1353,8 +1353,8 @@ public class BookingService implements IBookingService {
 
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY, 0);
-		c.set(Calendar.HOUR, 0);
 		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 
 		List<Integer> offersId = new ArrayList<>();
@@ -1385,7 +1385,7 @@ public class BookingService implements IBookingService {
 		} else {
 			listPrices = priceByDay(hotelId, roomTypeId, startDate, endDate, entityUtils.isOfferStackable(offerId));
 			for (Entry<Date, Double> entry : listPrices.entrySet()) {
-				entry.setValue(specialOfferProductService.getFinalPrice(offerId, offerId, entry.getValue(), true));
+				entry.setValue(specialOfferProductService.getFinalPrice(offerId, 1, entry.getValue(), true));
 			}
 		}
 
