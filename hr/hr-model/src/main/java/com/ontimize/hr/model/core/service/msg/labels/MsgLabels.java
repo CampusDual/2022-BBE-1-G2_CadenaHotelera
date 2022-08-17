@@ -65,6 +65,7 @@ public class MsgLabels {
 	public static final String ROOM_TYPE_FORMAT = "WRONG_ROOM_TYPE_ID_FORMAT";
 	public static final String NO_FREE_ROOMS = "THERE_ARE_NO_FREE_ROOMS";
 	public static final String ROOM_STATUS_NOT_EXISTS= "ROOM_STATUS_NOT_EXISTS";
+	public static final String ROOM_STATUS_ALREADY_NORMAL= "ROOM_STATUS_ALREADY_NORMAL";
 	public static final String ROOM_OCUPIED = "ROOM_OCUPIED";
 	public static final String ROOM_NUMBER_BLANK ="ROOM_NUMBER_BLANK";
 	public static final String ROOM_CAPACITY ="ROOM_CAPACITY_SURPASSED";
