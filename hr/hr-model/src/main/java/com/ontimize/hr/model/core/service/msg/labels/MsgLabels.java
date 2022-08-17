@@ -65,7 +65,7 @@ public class MsgLabels {
 	public static final String ROOM_TYPE_FORMAT = "WRONG_ROOM_TYPE_ID_FORMAT";
 	public static final String NO_FREE_ROOMS = "THERE_ARE_NO_FREE_ROOMS";
 	public static final String ROOM_STATUS_NOT_EXISTS= "ROOM_STATUS_NOT_EXISTS";
-	public static final String ROOM_OCUPIED = "ROOM_OCUPIED";
+	public static final String ROOM_OCCUPIED = "ROOM_OCCUPIED";
 	public static final String ROOM_NUMBER_BLANK ="ROOM_NUMBER_BLANK";
 	public static final String ROOM_CAPACITY ="ROOM_CAPACITY_SURPASSED";
 	
@@ -198,8 +198,12 @@ public class MsgLabels {
 	public static final String FETCHING_ERROR = "ERROR_WHILE_CHECKING_FOR_RECORDS";
 	
 	// RECOMMENDATIONS
-	public static final String NO_RECOMMENDATIONS_IN_RADIUS ="NO_RECOMMENDATIONS_IN_RADIUS";
-	
+	public static final String NO_RECOMMENDATIONS_IN_RADIUS ="No recommendations in given radius.";
+	public static final String RECOMMENDATIONS_RADIUS_OUT_OF_RANGE = "Radius values must be between 0 and 20.";
+	public static final String ROOM_TYPE_NOT_FOUND = "ROOM_TYPE_NOT_FOUND";
+	public static final String BOOKING_SAME_ROOM = "BOOKING_SAME_ROOM";
+	public static final String BOOKING_DIFFERENT_ROOM_TYPE = "BOOKING_DIFFERENT_ROOM_TYPE";
+
 	
 	
 	private MsgLabels() {

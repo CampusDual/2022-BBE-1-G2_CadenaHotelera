@@ -300,10 +300,10 @@ public class RoomService implements IRoomService {
 
 		for (int i = 0; i < c; i++) {
 			if (bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
-				LOG.info(MsgLabels.ROOM_OCUPIED);
+				LOG.info(MsgLabels.ROOM_OCCUPIED);
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(MsgLabels.ROOM_OCUPIED);
+				result.setMessage(MsgLabels.ROOM_OCCUPIED);
 				return result;
 			}
 		}

@@ -137,5 +137,23 @@
    			</Sentence>
   		</Query>
   		
+  		<Query id="getRoomTypeQuery">
+  		<Sentence>
+  		<![CDATA[
+  
+  		SELECT 
+  			#COLUMNS# 
+  		FROM 
+  			room r 
+  		LEFT JOIN 
+  			booking b 
+  		ON 
+  			r.rom_number =b.bok_rom_number and r.rom_htl_id = b.bok_htl_id  
+  		#WHERE#
+  		]]>
+ 
+  		</Sentence>
+  		</Query>
+  		
 	</Queries>
 </JdbcEntitySetup>

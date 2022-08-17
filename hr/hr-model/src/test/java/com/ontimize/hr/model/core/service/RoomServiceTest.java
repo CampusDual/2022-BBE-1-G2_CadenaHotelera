@@ -229,7 +229,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(MsgLabels.ROOM_OCUPIED, result.getMessage());
+		assertEquals(MsgLabels.ROOM_OCCUPIED, result.getMessage());
 	}
 	
 	@Test
@@ -267,7 +267,7 @@ class RoomServiceTest {
 		when(daoHelper.query(isA(BookingDao.class), anyMap(), anyList())).thenReturn(bookingsResult);
 		EntityResult result = service.roomUpdateStatus(req);
 		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
-		assertEquals(MsgLabels.ROOM_OCUPIED, result.getMessage());
+		assertEquals(MsgLabels.ROOM_OCCUPIED, result.getMessage());
 	}
 	
 	@Test
