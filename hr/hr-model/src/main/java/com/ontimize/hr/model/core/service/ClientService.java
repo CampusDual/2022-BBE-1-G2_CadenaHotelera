@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -152,9 +153,11 @@ public class ClientService implements IClientService {
 
 			}
 
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
 			// check date
 			try {
-				date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
+				date = df.parse(filter.get("qry_date").toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ERROR_PARSE_DATE);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_PARSE_DATE);
@@ -175,7 +178,7 @@ public class ClientService implements IClientService {
 			}
 
 			// if Hotel exists
-			Date fechaPasada = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("qry_date").toString());
+			Date fechaPasada = df.parse(filter.get("qry_date").toString());
 
 			Map<String, Object> keyMap = new HashMap<>();
 			keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, searchClientInDate(

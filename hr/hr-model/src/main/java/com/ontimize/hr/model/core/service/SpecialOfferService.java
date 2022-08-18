@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
@@ -123,12 +124,12 @@ public class SpecialOfferService implements ISpecialOffersService {
 				LOG.info(MsgLabels.DATA_MANDATORY);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATA_MANDATORY);
 			}
-
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
 			Date start = null;
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
 				try {
-					start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
+					start = df.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
 					insertMap.put(SpecialOfferDao.ATTR_START, start);
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_START_DATEFORMAT);
@@ -140,8 +141,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			Date end = null;
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
 				try {
-					end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
+					end = df.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
 					insertMap.put(SpecialOfferDao.ATTR_END, end);
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.SPECIAL_OFFER_BAD_ACTIVE_END_DATEFORMAT);
@@ -172,8 +172,15 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 			Boolean stackable = null;
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_STACKABLE)) {
-				stackable = Boolean.parseBoolean(keyMap.get(SpecialOfferDao.ATTR_STACKABLE).toString());
-				insertMap.put(SpecialOfferDao.ATTR_STACKABLE, stackable);
+				Object aux = keyMap.get(SpecialOfferDao.ATTR_STACKABLE);
+				if (aux != null) {
+					if (!"true".equalsIgnoreCase(aux.toString()) || !"false".equalsIgnoreCase(aux.toString())) {
+						LOG.info(MsgLabels.SPECIAL_STACKABLE_FORMAT);
+						return EntityUtils.errorResult(MsgLabels.SPECIAL_STACKABLE_FORMAT);
+					}
+					stackable = Boolean.parseBoolean(keyMap.get(SpecialOfferDao.ATTR_STACKABLE).toString());
+					insertMap.put(SpecialOfferDao.ATTR_STACKABLE, stackable);
+				}
 			}
 
 			ArrayList<OfferCondition> conditions = new ArrayList<>();
@@ -502,10 +509,11 @@ public class SpecialOfferService implements ISpecialOffersService {
 		Boolean active = null;
 		Map<String, Object> query = new HashMap<>();
 		if (offerIdList == null) {
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_START)) {
 				try {
-					start = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
+					start = df.parse(keyMap.get(SpecialOfferDao.ATTR_START).toString());
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
 					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
@@ -514,8 +522,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_END)) {
 				try {
-					end = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
+					end = df.parse(keyMap.get(SpecialOfferDao.ATTR_END).toString());
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
 					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_END_FORMAT);
@@ -524,8 +531,12 @@ public class SpecialOfferService implements ISpecialOffersService {
 
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_ACTIVE) && !stripActive) {
 				Object aux = keyMap.get(SpecialOfferDao.ATTR_ACTIVE);
-				if (aux != null)
-					active = Boolean.parseBoolean(aux.toString());
+				if (aux != null
+						&& (!"true".equalsIgnoreCase(aux.toString()) || !"false".equalsIgnoreCase(aux.toString()))) {
+					LOG.info(MsgLabels.CONDITION_ACTIVE_FORMAT);
+					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_FORMAT);
+				}
+				active = Boolean.parseBoolean(aux.toString());
 			}
 
 			if ((start != null) != (end != null)) {

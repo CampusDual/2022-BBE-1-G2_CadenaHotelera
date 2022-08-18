@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service.utils;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -836,13 +837,14 @@ public class EntityUtils {
 				}
 			}
 		}
-
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		if (conditionMap.containsKey(SpecialOfferConditionDao.ATTR_START)) {
 			if (conditionMap.get(SpecialOfferConditionDao.ATTR_START) == null) {
 				result.setStartBookingOffer(null);
 			} else {
 				try {
-					result.setStartBookingOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+					result.setStartBookingOffer(df
 							.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_START).toString()));
 				} catch (ParseException e) {
 					throw new FillException(MsgLabels.CONDITION_BOOKING_START_FORMAT);
@@ -856,7 +858,7 @@ public class EntityUtils {
 				result.setEndBookingOffer(null);
 			} else {
 				try {
-					result.setEndBookingOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+					result.setEndBookingOffer(df
 							.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_END).toString()));
 				} catch (ParseException e) {
 					throw new FillException(MsgLabels.CONDITION_BOOKING_END_FORMAT);
@@ -879,7 +881,7 @@ public class EntityUtils {
 
 		if (conditionMap.containsKey(SpecialOfferDao.ATTR_START)) {
 			try {
-				result.setStartActiveOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				result.setStartActiveOffer(df
 						.parse(conditionMap.get(SpecialOfferDao.ATTR_START).toString()));
 			} catch (ParseException e) {
 				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
@@ -887,7 +889,7 @@ public class EntityUtils {
 		}
 		if (conditionMap.containsKey(SpecialOfferDao.ATTR_END)) {
 			try {
-				result.setEndActiveOffer(new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				result.setEndActiveOffer(df
 						.parse(conditionMap.get(SpecialOfferDao.ATTR_END).toString()));
 			} catch (ParseException e) {
 				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);

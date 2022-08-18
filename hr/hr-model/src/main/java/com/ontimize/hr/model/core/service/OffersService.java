@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,7 +84,8 @@ public class OffersService implements IOffersService {
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult offerInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
-
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		try {
 			if (!attrMap.containsKey(OffersDao.ATTR_HTL_OFFER)) {
 				LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
@@ -107,7 +109,7 @@ public class OffersService implements IOffersService {
 			}
 
 			try {
-				Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
+				Date day = df.parse(attrMap.get(OffersDao.ATTR_DAY).toString());
 
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -145,10 +147,11 @@ public class OffersService implements IOffersService {
 	public EntityResult offerUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 		try {
-
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
 			if (attrMap.containsKey(OffersDao.ATTR_DAY)) {
 				try {
-					Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(OffersDao.ATTR_DAY).toString());
+					Date day = df.parse(attrMap.get(OffersDao.ATTR_DAY).toString());
 
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.DATE_FORMAT);
@@ -214,14 +217,16 @@ public class OffersService implements IOffersService {
 			LOG.info(MsgLabels.EMPTY_FILTER);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.EMPTY_FILTER);
 		}
-
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
+		
 		Date startDate = null;
 		if (!keyMap.containsKey("qry_start")) {
 			LOG.info(MsgLabels.ENTRY_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
 		} else {
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get("qry_start").toString());
+				startDate = df.parse(keyMap.get("qry_start").toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ENTRY_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_FORMAT);
@@ -237,7 +242,7 @@ public class OffersService implements IOffersService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_MANDATORY);
 		} else {
 			try {
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(keyMap.get("qry_end").toString());
+				endDate = df.parse(keyMap.get("qry_end").toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_FORMAT);

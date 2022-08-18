@@ -514,9 +514,6 @@ public class HotelService implements IHotelService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
 		
-		
-		
-		
 
 		// check there are recommendations in radius
 		if (listRecommendations.isEmpty()) {

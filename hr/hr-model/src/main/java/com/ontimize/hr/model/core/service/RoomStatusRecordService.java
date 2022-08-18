@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -177,8 +178,10 @@ public class RoomStatusRecordService implements IRoomStatusRecordService {
 			Date queryDateStart=null;
 			Date queryDateEnd=null;
 			try {
-				queryDateStart = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("query_date_start").toString());
-				queryDateEnd = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(filter.get("query_date_end").toString());
+				DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+				df.setLenient(false);
+				queryDateStart = df.parse(filter.get("query_date_start").toString());
+				queryDateEnd = df.parse(filter.get("query_date_end").toString());
 			}catch(ParseException e) {
 				LOG.info(MsgLabels.DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
