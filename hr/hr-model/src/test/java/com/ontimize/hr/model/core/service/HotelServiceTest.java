@@ -49,6 +49,7 @@ import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.hr.model.core.service.utils.entities.airportapi.Airport;
 import com.ontimize.hr.model.core.service.utils.entities.airportapi.ApiAirport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.GeoCode;
 import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.ApiRecommendation;
 import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.Recommendation;
 import com.ontimize.jee.common.dto.EntityResult;
@@ -1115,19 +1116,7 @@ class HotelServiceTest {
 			}
 		});
 
-		try {
-			when(apiRecommendation.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
-		} catch (IOException e) {
-			LOG.error("EXCEPTION_IN_TEST");
-		}
-
 		List<Recommendation> lista = new ArrayList<>();
-
-		try {
-			when(apiRecommendation.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
-		} catch (URISyntaxException | IOException e) {
-			LOG.error("EXCEPTION_IN_TEST");
-		}
 
 		EntityResult er = service.getAirports(req);
 
@@ -1163,7 +1152,7 @@ class HotelServiceTest {
 		}
 
 		List<Recommendation> lista = new ArrayList<>();
-		lista.add(new Recommendation());
+		lista.add(new Recommendation("hola","descripcion",new GeoCode(15D, 15D),1.0,new ArrayList<String>()));
 		try {
 			when(apiRecommendation.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
 		} catch (URISyntaxException | IOException e) {

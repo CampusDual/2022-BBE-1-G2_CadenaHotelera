@@ -1021,7 +1021,27 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsDelete'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancelBooking'));
+insert into trole_server_permission(id_rolename,id_server_permission)
 
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAll'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAlternatives'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDisable'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionAdd'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionModify'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionRemove'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductAdd'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductModify'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductRemove'));
 
 --asignamos permisos a recepcionista--
 insert into trole_server_permission(id_rolename,id_server_permission)

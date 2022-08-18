@@ -360,7 +360,7 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			return MsgLabels.SPECIAL_OFFER_DOES_NOT_EXIST;
 
 		if (hotelToEnforce != null && !hotelToEnforce.equals(hotelId))
-			return MsgLabels.CONDITION_HOTEL_MANDATORY;
+			return MsgLabels.CONDITION_HOTEL_MANDATORY_AND_SAME_AS_USER;
 
 		if (hotelId != null && !entityUtils.hotelExists(hotelId))
 			return MsgLabels.HOTEL_NOT_EXIST;

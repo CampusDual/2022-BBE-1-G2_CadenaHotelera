@@ -581,7 +581,7 @@ class SpecialOfferConditionServiceTest {
 		//when(entityUtils.hotelExists(anyInt())).thenReturn(true);
 		
 		String errorString = service.checkConditionValid(condition,1,false);
-		assertEquals(MsgLabels.CONDITION_HOTEL_MANDATORY ,errorString);
+		assertEquals(MsgLabels.CONDITION_HOTEL_MANDATORY_AND_SAME_AS_USER ,errorString);
 	}
 	
 	@Test
