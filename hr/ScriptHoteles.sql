@@ -393,11 +393,6 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,1
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,131);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,132);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,133);
-INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,134);
-INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,135);
-INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,136);
-INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,137);
-INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,138);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t

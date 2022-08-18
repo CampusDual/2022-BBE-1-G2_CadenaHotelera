@@ -96,9 +96,9 @@ class RoomServiceTest {
 		
 		
 		when(daoHelper.query(isA(RoomDao.class), anyMap(), anyList())).thenReturn(roomExistsResult);
-		when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
+		//when(daoHelper.update(isA(RoomDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult result = service.roomUpdateStatus(req);
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL, result.getCode());
+		assertEquals(EntityResult.OPERATION_WRONG, result.getCode());
 	}
 	
 	@Test
