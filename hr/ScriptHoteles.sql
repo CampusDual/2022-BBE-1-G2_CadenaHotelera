@@ -111,6 +111,7 @@ INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingFreeByCityOrHotel');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/getBudget');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingOcupiedCleanQuery');
+INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IBookingService/bookingRoomChange');
 
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientQuery');
 INSERT INTO TSERVER_PERMISSION(permission_name) VALUES('com.ontimize.hr.api.core.service.IClientService/clientInsert');
@@ -209,6 +210,43 @@ INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.cor
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/getPicture');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/postPicture');
 INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IPictureService/getPictureArray');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.IRoomStatusRecordService/roomStatusRecordSearch');
+
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAll');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAlternatives');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDisable');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersCodesService/specialOfferCodeDelete');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionAdd');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionModify');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionRemove');
+
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductQuery');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductInsert');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductUpdate');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductDelete');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductAdd');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductModify');
+INSERT INTO tserver_permission(permission_name) VALUES ('com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductRemove');
 
 
 INSERT INTO TSETTING VALUES(0,'mail_host','smtp.gmail.com','Host del servidor');
@@ -318,6 +356,43 @@ INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,9
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,94);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,95);
 INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,96);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,97);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,98);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,99);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,100);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,101);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,102);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,103);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,104);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,105);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,106);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,107);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,108);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,109);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,110);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,111);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,112);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,113);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,114);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,115);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,116);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,117);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,118);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,119);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,120);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,121);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,122);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,123);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,124);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,125);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,126);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,127);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,128);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,129);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,130);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,131);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,132);
+INSERT INTO TROLE_SERVER_PERMISSION(id_rolename,id_server_permission) VALUES(0,133);
 
 --select t.ID_ROLE_SERVER_PERMISSION,t.ID_ROLENAME,t.ID_SERVER_PERMISSION,tp.PERMISSION_NAME
 --from trole_server_permission t
@@ -338,12 +413,14 @@ drop table if exists booking_guest;
 drop table if exists booking;
 drop table if exists special_offer;
 drop table if exists status_booking;
+drop table if exists room_status_record;
 drop  table if exists room;
 drop table if exists room_status;
 drop table if exists room_type;
 drop  table if exists client;
 drop table if exists hotel;
 drop table if exists Picture;
+
 
 CREATE TABLE if not exists hotel(
     htl_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
@@ -422,6 +499,7 @@ Create TABLE if not exists special_offer(
     sofr_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
     sofr_active_start date,
     sofr_active_end date,
+    sofr_active boolean not null default true,
     sofr_stackable boolean not null default false
 );
 CREATE TABLE if not exists special_offer_code(
@@ -429,6 +507,7 @@ CREATE TABLE if not exists special_offer_code(
     ofcd_code varchar(15),
     ofcd_active_start date,
     ofcd_active_end date,
+    ofcd_active boolean not null default true,
     CONSTRAINT pk_ofcd PRIMARY KEY (ofcd_sofr_id,ofcd_code),
     CONSTRAINT fk_sofr FOREIGN KEY (ofcd_sofr_id) REFERENCES special_offer(sofr_id)
 );
@@ -534,7 +613,7 @@ create table if not exists special_offer_product(
     sopt_sofr_id integer,
     sopt_percent decimal(10,2),
     sopt_flat decimal(10,2),
-    spot_swap decimal(10,2),
+    sopt_swap decimal(10,2),
     CONSTRAINT pk_special_offer_product PRIMARY KEY (sopt_det_id,sopt_sofr_id),
     CONSTRAINT fk_sopt_det FOREIGN KEY (sopt_det_id) REFERENCES details_type(det_id),
     CONSTRAINT fk_sopt_sofr FOREIGN KEY (sopt_sofr_id) REFERENCES special_offer(sofr_id)
@@ -545,7 +624,7 @@ create table if not exists special_offer_condition(
     socd_sofr_id integer not null,
     socd_htl_id integer,
     socd_typ_id integer,
-    socd_days integer,
+    socd_nights integer,
     socd_start date,
     socd_end date,
     CONSTRAINT fk_socd_sofr FOREIGN KEY (socd_sofr_id) REFERENCES special_offer(sofr_id)
@@ -572,6 +651,26 @@ create table if not exists booking_details(
     bok_det_paid BOOLEAN NOT NULL default false,
     CONSTRAINT fk_bok_id FOREIGN KEY (bok_det_bok_id) REFERENCES booking(bok_id),
     CONSTRAINT fk_details_type FOREIGN KEY (bok_det_type) REFERENCES details_type(det_id)
+);
+
+create table if not exists picture(
+pic_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
+pic_name varchar(50) not null,
+pic_desc varchar(255),
+pic bytea not null
+);
+
+create table if not exists room_status_record(
+rsr_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
+rsr_htl_id INTEGER not null,
+rsr_rom_number  varchar(15)not null,
+rsr_rom_rsts_id INTEGER,
+rsr_rom_status_date DATE not null,
+
+constraint fk_htl_status_record foreign key(rsr_htl_id) references hotel(htl_id),
+constraint fk_rom_number_status_record foreign key(rsr_rom_number,rsr_htl_id) references room(rom_number,rom_htl_id),
+constraint fk_rom_rsts_id_status_record foreign key(rsr_rom_rsts_id) references room_status(rsts_id)
+
 );
 
 
@@ -617,12 +716,7 @@ create table if not exists cancellations(
         CONSTRAINT fk_can_sea FOREIGN KEY (can_sea_id) REFERENCES season(sea_id)
 );
 
-create table if not exists picture(
-pic_id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) NOT NULL PRIMARY KEY,
-pic_name varchar(50) not null,
-pic_desc varchar(255),
-pic bytea not null
-);
+
 
 /*************************************************************************
 *        MASTER TABLES POPULATION                                        *
@@ -927,7 +1021,27 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancellationsDelete'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ICancellationsService/cancelBooking'));
+insert into trole_server_permission(id_rolename,id_server_permission)
 
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferCreate'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAll'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferListAlternatives'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersService/specialOfferDisable'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionAdd'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionModify'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersConditionsService/specialOfferConditionRemove'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductAdd'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductModify'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISpecialOffersProductsService/specialOfferProductRemove'));
 
 --asignamos permisos a recepcionista--
 insert into trole_server_permission(id_rolename,id_server_permission)

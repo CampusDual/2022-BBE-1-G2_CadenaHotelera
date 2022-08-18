@@ -47,8 +47,11 @@ import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.Airport;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.ApiAirport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.Airport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.ApiAirport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.GeoCode;
+import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.ApiRecommendation;
+import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.Recommendation;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -76,6 +79,14 @@ class HotelServiceTest {
 	@Mock
 	private ApiAirport apiAirport;
 
+	@Mock
+	private ApiRecommendation apiRecommendation;
+
+	/**
+	 *  HOTEL TESTS
+	 */
+	
+	
 	@Test
 	@DisplayName("Inserting wrong number of stars")
 	void insertWrongNumberOfStarsTest() {
@@ -493,6 +504,11 @@ class HotelServiceTest {
 		assertTrue(er.calculateRecordNumber() > 0);
 	}
 
+	
+	/**
+	 * AIRPORT API TESTS
+	 */
+	
 	@Test
 	@DisplayName("Fails when there is no id hotel in req")
 	void testGetAirportsHotelMandatory() {
@@ -794,7 +810,6 @@ class HotelServiceTest {
 	}
 
 	@Test
-
 	@DisplayName("fails when throwing an exception when try get airportsList")
 	void testGetAirportErrorGetList() {
 		Map<String, Object> req = new HashMap<String, Object>();
@@ -833,6 +848,11 @@ class HotelServiceTest {
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
 	}
+	
+	
+	/**
+	 * WEATHER API TESTS 
+	 */
 	
 	@Test
 	@DisplayName("Fails when there is no id hotel in req")
@@ -1008,5 +1028,182 @@ class HotelServiceTest {
 
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
 	}
+
+	
+	
+	/**
+	 * RECOMMENDATIONS API TESTS
+	 */
+	
+	@Test
+	@DisplayName("Fails when there is no id hotel in req")
+	void testGetRecommendationsHotelMandatory() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put("radius", 100);
+
+		EntityResult er = service.getRecommendations(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_ID_MANDATORY, er.getMessage());
+}
+
+	
+
+	@Test
+	@DisplayName("Fails when hotel doesn't exist")
+	void testGetRecommendationHotelNotExists() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 100);
+
+		when(utils.hotelExists(anyInt())).thenReturn(false);
+
+		EntityResult er = service.getRecommendations(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
+
+	}
+
+	@Test
+	@DisplayName("Fails when radius format is wrong")
+	void testGetRecommendationWrongRadiusFormat() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", "fails");
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		EntityResult er = service.getRecommendations(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.WRONG_RADIUS_FORMAT, er.getMessage());
+	}
+
+	@Test
+	@DisplayName("Fails when radius format is out of range")
+	void testGetRecommendationsRadiusOutRange() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 501);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		EntityResult er = service.getRecommendations(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("fails when there are no recommendations in radius")
+	void testGetRecommendationNoRecommendationsInRadius() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		List<Recommendation> lista = new ArrayList<>();
+
+		EntityResult er = service.getAirports(req);
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.NO_HOTELS_IN_RADIUS, er.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("success without radius")
+	void testGetRecommendationsSuccessWithoutRadius() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiRecommendation.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		List<Recommendation> lista = new ArrayList<>();
+		lista.add(new Recommendation("hola","descripcion",new GeoCode(15D, 15D),1.0,new ArrayList<String>()));
+		try {
+			when(apiRecommendation.getList(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(lista);
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+
+		EntityResult er = service.getRecommendations(req);
+
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
+		assertTrue(er.calculateRecordNumber() > 0);
+	}
+	
+	
+	@DisplayName("fails when throwing an exception when try get recommendationsList")
+	void testGetRecommendationErrorGetList() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(HotelDao.ATTR_ID, 23);
+		req.put("radius", 10);
+
+		when(utils.hotelExists(anyInt())).thenReturn(true);
+
+		when(daoHelper.query(any(), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(new HashMap<String, Object>() {
+					{
+						put(HotelDao.ATTR_LATITUDE, "34.023232");
+						put(HotelDao.ATTR_LONGITUDE, "-13.345353");
+					}
+				});
+			}
+		});
+
+		try {
+			when(apiRecommendation.getTokenAccess(anyString(), anyString(), anyString(), any())).thenReturn("ssfsff");
+		} catch (IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+		
+		try {
+			when(apiRecommendation.getList(anyString(), anyString(), anyString(), anyString(), any())).thenThrow(new IOException());
+		} catch (URISyntaxException | IOException e) {
+			LOG.error("EXCEPTION_IN_TEST");
+		}
+		
+		EntityResult er = service.getRecommendations(req);
+
+		
+
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+	}
+	
 
 }

@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IRoomService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.RoomDao;
+import com.ontimize.hr.model.core.dao.RoomStatusRecordDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.hr.model.core.service.utils.entitys.RoomStatus;
+import com.ontimize.hr.model.core.service.utils.entities.RoomStatus;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -41,6 +42,9 @@ public class RoomService implements IRoomService {
 
 	@Autowired
 	private BookingDao bookingDao;
+	
+	@Autowired
+	private RoomStatusRecordDao roomStatusRecordDao;
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
@@ -181,8 +185,32 @@ public class RoomService implements IRoomService {
 			data.remove(RoomDao.ATTR_NUMBER);
 		if (data.containsKey(RoomDao.ATTR_TYPE_ID))
 			data.remove(RoomDao.ATTR_TYPE_ID);
-
+		
 		// eliminamos cualquier intento de modificar otro campo de la tabla rooms
+		
+		Map <String,Object> attrMapRoomStatus = new HashMap<>();
+		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_HOTEL_ID,filter.get(RoomDao.ATTR_HTL_ID));
+		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_NUMBER,filter.get(RoomDao.ATTR_NUMBER));
+		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID, data.get(RoomDao.ATTR_STATUS_ID));
+		
+		if (data.containsKey(RoomDao.ATTR_STATUS_START) && data.containsKey(RoomDao.ATTR_STATUS_END)) {
+			try{
+				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
+			}catch (ParseException e) {
+				LOG.info(MsgLabels.DATE_FORMAT);
+				result = new EntityResultMapImpl();
+				result.setCode(EntityResult.OPERATION_WRONG);
+				result.setMessage(MsgLabels.DATE_FORMAT);
+				return result;
+			}
+			attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_DATE, startDate);
+		}else {
+			attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_DATE, new Date());
+		}
+		
+		//obtenemos los datos para hacer el insert en RoomStatusRecord
+
+		
 
 		Integer auxHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
 		if (!filter.containsKey(RoomDao.ATTR_HTL_ID)) {
@@ -238,6 +266,13 @@ public class RoomService implements IRoomService {
 
 		if (!data.containsKey(RoomDao.ATTR_STATUS_ID) && !data.containsKey(RoomDao.ATTR_STATUS_START)
 				&& !data.containsKey(RoomDao.ATTR_STATUS_END)) {
+			attrListRoom.add(RoomDao.ATTR_STATUS_ID);
+			
+			EntityResult resultRoom = this.daoHelper.query(roomDao, keyMapRoom, attrListRoom);
+			if(resultRoom.getRecordValues(0).get(RoomDao.ATTR_STATUS_ID)==null) {
+				LOG.info(MsgLabels.ROOM_STATUS_ALREADY_NORMAL);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_STATUS_ALREADY_NORMAL);
+			}
 			Map<String, Object> dataNull = new HashMap<>();
 
 			dataNull.put(RoomDao.ATTR_STATUS_ID, null);
@@ -245,6 +280,7 @@ public class RoomService implements IRoomService {
 			dataNull.put(RoomDao.ATTR_STATUS_END, null);
 
 			result = this.daoHelper.update(this.roomDao, dataNull, filter);
+			this.daoHelper.insert(this.roomStatusRecordDao, attrMapRoomStatus);
 			return result;
 		}
 
@@ -300,18 +336,22 @@ public class RoomService implements IRoomService {
 
 		for (int i = 0; i < c; i++) {
 			if (bookings.getRecordValues(i).get(BookingDao.ATTR_ROM_NUMBER).equals(filter.get(RoomDao.ATTR_NUMBER))) {
-				LOG.info(MsgLabels.ROOM_OCUPIED);
+				LOG.info(MsgLabels.ROOM_OCCUPIED);
 				result = new EntityResultMapImpl();
 				result.setCode(EntityResult.OPERATION_WRONG);
-				result.setMessage(MsgLabels.ROOM_OCUPIED);
+				result.setMessage(MsgLabels.ROOM_OCCUPIED);
 				return result;
 			}
 		}
 		// hasta aqui cpmprobamos que la habitacion no este ocupada o tenga reservas a
 		// futuro
+		
+		
+		
 
 		try {
 			result = this.daoHelper.update(this.roomDao, data, filter);
+			this.daoHelper.insert(this.roomStatusRecordDao, attrMapRoomStatus);
 			return result;
 		} catch (DataIntegrityViolationException e) {
 			result = new EntityResultMapImpl();

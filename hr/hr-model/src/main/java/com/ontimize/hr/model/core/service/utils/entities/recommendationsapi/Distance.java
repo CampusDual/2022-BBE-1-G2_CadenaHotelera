@@ -1,4 +1,4 @@
-package com.ontimize.hr.model.core.service.utils.entitys.airportapi;
+package com.ontimize.hr.model.core.service.utils.entities.recommendationsapi;
 
 
 public class Distance {

@@ -43,6 +43,7 @@ public class SpecialOfferCodeService implements ISpecialOffersCodesService {
 	@Override
 	@Secured({PermissionsProviderSecured.SECURED})
 	public EntityResult specialOfferCodeInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
+		
 		return daoHelper.insert(specialOfferCodeDao, attrMap);
 	}
 
@@ -58,6 +59,5 @@ public class SpecialOfferCodeService implements ISpecialOffersCodesService {
 	public EntityResult specialOfferCodeDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return daoHelper.delete(specialOfferCodeDao, keyMap);
 	}
-
 	
 }

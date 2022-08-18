@@ -26,6 +26,7 @@ import com.ontimize.hr.api.core.service.IBookingService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.service.BookingService;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -204,6 +205,7 @@ public class BookingRestController extends ORestController<IBookingService> {
 		}
 	}
 
+	
 
 	@GetMapping("bookingGetReport")
 	public ResponseEntity<byte[]> getReceipt(@RequestBody Map<String, Object> req)
@@ -244,4 +246,26 @@ public class BookingRestController extends ORestController<IBookingService> {
 		headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 		return new ResponseEntity<>(contents, headers, HttpStatus.OK);
 	}
+	
+	
+	@PostMapping(value = "updateroom", produces = MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult updateRoom(@RequestBody Map<String, Object> req) {
+		
+		Map<String, Object>keyMap = new HashMap<>();
+		
+		try {
+			keyMap = (Map<String, Object>) req.get(Utils.DATA);
+			
+		}catch (Exception e) {
+
+			/*
+			 * cállate sonar lint
+			 */
+	
+		}
+		
+		return bookingService.bookingRoomChange(keyMap);
+	}
+	
+	
 }

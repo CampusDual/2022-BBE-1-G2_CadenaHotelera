@@ -1,6 +1,8 @@
 package com.ontimize.hr.model.core.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -48,6 +50,9 @@ class BookingDetailsServiceTest {
 	@Mock
 	private BookingDetailsDao bookingDetailsDao;
 
+	@Mock
+	private SpecialOfferProductService specialOfferProductService;
+	
 	@Mock
 	private CredentialUtils credentialUtils;
 	
@@ -759,10 +764,40 @@ class BookingDetailsServiceTest {
 		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);
 		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(true);
 		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
+		when(specialOfferProductService.getFinalPrice(anyInt(), anyInt(), anyDouble(),anyBoolean())).thenReturn(35.0);
+		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenReturn(new EntityResultMapImpl());
+		EntityResult res = service.bookingDetailsAdd(keyMap);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+	}
+	@Test
+	@DisplayName("Fake gift insert charge")
+	void testBookingDetailsAddDetailGift() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 17);
+		keyMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 55);
+		keyMap.put(BookingDetailsDao.ATTR_PRICE, 35);
+		keyMap.put("qry_gift", true);
+		when(entityUtils.bookingExists(17)).thenReturn(true);
+		when(entityUtils.isBookinActive(17)).thenReturn(true);
+		when(entityUtils.detailTypeExists(55)).thenReturn(true);
+		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
+		when(entityUtils.isBookingFromHotel(anyInt(), anyInt())).thenReturn(true);
+		when(entityUtils.detailTypeExistsInHotel(anyInt(), anyInt())).thenReturn(true);
+		when(daoHelper.getUser()).thenReturn(new UserInformation("Juan","contraseña",new ArrayList<GrantedAuthority>(),null));
 		when(daoHelper.insert(isA(BookingDetailsDao.class), anyMap())).thenReturn(new EntityResultMapImpl());
 		EntityResult res = service.bookingDetailsAdd(keyMap);
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
 	}
 	
-	
+	@Test
+	@DisplayName("Fake gift with price at zero and no gift flag insert charge")
+	void testBookingDetailsAddDetailZeroPriceGift() {
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, 17);
+		keyMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 55);
+		keyMap.put(BookingDetailsDao.ATTR_PRICE, 0);
+		EntityResult res = service.bookingDetailsAdd(keyMap);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.BOOKING_DETAILS_PRICE_ZERO,res.getMessage());
+	}
 }

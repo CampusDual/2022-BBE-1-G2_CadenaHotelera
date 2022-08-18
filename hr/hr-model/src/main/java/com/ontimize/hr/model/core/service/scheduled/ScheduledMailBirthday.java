@@ -17,7 +17,7 @@ public class ScheduledMailBirthday {
 
 	private boolean isEnabled = false;
 
-	@Scheduled(fixedRate = Utils.SECOND * 3)
+	@Scheduled(fixedRate = Utils.SECOND * 15)
 	public void sendMailBirthay() {
 		if (isEnabled) {
 			birthdayService.getBirthdayClients();

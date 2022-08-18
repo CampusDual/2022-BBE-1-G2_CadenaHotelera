@@ -6,13 +6,14 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.json.JsonObject;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;	
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,11 @@ import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.Airport;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.ApiAirport;
-import com.ontimize.hr.model.core.service.utils.entitys.airportapi.CredentialsApi;
-import com.ontimize.hr.model.core.service.utils.entitys.recommendationsapi.ApiRecommendation;
-import com.ontimize.hr.model.core.service.utils.entitys.recommendationsapi.Recommendation;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.Airport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.ApiAirport;
+import com.ontimize.hr.model.core.service.utils.entities.airportapi.CredentialsApi;
+import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.ApiRecommendation;
+import com.ontimize.hr.model.core.service.utils.entities.recommendationsapi.Recommendation;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -308,122 +309,9 @@ public class HotelService implements IHotelService {
 	}
 
 	
-	@Override 
-	 @Secured({ PermissionsProviderSecured.SECURED }) 
-	 public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException { 
-	  // req va a contener radius e htl_id, radius es opcional, si no viene en la 
-	  // petición se le pone valor 50 
-	 
-	  if (!req.containsKey(HotelDao.ATTR_ID)) { 
-	   LOG.info(MsgLabels.HOTEL_ID_MANDATORY); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY); 
-	  } 
-	 
-	  Integer idHotel; 
-	  try { 
-	   idHotel = Integer.parseInt(req.get(HotelDao.ATTR_ID).toString()); 
-	  } catch (NumberFormatException e) { 
-	   LOG.info(MsgLabels.HOTEL_ID_FORMAT); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT); 
-	  } 
-	  ; 
-	  if (!utils.hotelExists(idHotel)) { 
-	   LOG.info(MsgLabels.HOTEL_NOT_EXIST); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST); 
-	  } 
-	 
-	  Integer radius; 
-	  if (!req.containsKey("radius")) { 
-	   radius = 50; 
-	  } else { 
-	   try { 
-	    radius = Integer.parseInt(req.get("radius").toString()); 
-	   } catch (NumberFormatException e) { 
-	    LOG.info(MsgLabels.WRONG_RADIUS_FORMAT); 
-	    return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT); 
-	   } 
-	   if(radius<0 || radius > 500) { 
-	    LOG.info(MsgLabels.RADIUS_OUT_OF_RANGE); 
-	    return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RADIUS_OUT_OF_RANGE); 
-	   } 
-	  } 
-	 
-	  // get latitude/longitude hotel 
-	  List<String> attrList = new ArrayList<>(); 
-	  attrList.add(HotelDao.ATTR_LATITUDE); 
-	  attrList.add(HotelDao.ATTR_LONGITUDE); 
-	 
-	  Map<String, Object> keyMap = new HashMap<String, Object>(); 
-	  keyMap.put(HotelDao.ATTR_ID, idHotel); 
-	 
-	  EntityResult coordinateHotelER = this.daoHelper.query(this.hotelDao, keyMap, attrList); 
-	  if (coordinateHotelER.getCode() == EntityResult.OPERATION_SUCCESSFUL) { 
-	   if (coordinateHotelER.calculateRecordNumber() == 0) { 
-	    LOG.info(MsgLabels.HOTEL_NOT_FOUND); 
-	    return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND); 
-	   } 
-	  } else { 
-	   LOG.info(MsgLabels.HOTEL_QUERY_ERROR); 
-	   return coordinateHotelER; 
-	  } 
-	 
-	  String latitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LATITUDE).toString(); 
-	  String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString(); 
-	 
-	  // get CloseableHttpClient 
-	  CloseableHttpClient client = null; 
-	  try { 
-	   client = apiAirport.getClient(); 
-	  } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) { 
-	   LOG.error(e.getMessage()); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage()); 
-	  } 
-	   
-	  //get token 
-	  String tokenAccess = null; 
-	  try { 
-	   tokenAccess = apiAirport.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID, 
-	     CredentialsApi.CLIENT_SECRET, client); 
-	  } catch (IOException e) { 
-	   LOG.error(e.getMessage()); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage()); 
-	  } 
-	   
-	  //get Airports 
-	  List<Airport> listAirports = null; 
-	  try { 
-	   listAirports = apiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(), 
-	     client); 
-	  } catch (IOException | URISyntaxException e) { 
-	   LOG.error(e.getMessage()); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage()); 
-	  } 
-	 
-	  // check there are airports in radius 
-	  if (listAirports.isEmpty()) { 
-	   LOG.info(MsgLabels.NO_HOTELS_IN_RADIUS); 
-	   return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_HOTELS_IN_RADIUS); 
-	  } 
-	   
-	  // return airports 
-	  Map<String, Object> mapAirports = new HashMap<>(); 
-	  mapAirports.put("Airports", listAirports); 
-	 
-	  return new EntityResultMapImpl() { 
-	   { 
-	    setCode(EntityResult.OPERATION_SUCCESSFUL); 
-	    addRecord(mapAirports); 
-	   } 
-	  }; 
-	 
-	 }
-	
-	
-	
-	
 	@Override
-	// @Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult getRecommendations(Map<String, Object> req) {
+	@Secured({ PermissionsProviderSecured.SECURED })
+	 public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException { 
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
 
@@ -502,6 +390,119 @@ public class HotelService implements IHotelService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
 		
+		//get Airports
+		List<Airport> listAirports = null;
+		try {
+			listAirports = apiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(),
+					client);
+		} catch (IOException | URISyntaxException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
+
+		// check there are airports in radius
+		if (listAirports.isEmpty()) {
+			LOG.info(MsgLabels.NO_HOTELS_IN_RADIUS);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_HOTELS_IN_RADIUS);
+		}
+		
+		// return airports
+		Map<String, Object> mapAirports = new HashMap<>();
+		mapAirports.put("Airports", listAirports);
+
+		return new EntityResultMapImpl() {
+			{
+				setCode(EntityResult.OPERATION_SUCCESSFUL);
+				addRecord(mapAirports);
+			}
+		};
+
+	}
+
+	
+	
+	
+	@Override
+	// @Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult getRecommendations(Map<String, Object> req) {
+		// req va a contener radius e htl_id, radius es opcional, si no viene en la
+		// petición se le pone valor 50
+
+		if (!req.containsKey(HotelDao.ATTR_ID)) {
+			LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
+}
+
+		Integer idHotel;
+		try {
+			idHotel = Integer.parseInt(req.get(HotelDao.ATTR_ID).toString());
+		} catch (NumberFormatException e) {
+			LOG.info(MsgLabels.HOTEL_ID_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_FORMAT);
+		}
+		;
+		if (!utils.hotelExists(idHotel)) {
+			LOG.info(MsgLabels.HOTEL_NOT_EXIST);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
+		}
+
+		Integer radius;
+		if (!req.containsKey("radius")) {
+			radius = 1;
+		} else {
+			try {
+				radius = Integer.parseInt(req.get("radius").toString());
+			} catch (NumberFormatException e) {
+				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
+			}
+			if(radius<0 || radius > 20) {
+				LOG.info(MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
+			}
+		}
+
+		// get latitude/longitude hotel
+		List<String> attrList = new ArrayList<>();
+		attrList.add(HotelDao.ATTR_LATITUDE);
+		attrList.add(HotelDao.ATTR_LONGITUDE);
+
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(HotelDao.ATTR_ID, idHotel);
+
+		EntityResult coordinateHotelER = this.daoHelper.query(this.hotelDao, keyMap, attrList);
+		if (coordinateHotelER.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+			if (coordinateHotelER.calculateRecordNumber() == 0) {
+				LOG.info(MsgLabels.HOTEL_NOT_FOUND);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND);
+			}
+		} else {
+			LOG.info(MsgLabels.HOTEL_QUERY_ERROR);
+			return coordinateHotelER;
+		}
+
+		String latitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LATITUDE).toString();
+		String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString();
+
+		// get CloseableHttpClient
+		CloseableHttpClient client = null;
+		try {
+			client = apiRecommendation.getClient();
+		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
+		
+		//get token
+		String tokenAccess = null;
+		try {
+			tokenAccess = apiRecommendation.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
+					CredentialsApi.CLIENT_SECRET, client);
+		} catch (IOException e) {
+			LOG.error(e.getMessage());
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
+		}
+		
 		// get Recommendations
 		List<Recommendation> listRecommendations = null;
 		
@@ -512,12 +513,26 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
+		
+		
+		
+		
 
 		// check there are recommendations in radius
 		if (listRecommendations.isEmpty()) {
 			LOG.info(MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 		}
+		
+		
+		for (Recommendation recommendation:listRecommendations) {
+			 Double distancia = Utils.getDistance(latitudeHotel, longitudeHotel, recommendation.getGeoCode().getLatitude().toString(),
+					 recommendation.getGeoCode().getLongitude().toString());
+			
+			 recommendation.setDistance(Math.round(distancia*100.0)/100.0);
+		}
+		
+		
 		
 		// return recommendations
 		Map<String, Object> mapRecommendations = new HashMap<>();

@@ -50,6 +50,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 	private CredentialUtils credentialUtils;
 
 	@Autowired
+	private SpecialOfferProductService specialOfferProductService;
+	
+	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
 	/**
@@ -349,7 +352,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 			}
 		}
-		Double nominalPrice = price;
+		
 		Boolean paid = false;
 		if (keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
 				paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
@@ -387,7 +390,21 @@ public class BookingDetailsService implements IBookingDetailsService {
 						MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
 			}
 		}
-
+		
+		Double nominalPrice = price;
+		String discountReason = null;
+		Object queryGift = keyMap.get("qry_gift");
+		if(queryGift!=null) {
+			price=0.0;
+			discountReason="Gift";
+			paid=true;
+		}else{
+			Integer specialOfferId = entityUtils.getSpecialOfferBooking(bookingId);
+			if (specialOfferId!=null) {
+				price = specialOfferProductService.getFinalPrice(specialOfferId, detailsType, price,true);
+			}
+		}
+		
 		Map<String, Object> keyMapInsert = new HashMap<>();
 		keyMapInsert.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
 		keyMapInsert.put(BookingDetailsDao.ATTR_DATE, date);
@@ -395,6 +412,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 		keyMapInsert.put(BookingDetailsDao.ATTR_PAID, paid);
 		keyMapInsert.put(BookingDetailsDao.ATTR_PRICE, price);
 		keyMapInsert.put(BookingDetailsDao.ATTR_NOMINAL_PRICE, nominalPrice);
+		keyMapInsert.put(BookingDetailsDao.ATTR_DISCOUNT_REASON, discountReason);
 		try {
 			return daoHelper.insert(bookingDetailsDao, keyMapInsert);
 		} catch (BadSqlGrammarException e) {

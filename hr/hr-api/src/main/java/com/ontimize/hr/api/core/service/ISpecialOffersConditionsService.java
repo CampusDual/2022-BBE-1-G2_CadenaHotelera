@@ -12,5 +12,8 @@ public interface ISpecialOffersConditionsService {
 		 public EntityResult specialOfferConditionInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException;
 		 public EntityResult specialOfferConditionUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 		 public EntityResult specialOfferConditionDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+		 public EntityResult specialOfferConditionAdd(Map<String, Object> attrMap) throws OntimizeJEERuntimeException;
+		 public EntityResult specialOfferConditionModify(Map<String, Object> attrMap, Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
+		 public EntityResult specialOfferConditionRemove(Map<String, Object> keyMap) throws OntimizeJEERuntimeException;
 
 }

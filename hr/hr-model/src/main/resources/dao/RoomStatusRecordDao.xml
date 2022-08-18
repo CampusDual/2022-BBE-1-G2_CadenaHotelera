@@ -3,30 +3,13 @@
 	xmlns="http://www.ontimize.com/schema/jdbc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
-	catalog="" schema="${mainschema}" table="special_offer"
+	catalog="" schema="${mainschema}" table="room_status_record"
 	datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
 	<DeleteKeys>
-		<Column>sofr_id</Column>
+		<Column>rsr_id</Column>
 	</DeleteKeys>
 	<UpdateKeys>
-		<Column>sofr_id</Column>
+		<Column>rsr_id</Column>
 	</UpdateKeys>
-	<GeneratedKey>sofr_id</GeneratedKey>
-	<Queries>
-	<Query id="idfromconditionsquery">
-	<Sentence>
-		<![CDATA[
-		SELECT 
-			DISTINCT sofr_id
-		FROM
-			special_offer
-		INNER JOIN
-			special_offer_condition
-		ON
-			sofr_id = socd_sofr_id
-		#WHERE#
-		]]>
-	</Sentence>
-	</Query>
-	</Queries>
+	<GeneratedKey>rsr_id</GeneratedKey>
 </JdbcEntitySetup>
