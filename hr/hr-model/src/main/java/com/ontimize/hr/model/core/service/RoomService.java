@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -102,11 +103,13 @@ public class RoomService implements IRoomService {
 		Date startDate = null;
 		Date endDate = null;
 		int hotelId;
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		if (attrMap.containsKey(RoomDao.ATTR_STATUS_START) && attrMap.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				startDate = df
 						.parse(attrMap.get(RoomDao.ATTR_STATUS_START).toString());
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(attrMap.get(RoomDao.ATTR_STATUS_END).toString());
+				endDate = df.parse(attrMap.get(RoomDao.ATTR_STATUS_END).toString());
 
 				attrMap.remove(RoomDao.ATTR_STATUS_START);
 				attrMap.remove(RoomDao.ATTR_STATUS_END);
@@ -192,10 +195,11 @@ public class RoomService implements IRoomService {
 		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_HOTEL_ID,filter.get(RoomDao.ATTR_HTL_ID));
 		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_NUMBER,filter.get(RoomDao.ATTR_NUMBER));
 		attrMapRoomStatus.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID, data.get(RoomDao.ATTR_STATUS_ID));
-		
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		if (data.containsKey(RoomDao.ATTR_STATUS_START) && data.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try{
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
+				startDate = df.parse(data.get(RoomDao.ATTR_STATUS_START).toString());
 			}catch (ParseException e) {
 				LOG.info(MsgLabels.DATE_FORMAT);
 				result = new EntityResultMapImpl();
@@ -296,8 +300,8 @@ public class RoomService implements IRoomService {
 
 		if (data.containsKey(RoomDao.ATTR_STATUS_START) && data.containsKey(RoomDao.ATTR_STATUS_END)) {
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_START).toString());
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(data.get(RoomDao.ATTR_STATUS_END).toString());
+				startDate = df.parse(data.get(RoomDao.ATTR_STATUS_START).toString());
+				endDate = df.parse(data.get(RoomDao.ATTR_STATUS_END).toString());
 
 				if (startDate.after(endDate)) {
 					LOG.info(MsgLabels.DATE_BEFORE_GENERIC);

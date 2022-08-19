@@ -3,8 +3,14 @@ package com.ontimize.hr.model.core.service;
 import java.io.Console;
 import java.math.BigDecimal;
 import java.security.Permissions;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -247,7 +253,9 @@ public class BookingService implements IBookingService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_BLANK);
 			}
 
-			startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			startDate = df
 					.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 
 			if (!filter.containsKey(BookingDao.ATTR_DEPARTURE_DATE)) {
@@ -262,7 +270,7 @@ public class BookingService implements IBookingService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_BLANK);
 			}
 
-			endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			endDate = df
 					.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 
 			if (startDate.after(endDate)) {
@@ -367,7 +375,9 @@ public class BookingService implements IBookingService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_BLANK);
 			}
 
-			startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			startDate = df
 					.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 
 			if (!filter.containsKey(BookingDao.ATTR_DEPARTURE_DATE)) {
@@ -381,7 +391,7 @@ public class BookingService implements IBookingService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_BLANK);
 			}
 
-			endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			endDate = df
 					.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 
 			if (startDate.after(endDate)) {
@@ -566,24 +576,28 @@ public class BookingService implements IBookingService {
 			LOG.info(MsgLabels.ENTRY_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
 		}
-		java.sql.Date entryDate = null;
+		Date entryDate = null;
 		try {
-			entryDate = java.sql.Date.valueOf((String) parameters.get(BookingDao.ATTR_ENTRY_DATE));
+			SimpleDateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			entryDate = df.parse(parameters.get(BookingDao.ATTR_ENTRY_DATE).toString());
 		} catch (NullPointerException e) {
 			LOG.info(MsgLabels.ENTRY_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
-		} catch (Exception e) {
-			LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_FORMAT);
+		} catch (ParseException e) {
+			LOG.info(MsgLabels.ENTRY_DATE_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_FORMAT);
 		}
 
 		if (!parameters.containsKey(BookingDao.ATTR_DEPARTURE_DATE)) {
 			LOG.info(MsgLabels.DEPARTURE_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_MANDATORY);
 		}
-		java.sql.Date departureDate = null;
+		Date departureDate = null;
 		try {
-			departureDate = java.sql.Date.valueOf((String) parameters.get(BookingDao.ATTR_DEPARTURE_DATE));
+			SimpleDateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			departureDate = df.parse(parameters.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (NullPointerException e) {
 			LOG.info(MsgLabels.ENTRY_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
@@ -719,8 +733,8 @@ public class BookingService implements IBookingService {
 					detailMap.put(BookingDetailsDao.ATTR_DATE, priceEntry.getKey());
 					detailMap.put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
 					detailMap.put(BookingDetailsDao.ATTR_PAID, false);
-					detailMap.put(BookingDetailsDao.ATTR_PRICE, specialOfferProductService.getFinalPrice(offerID, 1,
-							priceEntry.getValue(), discardNormalOffers));
+					detailMap.put(BookingDetailsDao.ATTR_PRICE,
+							specialOfferProductService.getFinalPrice(offerID, 1, priceEntry.getValue(), true));
 					detailMap.put(BookingDetailsDao.ATTR_NOMINAL_PRICE, priceEntry.getValue());
 					daoHelper.insert(bookingDetailsDao, detailMap);
 				}
@@ -796,8 +810,9 @@ public class BookingService implements IBookingService {
 
 			Date startDate;
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
+				DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+				df.setLenient(false);
+				startDate = df.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.ENTRY_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_FORMAT);
@@ -805,8 +820,9 @@ public class BookingService implements IBookingService {
 
 			Date endDate;
 			try {
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-						.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+				DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+				df.setLenient(false);
+				endDate = df.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -866,7 +882,9 @@ public class BookingService implements IBookingService {
 			EntityResult res = this.daoHelper.query(this.bookingDao, filter, columns);
 			String date = res.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE).toString();
 
-			Date startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO).parse(date);
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			Date startDate = df.parse(date);
 			if (actualDate.compareTo(startDate) > 0) {
 				LOG.info(MsgLabels.BOOKING_STARTED);
 				EntityResult result = new EntityResultMapImpl();
@@ -981,11 +999,13 @@ public class BookingService implements IBookingService {
 
 		Date oldEntryDate;
 		Date oldDepartureDate;
-
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		try {
-			oldEntryDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+
+			oldEntryDate = df
 					.parse(result.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE).toString());
-			oldDepartureDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			oldDepartureDate = df
 					.parse(result.getRecordValues(0).get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (ParseException e1) {
 			LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -1016,10 +1036,11 @@ public class BookingService implements IBookingService {
 			LOG.info(MsgLabels.ENTRY_DATE_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_MANDATORY);
 		}
-
+		
 		Date newEntryDate;
 		try {
-			newEntryDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+
+			newEntryDate = df
 					.parse(data.get(BookingDao.ATTR_ENTRY_DATE).toString());
 		} catch (ParseException e) {
 			LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -1036,7 +1057,7 @@ public class BookingService implements IBookingService {
 
 		Date newDepartureDate;
 		try {
-			newDepartureDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			newDepartureDate = df
 					.parse(data.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (ParseException e) {
 			LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -1055,12 +1076,12 @@ public class BookingService implements IBookingService {
 		Map<String, Object> queryFreeRoomEntryMap = new HashMap<>();
 		Map<String, Object> filterEntryMap = new HashMap<>();
 		filterEntryMap.put(BookingDao.ATTR_ENTRY_DATE,
-				new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(newEntryDate));
+				df.format(newEntryDate));
 		Calendar c = Calendar.getInstance();
 		c.setTime(oldEntryDate);
 		c.add(Calendar.DAY_OF_MONTH, -1);
 		filterEntryMap.put(BookingDao.ATTR_DEPARTURE_DATE,
-				new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(c.getTime()));
+				df.format(c.getTime()));
 		filterEntryMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomEntryMap.put(Utils.FILTER, filterEntryMap);
@@ -1078,9 +1099,9 @@ public class BookingService implements IBookingService {
 		d.setTime(oldDepartureDate);
 		d.add(Calendar.DAY_OF_MONTH, +1);
 		filterDepartureMap.put(BookingDao.ATTR_ENTRY_DATE,
-				new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(d.getTime()));
+				df.format(d.getTime()));
 		filterDepartureMap.put(BookingDao.ATTR_DEPARTURE_DATE,
-				new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(newDepartureDate));
+				df.format(newDepartureDate));
 		filterDepartureMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomDepartureMap.put(Utils.FILTER, filterDepartureMap);
@@ -1303,8 +1324,10 @@ public class BookingService implements IBookingService {
 		Date startDate = null;
 		Date endDate = null;
 
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		try {
-			startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			startDate = df
 					.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 
 		} catch (ParseException e) {
@@ -1316,7 +1339,7 @@ public class BookingService implements IBookingService {
 		}
 
 		try {
-			endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+			endDate = df
 					.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 		} catch (ParseException e) {
 			LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -1364,10 +1387,9 @@ public class BookingService implements IBookingService {
 
 		List<Integer> offersId = new ArrayList<>();
 
-		
 		System.out.println(startDate);
 		System.out.println(c.getTime());
-		
+
 		if (!startDate.before(c.getTime())) {
 			offersId.addAll(specialOfferService.getOfferId(startDate, endDate, hotelId, roomTypeId, false));
 		} else {
@@ -1644,6 +1666,8 @@ public class BookingService implements IBookingService {
 		daoHelper.insert(bookingGuestDao, mapPrincipalGuest);
 		// agregamos el cliente que hace la reserva
 
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		// iniciamos bucle para recorrer todos los huespedes
 		for (int i = 0; i < guests.size(); i++) {
 			Map<String, Object> mapClients = (Map<String, Object>) guests.get(i);
@@ -1655,7 +1679,7 @@ public class BookingService implements IBookingService {
 					Map<String, Object> mapClient = new HashMap<>();
 					mapClient.put(ClientDao.ATTR_NAME, mapClients.get(ClientDao.ATTR_NAME));
 					try {
-						mapClient.put(ClientDao.ATTR_BIRTHDAY, new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+						mapClient.put(ClientDao.ATTR_BIRTHDAY, df
 								.parse(mapClients.get(ClientDao.ATTR_BIRTHDAY).toString()));
 					} catch (ParseException e1) {
 						LOG.info(MsgLabels.DATE_FORMAT);
@@ -1726,12 +1750,13 @@ public class BookingService implements IBookingService {
 		Date entry = null;
 		Date departure = null;
 		Date today = new Date();
-
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		if (resultBooking.calculateRecordNumber() == 1) {
 			try {
-				entry = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				entry = df
 						.parse(resultBooking.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE).toString());
-				departure = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				departure = df
 						.parse(resultBooking.getRecordValues(0).get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 			} catch (ParseException e) {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.DATE_FORMAT);
@@ -1846,8 +1871,9 @@ public class BookingService implements IBookingService {
 		if (filter.containsKey(BookingDao.ATTR_ENTRY_DATE)) {
 			if (filter.get(BookingDao.ATTR_ENTRY_DATE) instanceof String)
 				try {
-					entry = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
+					DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+					df.setLenient(false);
+					entry = df.parse(filter.get(BookingDao.ATTR_ENTRY_DATE).toString());
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.ENTRY_DATE_FORMAT);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_FORMAT);
@@ -1863,8 +1889,9 @@ public class BookingService implements IBookingService {
 		if (filter.containsKey(BookingDao.ATTR_DEPARTURE_DATE)) {
 			if (filter.get(BookingDao.ATTR_DEPARTURE_DATE) instanceof String)
 				try {
-					departure = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
+					DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+					df.setLenient(false);
+					departure = df.parse(filter.get(BookingDao.ATTR_DEPARTURE_DATE).toString());
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
 					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -2091,7 +2118,7 @@ public class BookingService implements IBookingService {
 	 */
 
 	@Override
-	@Secured({PermissionsProviderSecured.SECURED})
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingRoomChange(Map<String, Object> req) throws OntimizeJEERuntimeException {
 
 		try {
@@ -2118,7 +2145,6 @@ public class BookingService implements IBookingService {
 				}
 			}
 
-			
 			if (!entityUtils.bookingExists(bookingId)) {
 				LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
@@ -2145,7 +2171,7 @@ public class BookingService implements IBookingService {
 			if (!entityUtils.roomExists(hotelBookingId, roomNumber)) {
 				LOG.info(MsgLabels.ROOM_NOT_EXIST);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_NOT_EXIST);
- 
+
 			}
 
 			/*

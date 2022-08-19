@@ -1,6 +1,7 @@
 package com.ontimize.hr.model.core.service;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -300,9 +301,11 @@ public class CancellationsService implements ICancellationsService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.ERROR_PARSE_DATE);
 		}
 
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		// not cancel start booking day
-		if (new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(today)
-				.equals(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(firstDayBooking))) {
+		if (df.format(today)
+				.equals(df.format(firstDayBooking))) {
 			LOG.info(MsgLabels.BOOKING_STARTED);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.BOOKING_STARTED);
 		}

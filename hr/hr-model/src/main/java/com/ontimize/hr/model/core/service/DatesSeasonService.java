@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -91,8 +92,10 @@ public class DatesSeasonService implements IDatesSeasonService {
 			Date startDate = null;
 			Date endDate = null;
 
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				startDate = df
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
@@ -104,7 +107,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			try {
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				endDate = df
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);
@@ -149,11 +152,13 @@ public class DatesSeasonService implements IDatesSeasonService {
 	public EntityResult datesSeasonUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
 			throws OntimizeJEERuntimeException {
 
+		DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+		df.setLenient(false);
 		if (attrMap.containsKey(DatesSeasonDao.ATTR_START_DATE) && attrMap.containsKey(DatesSeasonDao.ATTR_END_DATE)) {
 			Date startDate = null;
 			Date endDate = null;
 			try {
-				startDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				startDate = df
 						.parse(attrMap.get(DatesSeasonDao.ATTR_START_DATE).toString());
 
 			} catch (ParseException e) {
@@ -165,7 +170,7 @@ public class DatesSeasonService implements IDatesSeasonService {
 			}
 
 			try {
-				endDate = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
+				endDate = df
 						.parse(attrMap.get(DatesSeasonDao.ATTR_END_DATE).toString());
 			} catch (ParseException e) {
 				LOG.info(MsgLabels.DEPARTURE_DATE_FORMAT);

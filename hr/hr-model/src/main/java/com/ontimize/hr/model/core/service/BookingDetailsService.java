@@ -1,5 +1,6 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IBookingDetailsService;
+import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.BookingDetailsDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
@@ -51,7 +53,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 	@Autowired
 	private SpecialOfferProductService specialOfferProductService;
-	
+
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
@@ -133,9 +135,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 		}
 
 		try {
-			Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-					.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
-
+			DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+			df.setLenient(false);
+			Date day = df.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 		} catch (ParseException e) {
 			LOG.info(MsgLabels.ERROR_PARSE_DATE);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_PARSE_DATE);
@@ -204,8 +206,10 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 			if (attrMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
 				try {
-					Date day = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
+					DateFormat df =new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+					df.setLenient(false);
+					Date day = 
+							df.parse(attrMap.get(BookingDetailsDao.ATTR_DATE).toString());
 
 				} catch (ParseException e) {
 					LOG.info(MsgLabels.ERROR_PARSE_DATE);
@@ -288,16 +292,17 @@ public class BookingDetailsService implements IBookingDetailsService {
 		c.set(Calendar.MILLISECOND, 0);
 		Date date = c.getTime();
 		if (keyMap.containsKey(BookingDetailsDao.ATTR_DATE)) {
-			if (keyMap.get(BookingDetailsDao.ATTR_DATE) instanceof Date) {
-				date = (Date) keyMap.get(BookingDetailsDao.ATTR_DATE);
-			} else {
-				try {
-					date = new SimpleDateFormat(Utils.DATE_FORMAT_ISO)
-							.parse(keyMap.get(BookingDetailsDao.ATTR_DATE).toString());
-				} catch (ParseException e) {
-					LOG.info(MsgLabels.DATE_FORMAT);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
-				}
+			try {
+
+				SimpleDateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+				df.setLenient(false);
+				date = df.parse(keyMap.get(BookingDetailsDao.ATTR_DATE).toString());
+			} catch (ParseException e) {
+				LOG.info(MsgLabels.DATE_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
+			} catch (NullPointerException e) {
+				LOG.info(MsgLabels.DATE_FORMAT);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
 			}
 
 			Calendar d = Calendar.getInstance();
@@ -324,6 +329,12 @@ public class BookingDetailsService implements IBookingDetailsService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_FORMAT);
 			}
 		}
+
+		if (detailsType != null && detailsType.equals(1)) {
+			LOG.info(MsgLabels.BOOKING_DETAILS_NIGHT);
+			return EntityUtils.errorResult(MsgLabels.BOOKING_DETAILS_NIGHT);
+		}
+
 		Double price = null;
 		if (!keyMap.containsKey(BookingDetailsDao.ATTR_PRICE)) {
 			LOG.info(MsgLabels.BOOKING_DETAILS_PRICE_MANDATORY);
@@ -352,10 +363,17 @@ public class BookingDetailsService implements IBookingDetailsService {
 
 			}
 		}
-		
+
 		Boolean paid = false;
 		if (keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
-				paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
+			Object aux = keyMap.get(BookingDetailsDao.ATTR_PAID);
+			if(aux!=null) {
+				if(!"true".equalsIgnoreCase(aux.toString())||!"false".equalsIgnoreCase(aux.toString())) {
+					LOG.info(MsgLabels.BOOKING_DETAILS_PAID_FORMAT);
+					return EntityUtils.errorResult(MsgLabels.BOOKING_DETAILS_PAID_FORMAT);
+				}
+			}
+			paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
 		}
 
 		if (!entityUtils.bookingExists(bookingId)) {
@@ -371,6 +389,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 			LOG.info(MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DETAILS_TYPE_NOT_EXISTS);
 		}
+
 		Integer hotelid = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
 		if (hotelid != -1 && !entityUtils.isBookingFromHotel(bookingId, hotelid)) {
 			LOG.info(MsgLabels.BOOKING_NOT_FROM_YOUR_HOTEL);
@@ -378,7 +397,7 @@ public class BookingDetailsService implements IBookingDetailsService {
 		}
 
 		if (hotelid == -1) {
-			if(!entityUtils.detailTypeExistsInHotel(detailsType, entityUtils.getHotelFromBooking(bookingId))) {
+			if (!entityUtils.detailTypeExistsInHotel(detailsType, entityUtils.getHotelFromBooking(bookingId))) {
 				LOG.info(MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
 						MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
@@ -390,21 +409,21 @@ public class BookingDetailsService implements IBookingDetailsService {
 						MsgLabels.DETAILS_TYPE_NOT_EXISTS_IN_HOTEL);
 			}
 		}
-		
+
 		Double nominalPrice = price;
 		String discountReason = null;
 		Object queryGift = keyMap.get("qry_gift");
-		if(queryGift!=null) {
-			price=0.0;
-			discountReason="Gift";
-			paid=true;
-		}else{
+		if (queryGift != null) {
+			price = 0.0;
+			discountReason = "Gift";
+			paid = true;
+		} else {
 			Integer specialOfferId = entityUtils.getSpecialOfferBooking(bookingId);
-			if (specialOfferId!=null) {
-				price = specialOfferProductService.getFinalPrice(specialOfferId, detailsType, price,true);
+			if (specialOfferId != null) {
+				price = specialOfferProductService.getFinalPrice(specialOfferId, detailsType, price, true);
 			}
 		}
-		
+
 		Map<String, Object> keyMapInsert = new HashMap<>();
 		keyMapInsert.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
 		keyMapInsert.put(BookingDetailsDao.ATTR_DATE, date);
