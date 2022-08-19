@@ -31,7 +31,7 @@
 			     	FROM public.details_type d
 					INNER JOIN public.booking_details bd ON d.det_id = bd.bok_det_type			     	
 			  		#WHERE#
-			  		ORDER BY d.det_description					
+			  		ORDER BY bd.bok_det_date ,d.det_description					
 				]]>
 			</Sentence>
 		</Query>
