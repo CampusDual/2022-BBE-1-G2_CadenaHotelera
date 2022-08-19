@@ -367,11 +367,9 @@ public class BookingDetailsService implements IBookingDetailsService {
 		Boolean paid = false;
 		if (keyMap.containsKey(BookingDetailsDao.ATTR_PAID)) {
 			Object aux = keyMap.get(BookingDetailsDao.ATTR_PAID);
-			if(aux!=null) {
-				if(!"true".equalsIgnoreCase(aux.toString())||!"false".equalsIgnoreCase(aux.toString())) {
+			if(aux!=null && !"true".equalsIgnoreCase(aux.toString())||!"false".equalsIgnoreCase(aux.toString())) {
 					LOG.info(MsgLabels.BOOKING_DETAILS_PAID_FORMAT);
 					return EntityUtils.errorResult(MsgLabels.BOOKING_DETAILS_PAID_FORMAT);
-				}
 			}
 			paid = Boolean.parseBoolean(keyMap.get(BookingDetailsDao.ATTR_PAID).toString());
 		}

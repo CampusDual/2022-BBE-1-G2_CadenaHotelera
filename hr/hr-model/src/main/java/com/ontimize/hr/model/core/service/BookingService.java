@@ -2110,11 +2110,7 @@ public class BookingService implements IBookingService {
 	}
 
 	/**
-	 * UPDATE_BOOKING_CHANGE_ROOM CAMBIO DE HABITACIÓN YA RESERVADA POR OTRA QUE
-	 * ESTÉ DISPONIBLE
-	 * 
-	 * 1. BUSCAR HABITACIONES DISPONIBLES 2. UPDATE BOOKING CON NUEVA HABITACION
-	 * 
+	 * This method allows to change the room in an not cancelled nor finished booking to a free one of the same type 
 	 */
 
 	@Override
@@ -2149,12 +2145,17 @@ public class BookingService implements IBookingService {
 				LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 			}
+			
+			if (!entityUtils.isBookinActive(bookingId)) {
+				LOG.info(MsgLabels.BOOKING_NOT_ACTIVE);
+				return EntityUtils.errorResult(MsgLabels.BOOKING_NOT_ACTIVE);
+			}
 
 			Integer userHotelId = credentialUtils.getHotelFromUser(daoHelper.getUser().getUsername());
 
-			Integer hotelBookingId = entityUtils.getHotelFromBooking(bookingId);
+			Integer hotelIdBooking = entityUtils.getHotelFromBooking(bookingId);
 
-			if (userHotelId != -1 && !userHotelId.equals(hotelBookingId)) {
+			if (userHotelId != -1 && !userHotelId.equals(hotelIdBooking)) {
 
 				LOG.info(MsgLabels.NO_ACCESS_TO_HOTEL);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_ACCESS_TO_HOTEL);
@@ -2168,25 +2169,26 @@ public class BookingService implements IBookingService {
 
 			String roomNumber = req.get(BookingDao.ATTR_ROM_NUMBER).toString();
 
-			if (!entityUtils.roomExists(hotelBookingId, roomNumber)) {
+			if (!entityUtils.roomExists(hotelIdBooking, roomNumber)) {
 				LOG.info(MsgLabels.ROOM_NOT_EXIST);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_NOT_EXIST);
 
 			}
 
-			/*
-			 * comprobar si es mismo tipo de habitación que la reserva
-			 * 
-			 */
+			String roomNumberFromBooking = entityUtils.getRoomNumberFromBooking(bookingId);
+			
+
+			if(roomNumberFromBooking.equals(roomNumber)) {
+				LOG.info(MsgLabels.BOOKING_SAME_ROOM);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_SAME_ROOM);
+			}
 
 			Map<String, Object> whereQuery = new HashMap<>();
-
-			whereQuery.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY,
-					roomTypeExpression(bookingId, hotelBookingId, roomNumber));
-
+			whereQuery.put(RoomDao.ATTR_HTL_ID, hotelIdBooking);
+			whereQuery.put(RoomDao.ATTR_NUMBER, new SearchValue(SearchValue.IN, Arrays.asList(roomNumber,roomNumberFromBooking)));
 			List<String> colsQuery = Arrays.asList(RoomDao.ATTR_TYPE_ID);
 
-			EntityResult erBooking = daoHelper.query(bookingDao, whereQuery, colsQuery, BookingDao.QUERY_ROOM_TYPE);
+			EntityResult erBooking = daoHelper.query(roomDao, whereQuery, colsQuery);
 
 			if (erBooking.isWrong()) {
 
@@ -2194,40 +2196,31 @@ public class BookingService implements IBookingService {
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 			}
 
-			if (erBooking.isEmpty()) {
-				LOG.error(MsgLabels.ROOM_TYPE_NOT_FOUND);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_NOT_FOUND);
-
-			}
-
-			if (erBooking.calculateRecordNumber() == 1) {
-				LOG.error(MsgLabels.BOOKING_SAME_ROOM);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_SAME_ROOM);
-			}
 
 			Integer roomType = (Integer) erBooking.getRecordValues(0).get(RoomDao.ATTR_TYPE_ID);
 
 			if (!roomType.equals(erBooking.getRecordValues(1).get(RoomDao.ATTR_TYPE_ID))) {
 
-				LOG.error(MsgLabels.BOOKING_DIFFERENT_ROOM_TYPE);
+				LOG.info(MsgLabels.BOOKING_DIFFERENT_ROOM_TYPE);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_DIFFERENT_ROOM_TYPE);
 			}
 
-			Date dateStarts, dateEnds;
+			Date dateStarts;
+			Date dateEnds;
 
 			Map<String, Object> datesQuery = new HashMap<>();
 
 			datesQuery.put(BookingDao.ATTR_ID, bookingId);
 
 			EntityResult dateResult = daoHelper.query(bookingDao, datesQuery,
-					new ArrayList<String>(Arrays.asList(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE)));
+					new ArrayList<>(Arrays.asList(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE)));
 
 			dateStarts = (Date) dateResult.getRecordValues(0).get(BookingDao.ATTR_ENTRY_DATE);
 			dateEnds = (Date) dateResult.getRecordValues(0).get(BookingDao.ATTR_DEPARTURE_DATE);
 
 			Map<String, Object> query = new HashMap<>();
 			Map<String, Object> queryFilter = new HashMap<>();
-			List<String> queryColumns = new ArrayList<String>();
+			List<String> queryColumns = new ArrayList<>();
 
 			queryColumns.add(RoomDao.ATTR_NUMBER);
 			queryColumns.add(RoomDao.ATTR_HTL_ID);
@@ -2235,7 +2228,7 @@ public class BookingService implements IBookingService {
 
 			query.put(Utils.COLUMNS, queryColumns);
 
-			queryFilter.put(BookingDao.ATTR_HTL_ID, hotelBookingId);
+			queryFilter.put(BookingDao.ATTR_HTL_ID, hotelIdBooking);
 
 			queryFilter.put(RoomDao.ATTR_TYPE_ID, roomType);
 
@@ -2249,7 +2242,7 @@ public class BookingService implements IBookingService {
 
 			Map<String, Object> roomFilter = new HashMap<>();
 			roomFilter.put(RoomDao.ATTR_NUMBER, roomFilter);
-			roomFilter.put(RoomDao.ATTR_HTL_ID, hotelBookingId);
+			roomFilter.put(RoomDao.ATTR_HTL_ID, hotelIdBooking);
 
 			queryFreeRoomsByDate = EntityResultTools.dofilter(queryFreeRoomsByDate, roomFilter);
 

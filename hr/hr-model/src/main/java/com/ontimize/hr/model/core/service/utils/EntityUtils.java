@@ -128,6 +128,12 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Checks if the room type exists
+	 * 
+	 * @param roomTypeId id of the room type
+	 * @return True if exists,false otherwise
+	 */
 	public boolean roomTypeExists(Integer roomTypeId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(RoomTypeDao.ATTR_ID, roomTypeId);
@@ -139,6 +145,14 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Checks the room exists in that hotel
+	 * 
+	 * @param hotelId    id of the hotel
+	 * @param roomNumber room number
+	 * @return true if the room exists, false otherwise
+	 * 
+	 */
 	public boolean roomExists(Integer hotelId, String roomNumber) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(RoomDao.ATTR_HTL_ID, hotelId);
@@ -150,6 +164,15 @@ public class EntityUtils {
 			throw new OntimizeJEERuntimeException();
 		}
 	}
+
+	/**
+	 * Checks if a room number of a determined type exists in a hotel
+	 * 
+	 * @param hotelId    id of the hotel
+	 * @param roomNumber room number
+	 * @param roomTypeId id of the room type
+	 * @return true if exists,false otherwise
+	 */
 
 	public boolean roomExists(Integer hotelId, String roomNumber, Integer roomTypeId) {
 		Map<String, Object> keyMap = new HashMap<>();
@@ -165,6 +188,12 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Checks if a detail type exists
+	 * 
+	 * @param detailId id of the detail type
+	 * @return true if exists false otherwise
+	 */
 	public boolean detailTypeExists(Integer detailId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(DetailsTypeDao.ATTR_ID, detailId);
@@ -214,6 +243,12 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Checks if the booking exists
+	 * 
+	 * @param bookingId id of the booking
+	 * @return true if exists, false otherwise
+	 */
 	public boolean bookingExists(Integer bookingId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(BookingDao.ATTR_ID, bookingId);
@@ -225,6 +260,12 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Checks if the employee exists
+	 * 
+	 * @param employeeId id of the employee
+	 * @return true if exists, false otherwise
+	 */
 	public boolean employeeExists(Integer employeeId) {
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(EmployeeDao.ATTR_ID, employeeId);
@@ -345,6 +386,28 @@ public class EntityUtils {
 				return (Integer) res.getRecordValues(0).get(BookingDao.ATTR_HTL_ID);
 			} else {
 				return -1;
+			}
+		} else {
+			throw new OntimizeJEERuntimeException();
+		}
+	}
+
+	/**
+	 * Returns the hotel id from the booking
+	 * 
+	 * @param bookingId id of the booking
+	 * @return Returns the room number null if the booking does not exist throws an
+	 *         exception when the query return an error
+	 */
+	public String getRoomNumberFromBooking(Integer bookingId) {
+		Map<String, Object> keyMap = new HashMap<>();
+		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		EntityResult res = daoHelper.query(bookingDao, keyMap, Arrays.asList(BookingDao.ATTR_ROM_NUMBER));
+		if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+			if (res.calculateRecordNumber() == 1) {
+				return (String) res.getRecordValues(0).get(BookingDao.ATTR_ROM_NUMBER);
+			} else {
+				return null;
 			}
 		} else {
 			throw new OntimizeJEERuntimeException();
@@ -506,7 +569,7 @@ public class EntityUtils {
 		EntityResult res = daoHelper.query(specialOfferDao, keyMap, Arrays.asList(SpecialOfferDao.ATTR_STACKABLE));
 		if (res.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
 			if (res.calculateRecordNumber() == 1) {
-				return (Boolean)res.getRecordValues(0).get(SpecialOfferDao.ATTR_STACKABLE);
+				return (Boolean) res.getRecordValues(0).get(SpecialOfferDao.ATTR_STACKABLE);
 			} else {
 				return false;
 			}
@@ -604,6 +667,12 @@ public class EntityUtils {
 
 	}
 
+	/**
+	 * Builds and error EntityResult with a message
+	 * 
+	 * @param message message to return inside the entityresult
+	 * @return an EntityResult object with the specified message
+	 */
 	public static EntityResult errorResult(String message) {
 		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
 	}
@@ -693,7 +762,6 @@ public class EntityUtils {
 		}
 	}
 
-	
 	/**
 	 * Merges the modified product into the base product into a new product object.
 	 * If either of them are null or empty it returns an empty product object.
@@ -719,8 +787,7 @@ public class EntityUtils {
 	 *                        merge if they are not null
 	 * @return a new OfferProduct object with the merged data.
 	 */
-	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
-			boolean mergeKeyIds) {
+	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct, boolean mergeKeyIds) {
 		return mergeProducts(baseProduct, modifiedProduct, mergeKeyIds, false);
 	}
 
@@ -737,8 +804,8 @@ public class EntityUtils {
 	 *                        present into the merged results.
 	 * @return a new OfferProduct object with the merged data.
 	 */
-	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct,
-			boolean mergeKeyIds, boolean setNullValues) {
+	public OfferProduct mergeProducts(OfferProduct baseProduct, OfferProduct modifiedProduct, boolean mergeKeyIds,
+			boolean setNullValues) {
 		OfferProduct result = new OfferProduct();
 		if ((baseProduct == null || baseProduct.isEmpty()) && (modifiedProduct == null || modifiedProduct.isEmpty()))
 			return result;
@@ -780,8 +847,7 @@ public class EntityUtils {
 	 *                      null
 	 * @return A new OfferCondition object with the data from the map
 	 */
-	public OfferCondition fillCondition(Map<String, Object> conditionMap, boolean fillID,
-			boolean fillIsPresent) {
+	public OfferCondition fillCondition(Map<String, Object> conditionMap, boolean fillID, boolean fillIsPresent) {
 		OfferCondition result = new OfferCondition(fillIsPresent);
 		if (conditionMap == null || conditionMap.isEmpty())
 			throw new FillException(MsgLabels.CONDITION_EMPTY);
@@ -844,8 +910,8 @@ public class EntityUtils {
 				result.setStartBookingOffer(null);
 			} else {
 				try {
-					result.setStartBookingOffer(df
-							.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_START).toString()));
+					result.setStartBookingOffer(
+							df.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_START).toString()));
 				} catch (ParseException e) {
 					throw new FillException(MsgLabels.CONDITION_BOOKING_START_FORMAT);
 				}
@@ -858,8 +924,7 @@ public class EntityUtils {
 				result.setEndBookingOffer(null);
 			} else {
 				try {
-					result.setEndBookingOffer(df
-							.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_END).toString()));
+					result.setEndBookingOffer(df.parse(conditionMap.get(SpecialOfferConditionDao.ATTR_END).toString()));
 				} catch (ParseException e) {
 					throw new FillException(MsgLabels.CONDITION_BOOKING_END_FORMAT);
 				}
@@ -881,16 +946,14 @@ public class EntityUtils {
 
 		if (conditionMap.containsKey(SpecialOfferDao.ATTR_START)) {
 			try {
-				result.setStartActiveOffer(df
-						.parse(conditionMap.get(SpecialOfferDao.ATTR_START).toString()));
+				result.setStartActiveOffer(df.parse(conditionMap.get(SpecialOfferDao.ATTR_START).toString()));
 			} catch (ParseException e) {
 				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
 			}
 		}
 		if (conditionMap.containsKey(SpecialOfferDao.ATTR_END)) {
 			try {
-				result.setEndActiveOffer(df
-						.parse(conditionMap.get(SpecialOfferDao.ATTR_END).toString()));
+				result.setEndActiveOffer(df.parse(conditionMap.get(SpecialOfferDao.ATTR_END).toString()));
 			} catch (ParseException e) {
 				throw new FillException(MsgLabels.CONDITION_ACTIVE_START_FORMAT);
 			}
@@ -899,10 +962,23 @@ public class EntityUtils {
 		return result;
 	}
 
+	/**
+	 * Fills a condition Object from a map object
+	 * 
+	 * @param conditionMap map with the data to fill from
+	 * @return a new condition object with the data from the map ignoring nulls and
+	 *         Id's
+	 */
 	public OfferCondition fillCondition(Map<String, Object> conditionMap) {
 		return fillCondition(conditionMap, false, false);
 	}
 
+	/**
+	 * Fills a product object from a map object
+	 * 
+	 * @param productMap map with the data to fill from
+	 * @return a new product object with the data from the map offerid
+	 */
 	public OfferProduct fillProduct(Map<String, Object> productMap) {
 		return fillProduct(productMap, false, false);
 	}
@@ -999,8 +1075,8 @@ public class EntityUtils {
 	 * @return returns a map filled with the data from the OfferCondition object. It
 	 *         strips the activeOffer properties.
 	 */
-	public Map<String, Object> fillConditionMap(OfferCondition condition, boolean fillConditionId,
-			boolean fillOfferId, boolean useNullValues) {
+	public Map<String, Object> fillConditionMap(OfferCondition condition, boolean fillConditionId, boolean fillOfferId,
+			boolean useNullValues) {
 		Map<String, Object> result = new HashMap<>();
 		if (fillConditionId && condition.getConditionId() != null)
 			result.put(SpecialOfferConditionDao.ATTR_ID, condition.getConditionId());
@@ -1046,8 +1122,7 @@ public class EntityUtils {
 	 *                              present flag to NullValue objects
 	 * @return a new map with the data from the product
 	 */
-	public Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId,
-			boolean setNullValueIfPresent) {
+	public Map<String, Object> fillProductMap(OfferProduct product, boolean putOfferId, boolean setNullValueIfPresent) {
 		Map<String, Object> result = new HashMap<>();
 		if (putOfferId && product.getSpecialOfferId() != null)
 			result.put(SpecialOfferProductDao.ATTR_OFFER_ID, product.getSpecialOfferId());
