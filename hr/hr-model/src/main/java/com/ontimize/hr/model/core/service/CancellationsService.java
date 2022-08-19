@@ -259,7 +259,7 @@ public class CancellationsService implements ICancellationsService {
 		Map<String, Object> keyMap = new HashMap<>() {
 			{
 				put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
-				put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1);
+				put(BookingDetailsDao.ATTR_TYPE_DETAILS_ID, 1); //type night detail
 			}
 		};
 		List<String> attrList = Arrays.asList(BookingDao.ATTR_HTL_ID, BookingDetailsDao.ATTR_ID,
