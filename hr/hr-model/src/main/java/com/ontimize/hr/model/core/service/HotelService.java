@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.json.JsonObject;
-import org.apache.http.impl.client.CloseableHttpClient;	
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,30 +43,49 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class HotelService.
+ */
 @Service("HotelService")
 @Lazy
 public class HotelService implements IHotelService {
 
+	/** The Constant LOG. */
 	private static final Logger LOG = LoggerFactory.getLogger(HotelService.class);
 
+	/** The hotel dao. */
 	@Autowired
 	private HotelDao hotelDao;
 
+	/** The credential. */
 	@Autowired
 	private CredentialUtils credential;
 
+	/** The utils. */
 	@Autowired
 	private EntityUtils utils;
-	
+
+	/** The api airport. */
 	@Autowired
 	private ApiAirport apiAirport;
-	
+
+	/** The api recommendation. */
 	@Autowired
-	private ApiRecommendation apiRecommendation; 
-	
+	private ApiRecommendation apiRecommendation;
+
+	/** The dao helper. */
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
 
+	/**
+	 * Hotel query.
+	 *
+	 * @param keyMap   the key map
+	 * @param attrList the attr list
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult hotelQuery(Map<String, Object> keyMap, List<String> attrList)
@@ -96,6 +115,12 @@ public class HotelService implements IHotelService {
 
 	}
 
+	/**
+	 * Hotel insert.
+	 *
+	 * @param attrMap the attr map
+	 * @return the entity result
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult hotelInsert(Map<String, Object> attrMap) {
@@ -151,6 +176,14 @@ public class HotelService implements IHotelService {
 
 	}
 
+	/**
+	 * Hotel update.
+	 *
+	 * @param attrMap the attr map
+	 * @param keyMap  the key map
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult hotelUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
@@ -207,6 +240,13 @@ public class HotelService implements IHotelService {
 
 	}
 
+	/**
+	 * Hotel delete.
+	 *
+	 * @param keyMap the key map
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult hotelDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
@@ -308,10 +348,17 @@ public class HotelService implements IHotelService {
 		return hotelsInRadius;
 	}
 
-	
+	/**
+	 * This method consumes an api that returns the closest airports to a
+	 * geographical point according to a given radius.
+	 *
+	 * @param req the request includes hotel and radius
+	 * @return the airports
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	 public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException { 
+	public EntityResult getAirports(Map<String, Object> req) throws OntimizeJEERuntimeException {
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
 
@@ -343,7 +390,7 @@ public class HotelService implements IHotelService {
 				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
 			}
-			if(radius<0 || radius > 500) {
+			if (radius < 0 || radius > 500) {
 				LOG.info(MsgLabels.RADIUS_OUT_OF_RANGE);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RADIUS_OUT_OF_RANGE);
 			}
@@ -379,8 +426,8 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
-		
-		//get token
+
+		// get token
 		String tokenAccess = null;
 		try {
 			tokenAccess = apiAirport.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
@@ -389,12 +436,11 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
-		
-		//get Airports
+
+		// get Airports
 		List<Airport> listAirports = null;
 		try {
-			listAirports = apiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(),
-					client);
+			listAirports = apiAirport.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(), client);
 		} catch (IOException | URISyntaxException e) {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
@@ -405,7 +451,7 @@ public class HotelService implements IHotelService {
 			LOG.info(MsgLabels.NO_HOTELS_IN_RADIUS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_HOTELS_IN_RADIUS);
 		}
-		
+
 		// return airports
 		Map<String, Object> mapAirports = new HashMap<>();
 		mapAirports.put("Airports", listAirports);
@@ -419,9 +465,6 @@ public class HotelService implements IHotelService {
 
 	}
 
-	
-	
-	
 	@Override
 	// @Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getRecommendations(Map<String, Object> req) {
@@ -431,7 +474,7 @@ public class HotelService implements IHotelService {
 		if (!req.containsKey(HotelDao.ATTR_ID)) {
 			LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
-}
+		}
 
 		Integer idHotel;
 		try {
@@ -456,9 +499,10 @@ public class HotelService implements IHotelService {
 				LOG.info(MsgLabels.WRONG_RADIUS_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.WRONG_RADIUS_FORMAT);
 			}
-			if(radius<0 || radius > 20) {
+			if (radius < 0 || radius > 20) {
 				LOG.info(MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
-				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12,
+						MsgLabels.RECOMMENDATIONS_RADIUS_OUT_OF_RANGE);
 			}
 		}
 
@@ -492,8 +536,8 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
-		
-		//get token
+
+		// get token
 		String tokenAccess = null;
 		try {
 			tokenAccess = apiRecommendation.getTokenAccess(CredentialsApi.URL_AUTH, CredentialsApi.CLIENT_ID,
@@ -502,35 +546,32 @@ public class HotelService implements IHotelService {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
-		
+
 		// get Recommendations
 		List<Recommendation> listRecommendations = null;
-		
+
 		try {
-			listRecommendations = apiRecommendation.getList(tokenAccess, latitudeHotel, longitudeHotel, radius.toString(),
-					client);
+			listRecommendations = apiRecommendation.getList(tokenAccess, latitudeHotel, longitudeHotel,
+					radius.toString(), client);
 		} catch (IOException | URISyntaxException e) {
 			LOG.error(e.getMessage());
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, e.getMessage());
 		}
-		
 
 		// check there are recommendations in radius
 		if (listRecommendations.isEmpty()) {
 			LOG.info(MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.NO_RECOMMENDATIONS_IN_RADIUS);
 		}
-		
-		
-		for (Recommendation recommendation:listRecommendations) {
-			 Double distancia = Utils.getDistance(latitudeHotel, longitudeHotel, recommendation.getGeoCode().getLatitude().toString(),
-					 recommendation.getGeoCode().getLongitude().toString());
-			
-			 recommendation.setDistance(Math.round(distancia*100.0)/100.0);
+
+		for (Recommendation recommendation : listRecommendations) {
+			Double distancia = Utils.getDistance(latitudeHotel, longitudeHotel,
+					recommendation.getGeoCode().getLatitude().toString(),
+					recommendation.getGeoCode().getLongitude().toString());
+
+			recommendation.setDistance(Math.round(distancia * 100.0) / 100.0);
 		}
-		
-		
-		
+
 		// return recommendations
 		Map<String, Object> mapRecommendations = new HashMap<>();
 		mapRecommendations.put("Recommendations", listRecommendations);
@@ -540,15 +581,15 @@ public class HotelService implements IHotelService {
 				setCode(EntityResult.OPERATION_SUCCESSFUL);
 				addRecord(mapRecommendations);
 			}
-		
+
 		};
-		
+
 	}
-	
+
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getWeather(Map<String, Object> req) throws OntimizeJEERuntimeException {
-		
+
 		if (!req.containsKey(HotelDao.ATTR_ID)) {
 			LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
@@ -565,65 +606,66 @@ public class HotelService implements IHotelService {
 			LOG.info(MsgLabels.HOTEL_NOT_EXIST);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
 		}
-		
+
 		// get latitude/longitude hotel
-				List<String> attrList = new ArrayList<>();
-				attrList.add(HotelDao.ATTR_LATITUDE);
-				attrList.add(HotelDao.ATTR_LONGITUDE);
+		List<String> attrList = new ArrayList<>();
+		attrList.add(HotelDao.ATTR_LATITUDE);
+		attrList.add(HotelDao.ATTR_LONGITUDE);
 
-				Map<String, Object> keyMap = new HashMap<String, Object>();
-				keyMap.put(HotelDao.ATTR_ID, idHotel);
+		Map<String, Object> keyMap = new HashMap<String, Object>();
+		keyMap.put(HotelDao.ATTR_ID, idHotel);
 
-				EntityResult coordinateHotelER = this.daoHelper.query(this.hotelDao, keyMap, attrList);
-				if (coordinateHotelER.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
-					if (coordinateHotelER.calculateRecordNumber() == 0) {
-						LOG.info(MsgLabels.HOTEL_NOT_FOUND);
-						return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND);
-					}
-				} else {
-					LOG.info(MsgLabels.HOTEL_QUERY_ERROR);
-					return coordinateHotelER;
-				}
+		EntityResult coordinateHotelER = this.daoHelper.query(this.hotelDao, keyMap, attrList);
+		if (coordinateHotelER.getCode() == EntityResult.OPERATION_SUCCESSFUL) {
+			if (coordinateHotelER.calculateRecordNumber() == 0) {
+				LOG.info(MsgLabels.HOTEL_NOT_FOUND);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_FOUND);
+			}
+		} else {
+			LOG.info(MsgLabels.HOTEL_QUERY_ERROR);
+			return coordinateHotelER;
+		}
 
-				String latitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LATITUDE).toString();
-				String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString();
-				
-				if(!Utils.checkCoordinate(latitudeHotel)) {
-					LOG.info(MsgLabels.HOTEL_FORMAT_LATITUDE);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LATITUDE);
-				}
-				
-				if(!Utils.checkCoordinate(longitudeHotel)) {
-					LOG.info(MsgLabels.HOTEL_FORMAT_LONGITUDE);
-					return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LONGITUDE);
-				}
-				
-				String geo = latitudeHotel+","+longitudeHotel;
-				
-				List<Object> listDays = null;
-				JsonObject jObject = null;
-				String ubicationKey = null;
-				
-				//Obtenemos los datos, enviando a la api la key y las cordenadas
-				ubicationKey=utils.geoPosition(geo,Utils.WEATHER_API_KEY);
-				jObject=utils.getWeather(Utils.WEATHER_API_KEY,ubicationKey);
-				//guardamos los datos en un String
-				String weatherJson = (jObject.get("DailyForecasts").toString());
+		String latitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LATITUDE).toString();
+		String longitudeHotel = coordinateHotelER.getRecordValues(0).get(HotelDao.ATTR_LONGITUDE).toString();
 
-				Gson gson = new Gson();
-				final Type tipoLista = new TypeToken<List<Object>>(){}.getType();
-				//obtenemos los datos a una lista de objetos
-				listDays=gson.fromJson(weatherJson, tipoLista);
-				
-				// return weather
-				Map<String, Object> mapWeather = new HashMap<>();
-				mapWeather.put("Weather", listDays);
-				
-				EntityResult result = new EntityResultMapImpl();
-				result.addRecord(mapWeather);
-				result.setCode(EntityResult.OPERATION_SUCCESSFUL);
-				
+		if (!Utils.checkCoordinate(latitudeHotel)) {
+			LOG.info(MsgLabels.HOTEL_FORMAT_LATITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LATITUDE);
+		}
+
+		if (!Utils.checkCoordinate(longitudeHotel)) {
+			LOG.info(MsgLabels.HOTEL_FORMAT_LONGITUDE);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_FORMAT_LONGITUDE);
+		}
+
+		String geo = latitudeHotel + "," + longitudeHotel;
+
+		List<Object> listDays = null;
+		JsonObject jObject = null;
+		String ubicationKey = null;
+
+		// Obtenemos los datos, enviando a la api la key y las cordenadas
+		ubicationKey = utils.geoPosition(geo, Utils.WEATHER_API_KEY);
+		jObject = utils.getWeather(Utils.WEATHER_API_KEY, ubicationKey);
+		// guardamos los datos en un String
+		String weatherJson = (jObject.get("DailyForecasts").toString());
+
+		Gson gson = new Gson();
+		final Type tipoLista = new TypeToken<List<Object>>() {
+		}.getType();
+		// obtenemos los datos a una lista de objetos
+		listDays = gson.fromJson(weatherJson, tipoLista);
+
+		// return weather
+		Map<String, Object> mapWeather = new HashMap<>();
+		mapWeather.put("Weather", listDays);
+
+		EntityResult result = new EntityResultMapImpl();
+		result.addRecord(mapWeather);
+		result.setCode(EntityResult.OPERATION_SUCCESSFUL);
+
 		return result;
-	}	
+	}
 
 }

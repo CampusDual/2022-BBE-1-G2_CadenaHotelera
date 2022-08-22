@@ -24,6 +24,10 @@ import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
+
+/**
+ * The Class BirthdayService.
+ */
 @Service("BirthayService")
 @Lazy
 public class BirthdayService implements IBirthdayService {
@@ -39,8 +43,11 @@ public class BirthdayService implements IBirthdayService {
 	private static final String ON = "ON";
 
 	public static final String SERVICE_ALREADY_ACTIVATED = "SERVICE_ALREADY_ACTIVATED";
+	
 	public static final String SERVICE_ALREADY_DEACTIVATED = "SERVICE_ALREADY_DEACTIVATED";
+	
 	public static final String STATUS_MANDATORY = "REQUEST_MUST_CONTAIN_STATUS";
+	
 	public static final String WRONG_STATUS = "ONLY_VALUES_ON_AND_OFF_ALLOWED";
 
 	@Autowired
@@ -51,7 +58,13 @@ public class BirthdayService implements IBirthdayService {
 
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
-
+	
+	/**
+	 *  Method that sets the enabled/disabled service birthday mail.
+	 *
+	 * @param req the req
+	 * @return the entity result
+	 */
 	@Override
 	public EntityResult setEnabledServiceBirthdayMail(Map<String, Object> req) {
 		if (req == null || req.isEmpty()) {
@@ -92,6 +105,10 @@ public class BirthdayService implements IBirthdayService {
 		return new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 12, STATUS_CHANGED);
 	}
 
+	/**
+	 * Method that obtains customers whose birthday is today and sends them a congratulatory email
+	 *
+	 */
 	public void getBirthdayClients() {
 	
 		List<String> attrList = Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,

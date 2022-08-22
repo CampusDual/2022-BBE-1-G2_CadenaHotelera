@@ -1245,6 +1245,14 @@ public class BookingService implements IBookingService {
 		return daoHelper.query(bookingDao, filterBooking, attrListBooking, BookingDao.QUERY_CHECKIN_TODAY);
 	}
 
+	/**
+	 * This method obtains a budget for a given hotel and room type, looking at
+	 * available offers.
+	 *
+	 * @param req the request contains hotel, room type, start day and end day.
+	 * @return the budget
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getBudget(Map<String, Object> req) throws OntimizeJEERuntimeException {
@@ -1919,7 +1927,7 @@ public class BookingService implements IBookingService {
 
 		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.IN_OP,
 				hotelList);
-	
+
 		BasicExpression where = BasicExpressionTools.combineExpressionOr(
 				searchBetweenWithYearNoHotel(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, entry,
 						departure),
@@ -2093,7 +2101,8 @@ public class BookingService implements IBookingService {
 
 			String subjectMail = "Expense report";
 			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
-			Utils.sendMail(CredentialUtils.receiver, subjectMail, textMail, "src/resources/report.pdf", null);
+			Utils.sendMail(hotelAndClientER.get(ClientDao.ATTR_EMAIL).toString(), subjectMail, textMail,
+					"src/resources/report.pdf", null);
 
 		} catch (JRException | MessagingException e) {
 			LOG.error(e.getMessage());
@@ -2103,7 +2112,8 @@ public class BookingService implements IBookingService {
 	}
 
 	/**
-	 * This method allows to change the room in an not cancelled nor finished booking to a free one of the same type 
+	 * This method allows to change the room in an not cancelled nor finished
+	 * booking to a free one of the same type
 	 */
 
 	@Override
@@ -2138,7 +2148,7 @@ public class BookingService implements IBookingService {
 				LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_NOT_EXISTS);
 			}
-			
+
 			if (!entityUtils.isBookinActive(bookingId)) {
 				LOG.info(MsgLabels.BOOKING_NOT_ACTIVE);
 				return EntityUtils.errorResult(MsgLabels.BOOKING_NOT_ACTIVE);
@@ -2169,16 +2179,16 @@ public class BookingService implements IBookingService {
 			}
 
 			String roomNumberFromBooking = entityUtils.getRoomNumberFromBooking(bookingId);
-			
 
-			if(roomNumberFromBooking.equals(roomNumber)) {
+			if (roomNumberFromBooking.equals(roomNumber)) {
 				LOG.info(MsgLabels.BOOKING_SAME_ROOM);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BOOKING_SAME_ROOM);
 			}
 
 			Map<String, Object> whereQuery = new HashMap<>();
 			whereQuery.put(RoomDao.ATTR_HTL_ID, hotelIdBooking);
-			whereQuery.put(RoomDao.ATTR_NUMBER, new SearchValue(SearchValue.IN, Arrays.asList(roomNumber,roomNumberFromBooking)));
+			whereQuery.put(RoomDao.ATTR_NUMBER,
+					new SearchValue(SearchValue.IN, Arrays.asList(roomNumber, roomNumberFromBooking)));
 			List<String> colsQuery = Arrays.asList(RoomDao.ATTR_TYPE_ID);
 
 			EntityResult erBooking = daoHelper.query(roomDao, whereQuery, colsQuery);
@@ -2188,7 +2198,6 @@ public class BookingService implements IBookingService {
 				LOG.error(MsgLabels.BAD_DATA);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 			}
-
 
 			Integer roomType = (Integer) erBooking.getRecordValues(0).get(RoomDao.ATTR_TYPE_ID);
 

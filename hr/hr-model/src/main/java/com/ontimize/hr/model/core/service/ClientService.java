@@ -200,6 +200,13 @@ public class ClientService implements IClientService {
 		}
 	}
 
+	/**
+	 * This method sends an email with an attached json that contains the clients
+	 * staying at a hotel on the given date.
+	 *
+	 * @param req the request contains the hotel and the desired date
+	 * @return the entity result
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult sendMailClients(Map<String, Object> req) {
@@ -224,7 +231,7 @@ public class ClientService implements IClientService {
 		Utils.createJSONClients(er, nameJSON);
 
 		try {
-			Utils.sendMail(receiverMail, subject, mailText, nameJSON,null);
+			Utils.sendMail(receiverMail, subject, mailText, nameJSON, null);
 		} catch (Exception ex) {
 			LOG.error(MsgLabels.ERROR_SENDING_MAIL);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR_SENDING_MAIL);

@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,8 +35,8 @@ import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
-import com.ontimize.jee.common.tools.EntityResultTools;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
+
 
 @Service("CancellationsService")
 @Lazy
@@ -60,6 +59,14 @@ public class CancellationsService implements ICancellationsService {
 	@Autowired
 	private DatesSeasonDao datesSeasonDao;
 
+	/**
+	 * Cancellations query.
+	 *
+	 * @param keyMap the key map
+	 * @param attrList the attr list
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult cancellationsQuery(Map<String, Object> keyMap, List<String> attrList)
@@ -67,6 +74,13 @@ public class CancellationsService implements ICancellationsService {
 		return this.daoHelper.query(this.cancellationsDao, keyMap, attrList);
 	}
 
+	/**
+	 * Cancellations insert.
+	 *
+	 * @param attrMap the attr map
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult cancellationsInsert(Map<String, Object> attrMap) throws OntimizeJEERuntimeException {
@@ -148,6 +162,14 @@ public class CancellationsService implements ICancellationsService {
 		return er;
 	}
 
+	/**
+	 * Cancellations update.
+	 *
+	 * @param attrMap the attr map
+	 * @param keyMap the key map
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult cancellationsUpdate(Map<String, Object> attrMap, Map<String, Object> keyMap)
@@ -224,12 +246,26 @@ public class CancellationsService implements ICancellationsService {
 		return er;
 	}
 
+	/**
+	 * Cancellations delete.
+	 *
+	 * @param keyMap the key map
+	 * @return the entity result
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult cancellationsDelete(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {
 		return this.daoHelper.delete(this.cancellationsDao, keyMap);
 	}
 
+	/**
+	 * Method that cancels a reservation applying the corresponding policy.
+	 *
+	 * @param req the booking id
+	 * @return the entity result with the nights and amount paid
+	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult cancelBooking(Map<String, Object> req) throws OntimizeJEERuntimeException {
@@ -423,6 +459,16 @@ public class CancellationsService implements ICancellationsService {
 		return er;
 	}
 
+	/**
+	 * Search days booking high season.
+	 *
+	 * @param bokDetailsDate the bok details date
+	 * @param datesSeasonStartDate the dates season start date
+	 * @param datesSeasonEndDate the dates season end date
+	 * @param bookId the book id
+	 * @param bookingId the booking id
+	 * @return the basic expression
+	 */
 	private BasicExpression searchDaysBookingHighSeason(String bokDetailsDate, String datesSeasonStartDate,
 			String datesSeasonEndDate, String bookId, int bookingId) {
 		BasicField bokDetaildDateBF = new BasicField(bokDetailsDate);
