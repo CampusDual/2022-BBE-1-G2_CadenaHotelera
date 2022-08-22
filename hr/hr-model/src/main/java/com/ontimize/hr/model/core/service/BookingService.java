@@ -455,8 +455,8 @@ public class BookingService implements IBookingService {
 		BasicField hotelIdB = new BasicField(hotelIdS);
 		BasicExpression bexp = new BasicExpression(hotelIdB, BasicOperator.EQUAL_OP, hotelId);
 		BasicExpression bexp1 = new BasicExpression(entry, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, startDate);
-		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, endDate);
+		BasicExpression bexp2 = new BasicExpression(entry, BasicOperator.LESS_OP, endDate);
+		BasicExpression bexp3 = new BasicExpression(departure, BasicOperator.MORE_OP, startDate);
 		BasicExpression bexp4 = new BasicExpression(departure, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(entry, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(departure, BasicOperator.MORE_EQUAL_OP, endDate);
@@ -1919,7 +1919,7 @@ public class BookingService implements IBookingService {
 
 		BasicExpression whereHotelIn = new BasicExpression(new BasicField(BookingDao.ATTR_HTL_ID), BasicOperator.IN_OP,
 				hotelList);
-
+	
 		BasicExpression where = BasicExpressionTools.combineExpressionOr(
 				searchBetweenWithYearNoHotel(BookingDao.ATTR_ENTRY_DATE, BookingDao.ATTR_DEPARTURE_DATE, entry,
 						departure),
