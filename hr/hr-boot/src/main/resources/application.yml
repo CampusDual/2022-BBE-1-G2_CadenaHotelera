@@ -63,9 +63,9 @@ server:
 spring:
    datasource:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://localhost:5432/ExceptionsHoteles
-      username: user
-      password: pass
+      jdbc-url: jdbc:postgresql://45.84.210.174:65432/Backend_2022_G2
+      username: Backend_2022_G2
+      password: shaighael6EiS8phee
       initial-size: 10
       test-on-borrow: true
    main:
