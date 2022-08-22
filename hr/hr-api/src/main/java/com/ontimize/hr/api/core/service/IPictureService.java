@@ -22,7 +22,7 @@ public interface IPictureService {
 	
 	public ResponseEntity<byte[]> getPicture(Map<String,Object> req);
 	
-	public EntityResult postPicture(MultipartFile mf, String s, String c);
+	public EntityResult postPicture(MultipartFile mf, String req);
 	
 	public EntityResult getPictureArray(Map<String,Object> req);
 

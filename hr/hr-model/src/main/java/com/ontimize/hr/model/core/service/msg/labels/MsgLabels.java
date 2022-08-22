@@ -266,7 +266,8 @@ public class MsgLabels {
 	
 	//PICTURES
 	public static final String PICTURE_NAME_BLANK = "PICTURE_NAME_IS_BLANK";
-	public static final String PICTURE_WRONG_FORMAT = "PICTURE_FORMAT_WORNG_USE_JPG";
+	public static final String PICTURE_WRONG_FILE_FORMAT = "PICTURE_FORMAT_WORNG_USE_JPG";
+	public static final String PICTURE_WRONG_FORMAT = "PICTURE_FORMAT_WORNG";
 	public static final String PICTURE_NAME_MANDATORY = "PICTURE_NAME_IS_MANDATORY";
 	public static final String PICTURE_ID_MANDATORY = "PICTURE_ID_IS_MANDATORY";
 	public static final String PICTURE_ID_FORMAT = "PICTURE_ID_WRONG_FORMAT";

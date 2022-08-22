@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -62,14 +63,47 @@ class PictureServiceTest {
 		
 		
 		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/jpeg", data);
-		String s = "s";
-		String c = "c";
+		String s = "{\"pic_name\":\"nombre\",\"pic_desc\":\"desc\",\"pic_htl_id\":1,\"pic_rom_typ\":1}";
 		
 		when(daoHelper.insert(any(), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		EntityResult er = service.postPicture(mf, s, c);
+		EntityResult er = service.postPicture(mf, s);
 		
 		assertEquals(EntityResult.OPERATION_SUCCESSFUL, er.getCode());
+	}
+	
+	@Test
+	@DisplayName("post picture no hotel exists")
+	void testPostPictureBadHotel() throws IOException {
+		
+		byte [] data = "hola".getBytes();
+		
+		
+		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/jpeg", data);
+		String s = "{\"pic_name\":\"nombre\",\"pic_desc\":\"desc\",\"pic_htl_id\":1,\"pic_rom_typ\":1}";
+		
+		when(daoHelper.insert(any(), anyMap())).thenThrow(new DataIntegrityViolationException("fk_pic_htl_id"));
+		
+		EntityResult er = service.postPicture(mf, s);
+		
+		assertEquals(MsgLabels.HOTEL_NOT_EXIST, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("post picture no room type exists")
+	void testPostPictureBadRoomType() throws IOException {
+		
+		byte [] data = "hola".getBytes();
+		
+		
+		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/jpeg", data);
+		String s = "{\"pic_name\":\"nombre\",\"pic_desc\":\"desc\",\"pic_htl_id\":1,\"pic_rom_typ\":1}";
+		
+		when(daoHelper.insert(any(), anyMap())).thenThrow(new DataIntegrityViolationException("fk_pic_rom_typ"));
+		
+		EntityResult er = service.postPicture(mf, s);
+		
+		assertEquals(MsgLabels.ROOM_TYPE_NOT_EXIST, er.getMessage());
 	}
 	
 	@Test
@@ -85,7 +119,7 @@ class PictureServiceTest {
 		
 		//when(daoHelper.insert(any(), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		EntityResult er = service.postPicture(mf, s, c);
+		EntityResult er = service.postPicture(mf, s);
 		
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
 		assertEquals(MsgLabels.PICTURE_MANDATORY, er.getMessage());
@@ -100,14 +134,31 @@ class PictureServiceTest {
 		
 		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/gif", data);
 		String s = "s";
-		String c = "c";
 		
 		//when(daoHelper.insert(any(), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		EntityResult er = service.postPicture(mf, s, c);
+		EntityResult er = service.postPicture(mf, s);
 		
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
-		assertEquals(MsgLabels.PICTURE_WRONG_FORMAT, er.getMessage());
+		assertEquals(MsgLabels.PICTURE_WRONG_FILE_FORMAT, er.getMessage());
+	}
+	
+	@Test
+	@DisplayName("post picture bad json grammar")
+	void testPostPictureBadJsonGrammar() throws IOException {
+		
+		byte [] data = "hola".getBytes();
+		
+		
+		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/jpeg", data);
+		String s = "{\"pic_name\":\"nombre\";\"pic_desc\":\"desc\",\"pic_htl_id\":1,\"pic_rom_typ\":1}";
+		
+		//when(daoHelper.insert(any(), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
+		
+		EntityResult er = service.postPicture(mf, s);
+		
+		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
+		assertEquals(MsgLabels.BAD_DATA, er.getMessage());
 	}
 	
 	@Test
@@ -118,12 +169,11 @@ class PictureServiceTest {
 		
 		
 		MultipartFile mf = new MockMultipartFile("foto","foto.jpg", "image/jpeg", data);
-		String s = "";
-		String c = "c";
+		String s = "{\"pic_desc\":\"desc\",\"pic_htl_id\":1,\"pic_rom_typ\":1}";
 		
 		//when(daoHelper.insert(any(), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL,0,""));
 		
-		EntityResult er = service.postPicture(mf, s, c);
+		EntityResult er = service.postPicture(mf, s);
 		
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
 		assertEquals(MsgLabels.PICTURE_NAME_MANDATORY, er.getMessage());

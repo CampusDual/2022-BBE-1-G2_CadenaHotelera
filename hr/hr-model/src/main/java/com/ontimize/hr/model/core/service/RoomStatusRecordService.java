@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.ontimize.hr.api.core.service.IRoomStatusRecordService;
 import com.ontimize.hr.model.core.dao.RoomStatusRecordDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
@@ -42,9 +43,12 @@ public class RoomStatusRecordService implements IRoomStatusRecordService {
 	
 	@Autowired
 	private RoomStatusRecordDao roomStatusRecordDao;
-
+	
 	@Autowired
 	private DefaultOntimizeDaoHelper daoHelper;
+	
+	@Autowired
+	private EntityUtils entityUtils;
 
 
 	@Override
@@ -151,7 +155,7 @@ public class RoomStatusRecordService implements IRoomStatusRecordService {
 		List<String> attrList = Arrays.asList(RoomStatusRecordDao.ATTR_HOTEL_ID, RoomStatusRecordDao.ATTR_ROOM_NUMBER, 
 				RoomStatusRecordDao.ATTR_ROOM_STATUS_ID, RoomStatusRecordDao.ATTR_ROOM_STATUS_DATE);
 		Map<String, Object> keyMap = new HashMap<>();
-		Map<String, Object> filter = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
 		
 		//Creamos los mapas y listas necesarios para las consultas
 
@@ -162,26 +166,33 @@ public class RoomStatusRecordService implements IRoomStatusRecordService {
 		
 		//comprobamos que tenemos data
 		
-		filter = (Map<String, Object>) req.get(Utils.DATA);
+		data = (Map<String, Object>) req.get(Utils.DATA);
 		
-		if(!filter.containsKey(RoomStatusRecordDao.ATTR_HOTEL_ID)) {
+		if(!data.containsKey(RoomStatusRecordDao.ATTR_HOTEL_ID)) {
 			LOG.info(MsgLabels.HOTEL_ID_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_ID_MANDATORY);
 		}
-		keyMap.put(RoomStatusRecordDao.ATTR_HOTEL_ID, filter.get(RoomStatusRecordDao.ATTR_HOTEL_ID));
+		int hotelId = (int) data.get(RoomStatusRecordDao.ATTR_HOTEL_ID);
 		
-		if(filter.containsKey(RoomStatusRecordDao.ATTR_ROOM_NUMBER)) {
-			keyMap.put(RoomStatusRecordDao.ATTR_ROOM_NUMBER, filter.get(RoomStatusRecordDao.ATTR_ROOM_NUMBER));
+		if(!entityUtils.hotelExists(hotelId)) {
+			LOG.info(MsgLabels.HOTEL_NOT_EXIST);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
 		}
 		
-		if(filter.containsKey("query_date_start") && filter.containsKey("query_date_end")) {
+		keyMap.put(RoomStatusRecordDao.ATTR_HOTEL_ID, data.get(RoomStatusRecordDao.ATTR_HOTEL_ID));
+		
+		if(data.containsKey(RoomStatusRecordDao.ATTR_ROOM_NUMBER)) {
+			keyMap.put(RoomStatusRecordDao.ATTR_ROOM_NUMBER, data.get(RoomStatusRecordDao.ATTR_ROOM_NUMBER));
+		}
+		
+		if(data.containsKey("query_date_start") && data.containsKey("query_date_end")) {
 			Date queryDateStart=null;
 			Date queryDateEnd=null;
 			try {
 				DateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
 				df.setLenient(false);
-				queryDateStart = df.parse(filter.get("query_date_start").toString());
-				queryDateEnd = df.parse(filter.get("query_date_end").toString());
+				queryDateStart = df.parse(data.get("query_date_start").toString());
+				queryDateEnd = df.parse(data.get("query_date_end").toString());
 			}catch(ParseException e) {
 				LOG.info(MsgLabels.DATE_FORMAT);
 				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.DATE_FORMAT);
@@ -197,13 +208,13 @@ public class RoomStatusRecordService implements IRoomStatusRecordService {
 		
 		//consultamos entre las fechas si se envian
 		
-		if(filter.containsKey(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID)) {
-			if(filter.get(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID)==null) {
+		if(data.containsKey(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID)) {
+			if(data.get(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID)==null) {
 				BasicExpression StatusNull = new BasicExpression(new BasicField(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID),
 						BasicOperator.NULL_OP, null);
 				keyMap.put(SQLStatementBuilder.ExtendedSQLConditionValuesProcessor.EXPRESSION_KEY, StatusNull);
 			}else {
-				keyMap.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID, filter.get(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID));
+				keyMap.put(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID, data.get(RoomStatusRecordDao.ATTR_ROOM_STATUS_ID));
 			}
 		}
 		

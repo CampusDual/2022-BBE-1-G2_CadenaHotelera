@@ -68,11 +68,12 @@ public class PictureRestController extends ORestController<IPictureService>{
 	}
 	
 	@PostMapping(value ="postPicture",  produces = MediaType.APPLICATION_JSON_VALUE )
-	public EntityResult postPicture(@RequestPart("image") MultipartFile mf, @RequestParam("name") String s, @RequestParam("comment") String c) throws OntimizeJEERuntimeException{
+	public EntityResult postPicture(@RequestPart("image") MultipartFile mf, @RequestParam("data") String req) throws OntimizeJEERuntimeException{
 		
 		try {
-			return pictureService.postPicture(mf, s, c);
+			return pictureService.postPicture(mf,req);
 		}catch (Exception e) {
+			e.printStackTrace();
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR);
 		}
 	}

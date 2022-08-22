@@ -26,6 +26,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ontimize.hr.api.core.service.IPictureService;
 import com.ontimize.hr.model.core.dao.PictureDao;
 import com.ontimize.hr.model.core.dao.RoomTypeDao;
@@ -252,7 +256,7 @@ public class PictureService implements IPictureService {
 	 * @return ok and the picture id in the BD
 	 */
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public EntityResult postPicture(MultipartFile mf, String s, String c) {
+	public EntityResult postPicture(MultipartFile mf, String req) {
 		
 		if(mf.isEmpty()) {
 			LOG.info(MsgLabels.PICTURE_MANDATORY);
@@ -260,33 +264,66 @@ public class PictureService implements IPictureService {
 		}
 		
 		if(!mf.getContentType().equals("image/jpeg")) {
-			LOG.info(MsgLabels.PICTURE_WRONG_FORMAT);
-			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.PICTURE_WRONG_FORMAT);
+			LOG.info(MsgLabels.PICTURE_WRONG_FILE_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.PICTURE_WRONG_FILE_FORMAT);
 		}
 		
+		ObjectMapper objectMapper = new ObjectMapper();
+		TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};        
+		Map<String,Object> data=null;
+		try {
+			 data = objectMapper.readValue(req, typeRef);
+		} catch (JsonProcessingException  e1) {
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
+		}
 		
-		if(s.isBlank()||s.isEmpty()) {
+		if(data==null) {
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
+		}
+		
+		if(!data.containsKey(PictureDao.ATTR_NAME)) {
 			LOG.info(MsgLabels.PICTURE_NAME_MANDATORY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.PICTURE_NAME_MANDATORY);
-		}
-		
+		}		
 			
 		byte[] yourBytes=null;
 		try {
 			 yourBytes = mf.getBytes();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.info(MsgLabels.PICTURE_WRONG_FORMAT);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.PICTURE_WRONG_FORMAT);
 		}
-		//obtenemos el array de bytes a partir de la foto
+		//obtenemos el array de bytes a partir de la foto.
 		Map<String,Object> attrMap = new HashMap<>();
-		attrMap.put(PictureDao.ATTR_NAME, s);
+		attrMap.put(PictureDao.ATTR_NAME, data.get(PictureDao.ATTR_NAME));
 		attrMap.put(PictureDao.ATTR_PICTURE, yourBytes);
-		
-		if(!c.isEmpty()&&!c.isBlank()) {
-			attrMap.put(PictureDao.ATTR_DESCRIPTION, c);
+
+		if(data.containsKey(PictureDao.ATTR_DESCRIPTION)) {			
+				attrMap.put(PictureDao.ATTR_DESCRIPTION, data.get(PictureDao.ATTR_DESCRIPTION));
+		}
+		if(data.containsKey("pic_htl_id")) {
+			attrMap.put("pic_htl_id", data.get("pic_htl_id"));
+		}
+		if(data.containsKey("pic_rom_typ")) {
+			attrMap.put("pic_rom_typ", data.get("pic_rom_typ"));
 		}
 
-		return daoHelper.insert(pictureDao, attrMap);
+		try{
+			return daoHelper.insert(pictureDao, attrMap);
+		}catch(DataIntegrityViolationException e) {
+			if (e.getMessage() != null && e.getMessage().contains("fk_pic_htl_id")) {
+				LOG.info(MsgLabels.HOTEL_NOT_EXIST);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.HOTEL_NOT_EXIST);
+			}
+			if (e.getMessage() != null && e.getMessage().contains("fk_pic_rom_typ")) {
+				LOG.info(MsgLabels.ROOM_TYPE_NOT_EXIST);
+				return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ROOM_TYPE_NOT_EXIST);
+			}
+			LOG.info(MsgLabels.ERROR);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ERROR);
+		}
 	}
 	
 	/**
