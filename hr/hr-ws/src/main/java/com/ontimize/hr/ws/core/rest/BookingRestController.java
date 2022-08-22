@@ -105,31 +105,6 @@ public class BookingRestController extends ORestController<IBookingService> {
 
 	}
 
-	@PostMapping(value = "booking/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-	public EntityResult bookingDeleteById(@RequestBody Map<String, Object> req) {
-		try {
-			return this.bookingService.bookingDeleteById(req);
-		} catch (Exception e) {
-			e.printStackTrace();
-			EntityResult res = new EntityResultMapImpl();
-			res.setCode(EntityResult.OPERATION_WRONG);
-			return res;
-		}
-
-	}
-
-	@PostMapping(value = "booking/update", produces = MediaType.APPLICATION_JSON_VALUE)
-	public EntityResult bookingUpdateById(@RequestBody Map<String, Object> req) {
-		try {
-			return this.bookingService.bookingUpdateById(req);
-		} catch (Exception e) {
-			e.printStackTrace();
-			EntityResult res = new EntityResultMapImpl();
-			res.setCode(EntityResult.OPERATION_WRONG);
-			return res;
-		}
-
-	}
 
 	@PostMapping(value = "bookingcheckintoday/search", produces = MediaType.APPLICATION_JSON_VALUE)
 	public EntityResult bookingCheckInToday(@RequestBody Map<String, Object> req) {

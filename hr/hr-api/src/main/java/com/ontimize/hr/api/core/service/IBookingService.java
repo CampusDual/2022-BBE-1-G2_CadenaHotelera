@@ -27,10 +27,6 @@ public interface IBookingService {
 
 	public EntityResult bookingFreeByTypeQuery(Map<String, Object> req) throws OntimizeJEERuntimeException;
 
-	public EntityResult bookingDeleteById(Map<String, Object> req) throws OntimizeJEERuntimeException;
-
-	public EntityResult bookingUpdateById(Map<String, Object> req) throws OntimizeJEERuntimeException;
-
 	public EntityResult bookingcheckintodayQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException;
 

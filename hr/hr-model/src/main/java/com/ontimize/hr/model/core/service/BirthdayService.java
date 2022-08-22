@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IBirthdayService;
@@ -22,6 +23,7 @@ import com.ontimize.hr.model.core.service.scheduled.ScheduledMailBirthday;
 import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
+import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 
@@ -66,6 +68,7 @@ public class BirthdayService implements IBirthdayService {
 	 * @return the entity result
 	 */
 	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult setEnabledServiceBirthdayMail(Map<String, Object> req) {
 		if (req == null || req.isEmpty()) {
 			LOG.info(MsgLabels.DATA_MANDATORY);
