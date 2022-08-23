@@ -174,7 +174,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_STACKABLE)) {
 				Object aux = keyMap.get(SpecialOfferDao.ATTR_STACKABLE);
 				if (aux != null) {
-					if (!"true".equalsIgnoreCase(aux.toString()) || !"false".equalsIgnoreCase(aux.toString())) {
+					if (!"true".equalsIgnoreCase(aux.toString()) && !"false".equalsIgnoreCase(aux.toString())) {
 						LOG.info(MsgLabels.SPECIAL_STACKABLE_FORMAT);
 						return EntityUtils.errorResult(MsgLabels.SPECIAL_STACKABLE_FORMAT);
 					}
