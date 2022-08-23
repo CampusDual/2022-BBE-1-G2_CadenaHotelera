@@ -121,7 +121,7 @@
 		<field name="discount" class="java.lang.Double"/>
 		<field name="reasonDiscount" class="java.lang.String"/>
 		<variable name="total" class="java.lang.Double" calculation="Sum"/>
-		<variable name="prizeFinal1" class="java.lang.Double" resetType="None" calculation="Sum">
+		<variable name="prizeFinal1" class="java.lang.Double" calculation="Sum">
 			<variableExpression><![CDATA[$F{priceFinal}]]></variableExpression>
 		</variable>
 	</subDataset>
