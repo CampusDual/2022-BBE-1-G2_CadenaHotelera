@@ -75,9 +75,11 @@ import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
@@ -1786,7 +1788,9 @@ public class BookingService implements IBookingService {
 				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME1).toString() + " "
 				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME2).toString();
 
-		String invoiceRoute = "src/resources/invoice.jasper";
+		String invoiceRoute = "src/resources/invoice.jrxml";
+		String logoPath = "https://miro.medium.com/max/1400/1*PPhdDMQE6jrGGuWHU1ioQg.png";
+		String backgroundPath = "https://images.rawpixel.com/image_1000/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3AtNDQ4LXBhaS0wNjgtY2hpbS5qcGc.jpg";
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("NameHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_NAME).toString());
 		parameters.put("AddressHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_ADDRESS).toString());
@@ -1795,11 +1799,12 @@ public class BookingService implements IBookingService {
 		parameters.put("ClientId", hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_IDENTIFICATION).toString());
 		parameters.put("ClientPhone", hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_PHONE));
 		parameters.put("CollectionBeanParam", new JRBeanCollectionDataSource(listDetail));
-		parameters.put("logo_path", "https://miro.medium.com/max/1400/1*PPhdDMQE6jrGGuWHU1ioQg.png");
+		parameters.put("logo_path", logoPath);
+		parameters.put("background_path", backgroundPath);
 		byte[] pdf = null;
 		try {
-
-			JasperPrint jas = JasperFillManager.fillReport(invoiceRoute, parameters, new JREmptyDataSource());
+			JasperReport report = JasperCompileManager.compileReport(invoiceRoute);
+			JasperPrint jas = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
 			pdf = JasperExportManager.exportReportToPdf(jas);
 			JasperExportManager.exportReportToPdfFile(jas, "src/resources/report.pdf");
 
