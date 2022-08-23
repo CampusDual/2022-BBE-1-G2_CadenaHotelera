@@ -529,8 +529,8 @@ public class BookingService implements IBookingService {
 		BasicExpression bexp17 = new BasicExpression(statusB, BasicOperator.LIKE_OP, "A");
 
 		BasicExpression bexp1 = new BasicExpression(statusStart, BasicOperator.MORE_EQUAL_OP, startDate);
-		BasicExpression bexp2 = new BasicExpression(statusStart, BasicOperator.LESS_EQUAL_OP, startDate);
-		BasicExpression bexp3 = new BasicExpression(statusEnd, BasicOperator.MORE_EQUAL_OP, endDate);
+		BasicExpression bexp2 = new BasicExpression(statusStart, BasicOperator.LESS_OP, endDate);
+		BasicExpression bexp3 = new BasicExpression(statusEnd, BasicOperator.MORE_OP, startDate);
 		BasicExpression bexp4 = new BasicExpression(statusEnd, BasicOperator.LESS_EQUAL_OP, endDate);
 		BasicExpression bexp5 = new BasicExpression(statusStart, BasicOperator.LESS_EQUAL_OP, startDate);
 		BasicExpression bexp6 = new BasicExpression(statusEnd, BasicOperator.MORE_EQUAL_OP, endDate);
