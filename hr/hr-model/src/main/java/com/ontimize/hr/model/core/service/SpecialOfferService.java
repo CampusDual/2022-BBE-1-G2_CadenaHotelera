@@ -532,7 +532,7 @@ public class SpecialOfferService implements ISpecialOffersService {
 			if (keyMap.containsKey(SpecialOfferDao.ATTR_ACTIVE) && !stripActive) {
 				Object aux = keyMap.get(SpecialOfferDao.ATTR_ACTIVE);
 				if (aux != null
-						&& (!"true".equalsIgnoreCase(aux.toString()) || !"false".equalsIgnoreCase(aux.toString()))) {
+						&& (!"true".equalsIgnoreCase(aux.toString()) && !"false".equalsIgnoreCase(aux.toString()))) {
 					LOG.info(MsgLabels.CONDITION_ACTIVE_FORMAT);
 					return EntityUtils.errorResult(MsgLabels.CONDITION_ACTIVE_FORMAT);
 				}
