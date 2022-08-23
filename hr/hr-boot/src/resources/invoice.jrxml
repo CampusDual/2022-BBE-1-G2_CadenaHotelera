@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0f61c049-499c-4367-abf0-75a2211cc496">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
@@ -121,7 +121,7 @@
 		<field name="discount" class="java.lang.Double"/>
 		<field name="reasonDiscount" class="java.lang.String"/>
 		<variable name="total" class="java.lang.Double" calculation="Sum"/>
-		<variable name="prizeFinal1" class="java.lang.Double" resetType="Column" calculation="Sum">
+		<variable name="prizeFinal1" class="java.lang.Double" resetType="None" calculation="Sum">
 			<variableExpression><![CDATA[$F{priceFinal}]]></variableExpression>
 		</variable>
 	</subDataset>
@@ -440,7 +440,13 @@
 					<jr:column width="130" uuid="6c03d80c-c955-4097-b52e-946d16bb6191">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
 						<jr:tableHeader style="Table 3_TH" height="30" rowSpan="1"/>
-						<jr:tableFooter style="Table 3_TH" height="30" rowSpan="1"/>
+						<jr:tableFooter style="Table 3_TH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="130" height="30" uuid="5a651222-32e0-44c5-b49a-478d318110e9"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[TOTAL IMPORT:]]></text>
+							</staticText>
+						</jr:tableFooter>
 						<jr:columnHeader style="Table 3_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="130" height="30" uuid="51017ccf-e00b-45d2-af8b-8faed5619ce8"/>
@@ -448,13 +454,7 @@
 								<text><![CDATA[REASON DISCOUNT]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table 3_CH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="130" height="30" uuid="5a651222-32e0-44c5-b49a-478d318110e9"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[TOTAL IMPORT:]]></text>
-							</staticText>
-						</jr:columnFooter>
+						<jr:columnFooter style="Table 3_CH" height="30" rowSpan="1"/>
 						<jr:detailCell style="Table 3_TD" height="30">
 							<textField isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="130" height="30" uuid="e2873a2f-b161-4674-aaf4-be4077040072"/>
@@ -466,15 +466,7 @@
 					<jr:column width="80" uuid="4e7f49d3-9090-41b3-80f6-6b951791589c">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
 						<jr:tableHeader style="Table 3_TH" height="30" rowSpan="1"/>
-						<jr:tableFooter style="Table 3_TH" height="30" rowSpan="1"/>
-						<jr:columnHeader style="Table 3_CH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="c5f20d7c-fafa-4a5a-937d-22aaf2e6e40d"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[FINAL PRICE]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:columnFooter style="Table 3_CH" height="30" rowSpan="1">
+						<jr:tableFooter style="Table 3_TH" height="30" rowSpan="1">
 							<textField isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="30" uuid="d0d358ba-2b08-4423-a33e-d92d7892ac94"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -482,7 +474,15 @@
 								</textElement>
 								<textFieldExpression><![CDATA[$V{prizeFinal1}]]></textFieldExpression>
 							</textField>
-						</jr:columnFooter>
+						</jr:tableFooter>
+						<jr:columnHeader style="Table 3_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="80" height="30" uuid="c5f20d7c-fafa-4a5a-937d-22aaf2e6e40d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[FINAL PRICE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 3_CH" height="30" rowSpan="1"/>
 						<jr:detailCell style="Table 3_TD" height="30">
 							<textField isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="30" uuid="9bc76cbf-1be0-4df8-80d8-4ad711e9e455"/>
