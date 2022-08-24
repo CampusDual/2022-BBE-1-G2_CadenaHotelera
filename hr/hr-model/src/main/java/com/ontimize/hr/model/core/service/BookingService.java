@@ -1789,8 +1789,11 @@ public class BookingService implements IBookingService {
 				+ hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_SURNAME2).toString();
 
 		String invoiceRoute = "src/resources/invoice.jrxml";
-		String logoPath = "https://miro.medium.com/max/1400/1*PPhdDMQE6jrGGuWHU1ioQg.png";
-		String backgroundPath = "https://images.rawpixel.com/image_1000/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3AtNDQ4LXBhaS0wNjgtY2hpbS5qcGc.jpg";
+		// String logoPath = "https://miro.medium.com/max/1400/1*PPhdDMQE6jrGGuWHU1ioQg.png";
+		String logoPath = "src/resources/exceptionshotels.png";
+		// String backgroundPath = "https://images.rawpixel.com/image_1000/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3AtNDQ4LXBhaS0wNjgtY2hpbS5qcGc.jpg";
+		// String backgroundPath = "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvdHAyNDgtMzEtaW5zdGFncmFtc3RvcnkteF8xLWwwbTFpb25kLmpwZw.jpg";
+		String backgroundPath = "src/resources/background-report.png";
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("NameHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_NAME).toString());
 		parameters.put("AddressHotel", hotelAndClientER.getRecordValues(0).get(HotelDao.ATTR_ADDRESS).toString());
