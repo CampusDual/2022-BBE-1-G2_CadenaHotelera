@@ -332,7 +332,9 @@ public class HotelService implements IHotelService {
 			String longitudeHotel = hotelsER.getRecordValues(i).get(HotelDao.ATTR_LONGITUDE).toString();
 			Double distance = Utils.getDistance(latitudeHotel, longitudeHotel, latitudeReq, longitudeReq);
 			if (distance <= radius) {
-				hotelsInRadius.addRecord(hotelsER.getRecordValues(i));
+				Map<String,Object> mapHotelInRadius = hotelsER.getRecordValues(i);
+				mapHotelInRadius.put("distance", new DecimalFormat("#.##").format(distance) + " KM");				
+				hotelsInRadius.addRecord(mapHotelInRadius);
 			}
 
 		}

@@ -17,7 +17,7 @@ public class ScheduledMailBirthday {
 
 	private boolean isEnabled = false;
 
-	@Scheduled(cron = "0 30 14 ? * *", zone ="Europe/Madrid")
+	@Scheduled(cron = "0 27 10 ? * *", zone ="Europe/Madrid")
 	public void sendMailBirthay() {
 		if (isEnabled) {
 			birthdayService.getBirthdayClients();

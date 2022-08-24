@@ -2252,7 +2252,7 @@ class BookingServiceTest {
 			mocked.when(() -> JasperFillManager.fillReport(anyString(), anyMap(),isA(JREmptyDataSource.class))).thenThrow(new JRException(""));
 		}
 		
-		assertEquals(null, service.getPdfReport(1));
+		assertEquals(null, service.getPdfReport(anyInt(),anyBoolean()));
 		
 		
 	}

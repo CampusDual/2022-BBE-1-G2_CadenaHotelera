@@ -210,8 +210,14 @@ public class BookingRestController extends ORestController<IBookingService> {
 			LOG.info(MsgLabels.BOOKING_NOT_EXISTS);
 			return new ResponseEntity(MsgLabels.BOOKING_NOT_EXISTS, HttpStatus.BAD_REQUEST);
 		}
-
-		contents = bookingService.getPdfReport(idBooking);
+		
+		// send Mail?
+		boolean sendMail = false;
+		if(req.containsKey("report_to_mail")) {
+			sendMail = (boolean) req.get("report_to_mail");
+		}
+		
+		contents = bookingService.getPdfReport(idBooking, sendMail);
 		
 		headers.setContentType(MediaType.APPLICATION_PDF);
 		

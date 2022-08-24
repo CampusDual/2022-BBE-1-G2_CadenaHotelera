@@ -2,49 +2,28 @@ package com.ontimize.hr.model.core.service.utils.entities.airportapi;
 
 public class Airport {
 
-	private String type;
-	private String subType;
 	private String name;
 	private String detailedName;
 	private String timeZoneOffset;
 	private String iataCode;
 	private GeoCode geoCode;
 	private Distance distance;
-	private Double relevance;
 
 	public Airport() {
 
 	}
 
-	public Airport(String type, String subType, String name, String detailedName, String timeZoneOffset,
-			String iataCode, GeoCode geoCode, Distance distance, Double relevance) {
-		this.type = type;
-		this.subType = subType;
+	public Airport(String name, String detailedName, String timeZoneOffset,
+			String iataCode, GeoCode geoCode, Distance distance) {
 		this.name = name;
 		this.detailedName = detailedName;
 		this.timeZoneOffset = timeZoneOffset;
 		this.iataCode = iataCode;
 		this.geoCode = geoCode;
 		this.distance = distance;
-		this.relevance = relevance;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getSubType() {
-		return subType;
-	}
-
-	public void setSubType(String subType) {
-		this.subType = subType;
-	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -93,19 +72,11 @@ public class Airport {
 		this.distance = distance;
 	}
 
-	public Double getRelevance() {
-		return relevance;
-	}
-
-	public void setRelevance(Double relevance) {
-		this.relevance = relevance;
-	}
-
 	@Override
 	public String toString() {
-		return "Airport [type=" + type + ", subType=" + subType + ", name=" + name + ", detailedName=" + detailedName
-				+ ", timeZoneOffset=" + timeZoneOffset + ", iataCode=" + iataCode + ", geoCode=" + geoCode
-				+ ", distance=" + distance + ", relevance=" + relevance + "]";
+		return "Airport [name=" + name + ", detailedName=" + detailedName + ", timeZoneOffset=" + timeZoneOffset
+				+ ", iataCode=" + iataCode + ", geoCode=" + geoCode + ", distance=" + distance + "]";
 	}
+
 
 }

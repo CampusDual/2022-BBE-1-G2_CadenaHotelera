@@ -42,7 +42,7 @@ public interface IBookingService {
 
 	public EntityResult bookingOcupiedCleanQuery(Map<String, Object> req) throws OntimizeJEERuntimeException;
 
-	byte[] getPdfReport(int booking);
+	byte[] getPdfReport(int booking, boolean mail);
 
 	public EntityResult bookingRoomChange(Map<String, Object> req) throws OntimizeJEERuntimeException;
 

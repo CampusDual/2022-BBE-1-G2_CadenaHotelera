@@ -852,8 +852,6 @@ public class BookingService implements IBookingService {
 
 	}
 
-	
-
 	/**
 	 * Method to return the list of bookings that start today at a given hotel
 	 * 
@@ -874,8 +872,6 @@ public class BookingService implements IBookingService {
 		}
 		return this.daoHelper.query(this.bookingDao, keyMap, attrList, BookingDao.QUERY_CHECKIN_TODAY);
 	}
-
-	
 
 	/**
 	 * Method to search a booking using the name and identification of a client.
@@ -1744,9 +1740,10 @@ public class BookingService implements IBookingService {
 	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
-	public byte[] getPdfReport(int booking) {
+	public byte[] getPdfReport(int booking, boolean mail) {
 		Integer bookingId = booking;
-
+		boolean sendMail = mail;
+		
 		// get bookingDetails
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(BookingDetailsDao.ATTR_BOOKING_ID, bookingId);
@@ -1777,7 +1774,7 @@ public class BookingService implements IBookingService {
 
 		// get info Hotel and Client
 		Map<String, Object> keyMapHC = new HashMap<>();
-		keyMap.put(BookingDao.ATTR_ID, bookingId);
+		keyMapHC.put(BookingDao.ATTR_ID, bookingId);
 		List<String> columnsHC = Arrays.asList(ClientDao.ATTR_NAME, ClientDao.ATTR_SURNAME1, ClientDao.ATTR_SURNAME2,
 				ClientDao.ATTR_EMAIL, ClientDao.ATTR_IDENTIFICATION, ClientDao.ATTR_PHONE, HotelDao.ATTR_NAME,
 				HotelDao.ATTR_ADDRESS);
@@ -1811,11 +1808,13 @@ public class BookingService implements IBookingService {
 			pdf = JasperExportManager.exportReportToPdf(jas);
 			JasperExportManager.exportReportToPdfFile(jas, "src/resources/report.pdf");
 
-			String subjectMail = "Expense report";
-			String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
-			Utils.sendMail(hotelAndClientER.get(ClientDao.ATTR_EMAIL).toString(), subjectMail, textMail,
-					"src/resources/report.pdf", null);
-
+			// send mail
+			if (sendMail) {
+				String subjectMail = "Expense report";
+				String textMail = "In this email I enclose your expense report while you stayed at our hotel. We hope you enjoyed, see you soon!";
+				Utils.sendMail(hotelAndClientER.getRecordValues(0).get(ClientDao.ATTR_EMAIL).toString(), subjectMail,
+						textMail, "src/resources/report.pdf", null);
+			}
 		} catch (JRException | MessagingException e) {
 			LOG.error(e.getMessage());
 		}
