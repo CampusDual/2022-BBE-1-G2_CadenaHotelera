@@ -124,8 +124,8 @@ public class BirthdayService implements IBirthdayService {
 				String name = er.getRecordValues(i).get(ClientDao.ATTR_NAME).toString().toUpperCase();
 				String mailClient = er.getRecordValues(i).get(ClientDao.ATTR_EMAIL).toString();
 				try {
-					Utils.sendMail(mailClient, "HAPPY BIRTHDAY!", " CONGRATULATIONS ON YOUR NEW AGE " + name + "!!!!",
-							null, "src//resources//happy_birthday.jpg");
+					Utils.sendMail(mailClient, "Felicidades " +  name,  name + ", en este día tan especial nos hemos acordado de ti!",
+							null, "src//resources//felicitacion.jpg");
 					LOG.info("BIRTHDAY_MAIL_SENT");
 				} catch (MessagingException e) {
 					LOG.error(e.getMessage());
