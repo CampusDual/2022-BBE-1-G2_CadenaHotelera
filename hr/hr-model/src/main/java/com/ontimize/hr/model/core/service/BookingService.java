@@ -1733,7 +1733,7 @@ public class BookingService implements IBookingService {
 
 	/**
 	 * This method returns a pdf jasper report, with the spending details of a
-	 * chosen reservation.
+	 * chosen reservation, and send it by email if indicated.
 	 * 
 	 * @param booking booking id
 	 * @return pdf report

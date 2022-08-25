@@ -65,7 +65,7 @@ public class BirthdayService implements IBirthdayService {
 	 *  Method that sets the enabled/disabled service birthday mail.
 	 *
 	 * @param req the req
-	 * @return the entity result
+	 * @return the entity result if the status change
 	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })

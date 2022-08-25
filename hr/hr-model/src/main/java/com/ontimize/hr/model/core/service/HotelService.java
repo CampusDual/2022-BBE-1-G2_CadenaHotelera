@@ -43,7 +43,6 @@ import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class HotelService.
  */
@@ -354,7 +353,7 @@ public class HotelService implements IHotelService {
 	 * This method consumes an api that returns the closest airports to a
 	 * geographical point according to a given radius.
 	 *
-	 * @param req the request includes hotel and radius
+	 * @param req the request includes hotel and optional radius 
 	 * @return the airports
 	 * @throws OntimizeJEERuntimeException the ontimize JEE runtime exception
 	 */
@@ -468,7 +467,7 @@ public class HotelService implements IHotelService {
 	}
 
 	@Override
-	// @Secured({ PermissionsProviderSecured.SECURED })
+	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult getRecommendations(Map<String, Object> req) {
 		// req va a contener radius e htl_id, radius es opcional, si no viene en la
 		// petición se le pone valor 50
