@@ -303,6 +303,9 @@ public class ClientService implements IClientService {
 		} catch (FillException e) {
 			return EntityUtils.errorResult(e.getMessage(), LOG, null);
 		}
+		catch (DuplicateKeyException e) {
+			return EntityUtils.errorResult(MsgLabels.CLIENT_MAIL_EXISTS, LOG, null);
+		}
 		catch (BadSqlGrammarException e) {
 			return EntityUtils.errorResult(MsgLabels.BAD_DATA, LOG, e);
 		}
