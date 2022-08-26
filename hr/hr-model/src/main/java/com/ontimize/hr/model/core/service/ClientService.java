@@ -1,20 +1,24 @@
 package com.ontimize.hr.model.core.service;
 
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +26,13 @@ import com.ontimize.hr.api.core.service.IClientService;
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
+import com.ontimize.hr.model.core.service.exception.FillException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
+import com.ontimize.hr.model.core.service.utils.entities.ClientFull;
+import com.ontimize.jee.common.db.NullValue;
 import com.ontimize.jee.common.db.SQLStatementBuilder;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicExpression;
 import com.ontimize.jee.common.db.SQLStatementBuilder.BasicField;
@@ -32,6 +40,7 @@ import com.ontimize.jee.common.db.SQLStatementBuilder.BasicOperator;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
+import com.ontimize.jee.common.security.PermissionInfo;
 import com.ontimize.jee.common.security.PermissionsProviderSecured;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
 
@@ -265,6 +274,193 @@ public class ClientService implements IClientService {
 		// devuelvo ID + fechas con AND
 		return new BasicExpression(bexpId, BasicOperator.AND_OP, bexpFechas);
 
+	}
+
+	@Override
+	@Secured({ PermissionsProviderSecured.SECURED })
+	public EntityResult upsertClient(Map<String, Object> map) {
+		try {
+			if (map == null || map.isEmpty()) {
+				return EntityUtils.errorResult(MsgLabels.DATA_MANDATORY, LOG, null);
+			}
+			ClientFull client = fillClient(map, Arrays.asList(ClientDao.ATTR_ID),true);
+			String errorString = validate(client);
+			if (errorString != null)
+				return EntityUtils.errorResult(errorString, LOG, null);
+			Map<String, Object>baseClientFilterMap = new HashMap<String, Object>();
+			baseClientFilterMap.put(ClientDao.ATTR_IDENTIFICATION, client.getIdentification());
+			baseClientFilterMap.put(ClientDao.ATTR_BIRTHDAY, client.getBirthday());
+			EntityResult resBase = daoHelper.query(clientDao, baseClientFilterMap, Arrays.asList(ClientFull.getAllColumns()));
+			if (resBase.isEmpty()) {
+				  return daoHelper.insert(clientDao, fillClientMap(client));
+			}
+			else {
+				ClientFull baseClient = fillClient(resBase.getRecordValues(0));
+				EntityResult resUpdate= daoHelper.update(clientDao, fillClientMap(client), fillClientMap(baseClient));
+				resUpdate.put(ClientDao.ATTR_ID, baseClient.getId());
+				return resUpdate;
+			}
+		} catch (FillException e) {
+			return EntityUtils.errorResult(e.getMessage(), LOG, null);
+		}
+		catch (BadSqlGrammarException e) {
+			return EntityUtils.errorResult(MsgLabels.BAD_DATA, LOG, e);
+		}
+		catch (Exception e) {
+			return EntityUtils.errorResult(MsgLabels.ERROR,LOG,e);
+		}
+
+	}
+
+	private ClientFull fillClient(Map<String, Object> map) {
+		return fillClient(map, null, false);
+	}
+
+	private Map<String, Object> fillClientMap(ClientFull client) {
+		if (client == null || client.isEmpty())
+			throw new NullPointerException(MsgLabels.CLIENT_EMPTY);
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		if (client.getId() != null)
+			result.put(ClientDao.ATTR_ID, client.getId());
+		else if (client.isIdPresent())
+			result.put(ClientDao.ATTR_ID, new NullValue(Types.INTEGER));
+		
+		if(client.getName()!=null)
+			result.put(ClientDao.ATTR_NAME, client.getName());
+		else if(client.isNamePresent())
+			result.put(ClientDao.ATTR_NAME, new NullValue(Types.VARCHAR));
+		
+		if(client.getSurname1()!=null)
+			result.put(ClientDao.ATTR_SURNAME1, client.getSurname1());
+		else if(client.isSurname1Present())
+			result.put(ClientDao.ATTR_SURNAME1, new NullValue(Types.VARCHAR));
+
+		if(client.getSurname2()!=null)
+			result.put(ClientDao.ATTR_SURNAME2, client.getSurname2());
+		else if(client.isSurname2Present())
+			result.put(ClientDao.ATTR_SURNAME2, new NullValue(Types.VARCHAR));
+		
+		if(client.getIdentification()!=null)
+			result.put(ClientDao.ATTR_IDENTIFICATION, client.getIdentification());
+		else if (client.isIdentificationPresent())
+			result.put(ClientDao.ATTR_IDENTIFICATION, new NullValue(Types.VARCHAR));
+		
+		if (client.getBirthday()!=null)
+			result.put(ClientDao.ATTR_BIRTHDAY, client.getBirthday());
+		else if (client.isBirthdayPresent())
+			result.put(ClientDao.ATTR_BIRTHDAY, new NullValue(Types.DATE));
+		
+		if (client.getEmail()!=null)
+			result.put(ClientDao.ATTR_EMAIL, client.getEmail());
+		else if (client.isEmailPresent())
+			result.put(ClientDao.ATTR_EMAIL,new NullValue(Types.VARCHAR));
+		
+		if (client.isEmailSubscription()!=null)
+			result.put(ClientDao.ATTR_EMAIL_SUBSCRIPTION, client.isEmailSubscription());
+		else if (client.isEmailSubscriptionPresent())
+			result.put(ClientDao.ATTR_EMAIL_SUBSCRIPTION, new NullValue(Types.BOOLEAN));
+		
+		if(client.getPhone()!=null)
+			result.put(ClientDao.ATTR_PHONE, client.getPhone());
+		else if (client.isPhonePresent())
+			result.put(ClientDao.ATTR_PHONE, new NullValue(Types.VARCHAR));
+		return result;
+		
+	}
+
+	private ClientFull fillClient(Map<String, Object> map, List<String> ignoreProperties, boolean setPresent) {
+		ClientFull result = new ClientFull(setPresent);
+		if (map == null || map.isEmpty())
+			return result;
+		for (Entry<String, Object> property : map.entrySet()) {
+			if (ignoreProperties == null || (ignoreProperties != null && ignoreProperties.isEmpty())
+					|| ignoreProperties.stream().noneMatch(s -> s.contentEquals(property.getKey()))) {
+				switch (property.getKey()) {
+				case ClientDao.ATTR_ID:
+					Object aux = property.getValue();
+					if (aux != null)
+						try {
+							result.setId(Integer.parseInt(aux.toString()));
+						} catch (NumberFormatException e) {
+							throw new FillException(MsgLabels.CLIENT_ID_FORMAT);
+						}
+					else {
+						result.setId(null);
+					}
+					break;
+				case ClientDao.ATTR_NAME:
+					result.setName(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_SURNAME1:
+					result.setSurname1(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_SURNAME2:
+					result.setSurname2(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_IDENTIFICATION:
+					result.setIdentification(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_BIRTHDAY:
+					aux = property.getValue();
+					if (aux != null) {
+						try {
+							SimpleDateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+							df.setLenient(false);
+							result.setBirthday(df.parse(property.getValue().toString()));
+						} catch (ParseException e) {
+							throw new FillException(MsgLabels.CLIENT_BIRTHDAY_FORMAT);
+						}
+					} else {
+						result.setBirthday(null);
+					}
+					break;
+				case ClientDao.ATTR_EMAIL:
+					result.setEmail(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_PHONE:
+					result.setPhone(property.getValue() == null ? null : property.getValue().toString());
+					break;
+				case ClientDao.ATTR_EMAIL_SUBSCRIPTION:
+					aux = property.getValue();
+					if (aux == null || !"true".equalsIgnoreCase(property.getValue().toString())
+							&& !"false".equalsIgnoreCase(property.getValue().toString())) {
+						throw new FillException(MsgLabels.CLIENT_SURNAME1_MANDATORY);
+					}
+					result.setEmailSubscription(Boolean.parseBoolean(property.getValue().toString()));
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		return result;
+
+	}
+
+	private String validate(ClientFull client) {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		if (client.getBirthday() == null)
+			return MsgLabels.CLIENT_BIRTHDATE_MANDATORY;
+		if (!client.getBirthday().before(c.getTime()))
+			return MsgLabels.CLIENT_BIRTHDATE_TODAY_OR_LATER;
+		if (Utils.stringIsNullOrBlank(client.getName()))
+			return MsgLabels.CLIENT_NAME_MANDATORY;
+		if (Utils.stringIsNullOrBlank(client.getSurname1()))
+			return MsgLabels.CLIENT_SURNAME1_MANDATORY;
+		if (client.getSurname2() != null && client.getSurname2().isBlank())
+			return MsgLabels.CLIENT_SURNAME2_EMPTY_WHITESPACES;
+		if (client.getEmail() != null && !Utils.checkEmail(client.getEmail()))
+			return MsgLabels.CLIENT_MAIL_FORMAT;
+		if (Utils.stringIsNullOrBlank(client.getIdentification()))
+			return MsgLabels.CLIENT_IDENTIFICATION_MANDATORY;
+		if (Utils.stringIsNullOrBlank(client.getPhone()))
+			return MsgLabels.CLIENT_PHONE_EMPTY_WHITESPACES;
+		return null;
 	}
 
 }

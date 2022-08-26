@@ -1,5 +1,6 @@
 package com.ontimize.hr.ws.core.rest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ontimize.hr.api.core.service.IClientService;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.rest.ORestController;
@@ -48,5 +50,17 @@ public class ClientRestController extends ORestController<IClientService> {
 			res.setCode(EntityResult.OPERATION_WRONG);
 			return res;
 		}
+	}
+	
+	@PostMapping(value="upsertClient",produces=MediaType.APPLICATION_JSON_VALUE)
+	public EntityResult upsertClient(@RequestBody Map<String,Object> req) {
+		Map<String, Object>attrMap = new HashMap<String, Object>();
+		try {
+			attrMap= (Map<String, Object>) req.get(Utils.DATA);}
+		catch (Exception e) {
+			// To Shut up sonarLint
+		}
+		return clientService.upsertClient(attrMap);
+		
 	}
 }

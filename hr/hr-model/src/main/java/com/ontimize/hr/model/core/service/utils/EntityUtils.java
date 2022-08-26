@@ -25,6 +25,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -677,6 +678,16 @@ public class EntityUtils {
 		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
 	}
 
+	public static EntityResult errorResult(String message,Logger log,Throwable error) {
+		if(error==null) {
+			log.info(message);
+		}
+		else {
+			log.error(message, error);
+		}
+		return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, message);
+	}
+	
 	/**
 	 * Merges the conditions from the modifiedCondition into the baseCondition
 	 * keeping all the base properties that are null on the modified one.If a

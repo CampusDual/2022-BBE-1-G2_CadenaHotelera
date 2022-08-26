@@ -272,6 +272,8 @@ values(1,(select id_server_permission from TSERVER_PERMISSION where permission_n
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientDelete'));
 insert into trole_server_permission(id_rolename,id_server_permission)
+values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/upsertClient'));
+insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(1,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientsInDateQuery'));
@@ -456,6 +458,8 @@ values(2,(select id_server_permission from TSERVER_PERMISSION where permission_n
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientDelete'));
 insert into trole_server_permission(id_rolename,id_server_permission)
+values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/upsertClient'));
+insert into trole_server_permission(id_rolename,id_server_permission)
 values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/clientsInDateQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(2,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IHotelService/hotelQuery'));
@@ -579,6 +583,8 @@ insert into trole_server_permission(id_rolename,id_server_permission)
 values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingFreeByTypeQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IBookingService/bookingByType'));
+insert into trole_server_permission(id_rolename,id_server_permission)
+values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.IClientService/upsertClient'));
 insert into trole_server_permission(id_rolename,id_server_permission)
 values(4,(select id_server_permission from TSERVER_PERMISSION where permission_name ='com.ontimize.hr.api.core.service.ISeasonService/seasonQuery'));
 insert into trole_server_permission(id_rolename,id_server_permission)

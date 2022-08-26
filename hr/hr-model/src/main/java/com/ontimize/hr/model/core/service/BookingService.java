@@ -1516,6 +1516,9 @@ public class BookingService implements IBookingService {
 		return daoHelper.update(this.bookingDao, attrMap, keyMap);
 	}
 
+	/**
+	 * Shows the number of free rooms by type. There are two filter options by hotel or by city.
+	 */
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingFreeByCityOrHotel(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {

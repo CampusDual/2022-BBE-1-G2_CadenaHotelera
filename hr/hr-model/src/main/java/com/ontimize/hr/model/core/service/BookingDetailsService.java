@@ -264,6 +264,11 @@ public class BookingDetailsService implements IBookingDetailsService {
 		}
 	}
 
+	/**
+	 * Adds a charge to a a room by the booking id.
+	 * It also has the possibility to mark the charge as gift. The charge will show in the list even if its a gift.
+	 */
+	
 	@Override
 	@Secured({ PermissionsProviderSecured.SECURED })
 	public EntityResult bookingDetailsAdd(Map<String, Object> keyMap) throws OntimizeJEERuntimeException {

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +26,16 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.ClientDao;
 import com.ontimize.hr.model.core.dao.HotelDao;
+import com.ontimize.hr.model.core.service.exception.FillException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
+import com.ontimize.hr.model.core.service.utils.EntityUtils;
 import com.ontimize.hr.model.core.service.utils.Utils;
+import com.ontimize.hr.model.core.service.utils.entities.ClientFull;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.server.dao.DefaultOntimizeDaoHelper;
@@ -52,42 +57,44 @@ class ClientServiceTest {
 	@Mock
 	private Utils utils;
 
-	
 	@Test
 	@DisplayName("Query client")
 	void QueryClient() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
-		keyMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
-		
+		keyMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
+
 		List<String> attrList = new ArrayList<String>();
 		attrList.add(ClientDao.ATTR_IDENTIFICATION);
-		when(daoHelper.query(isA(ClientDao.class), anyMap(), any())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientQuery(keyMap, attrList).getCode());
+		when(daoHelper.query(isA(ClientDao.class), anyMap(), any()))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.clientQuery(keyMap, attrList).getCode());
 	}
-	
+
 	@Test
 	@DisplayName("Delete client")
 	void DeleteClient() {
 		Map<String, Object> keyMap = new HashMap<String, Object>();
-		keyMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
-		
-		when(daoHelper.delete(isA(ClientDao.class), anyMap())).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientDelete(keyMap).getCode());
+		keyMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
+
+		when(daoHelper.delete(isA(ClientDao.class), anyMap()))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.clientDelete(keyMap).getCode());
 	}
-	
+
 	@Test
 	@DisplayName("Inserting client")
 	void InsertClient() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		attrMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
-		attrMap.put(ClientDao.ATTR_NAME,"Juan");
-		attrMap.put(ClientDao.ATTR_SURNAME1,"Perico");
-		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
-		
-		when(daoHelper.insert(clientDao, attrMap)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientInsert(attrMap).getCode());
+		attrMap.put(ClientDao.ATTR_IDENTIFICATION, "12341234J");
+		attrMap.put(ClientDao.ATTR_NAME, "Juan");
+		attrMap.put(ClientDao.ATTR_SURNAME1, "Perico");
+		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
+
+		when(daoHelper.insert(clientDao, attrMap))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.clientInsert(attrMap).getCode());
 	}
-	
+
 	@Test
 	@DisplayName("Inserting mail duplicated")
 	void InsertClientMailExists() {
@@ -98,37 +105,40 @@ class ClientServiceTest {
 		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
 
 		when(daoHelper.insert(clientDao, attrMap)).thenThrow(new DuplicateKeyException(""));
-		//doThrow(new DuplicateKeyException(" ")).when(daoHelper).insert(clientDao,attrMap);
+		// doThrow(new DuplicateKeyException("
+		// ")).when(daoHelper).insert(clientDao,attrMap);
 		EntityResult er = service.clientInsert(attrMap);
-		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,er.getMessage());
+		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS, er.getMessage());
 	}
 
 	@Test
 	@DisplayName("Inserting mail wrong format")
 	void InsertBadFormatClientMail() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		attrMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
-		attrMap.put(ClientDao.ATTR_NAME,"Juan");
-		attrMap.put(ClientDao.ATTR_SURNAME1,"Perico");
-		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail");
-		
-		//when(daoHelper.insert(clientDao, attrMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,service.clientInsert(attrMap).getMessage());
+		attrMap.put(ClientDao.ATTR_IDENTIFICATION, "12341234J");
+		attrMap.put(ClientDao.ATTR_NAME, "Juan");
+		attrMap.put(ClientDao.ATTR_SURNAME1, "Perico");
+		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail");
+
+		// when(daoHelper.insert(clientDao, attrMap)).thenThrow(new
+		// DuplicateKeyException(""));
+		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT, service.clientInsert(attrMap).getMessage());
 	}
-	
+
 	@Test
 	@DisplayName("Updating client")
 	void UpdateClient() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail.com");
-		
+		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
+
 		Map<String, Object> keyMap = new HashMap<String, Object>();
-		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
-		
-		when(daoHelper.update(clientDao, attrMap,keyMap)).thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
-		assertEquals(EntityResult.OPERATION_SUCCESSFUL,service.clientUpdate(attrMap,keyMap).getCode());
+		keyMap.put(ClientDao.ATTR_IDENTIFICATION, "12341234J");
+
+		when(daoHelper.update(clientDao, attrMap, keyMap))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_SUCCESSFUL, 0, ""));
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, service.clientUpdate(attrMap, keyMap).getCode());
 	}
-	
+
 	@Test
 	@DisplayName("Updating mail duplicated")
 	void UpdateClientMailExists() {
@@ -136,26 +146,26 @@ class ClientServiceTest {
 		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail.com");
 
 		Map<String, Object> keyMap = new HashMap<String, Object>();
-		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
-		
-		when(daoHelper.update(clientDao, attrMap,keyMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS,service.clientUpdate(attrMap,keyMap).getMessage());
+		keyMap.put(ClientDao.ATTR_IDENTIFICATION, "12341234J");
+
+		when(daoHelper.update(clientDao, attrMap, keyMap)).thenThrow(new DuplicateKeyException(""));
+		assertEquals(MsgLabels.CLIENT_MAIL_EXISTS, service.clientUpdate(attrMap, keyMap).getMessage());
 	}
-	
+
 	@Test
 	@DisplayName("Updating mail Format")
 	void UpdateClientMailFormat() {
 		Map<String, Object> attrMap = new HashMap<String, Object>();
-		attrMap.put(ClientDao.ATTR_EMAIL,"juan@mail");
-		
+		attrMap.put(ClientDao.ATTR_EMAIL, "juan@mail");
+
 		Map<String, Object> keyMap = new HashMap<String, Object>();
-		keyMap.put(ClientDao.ATTR_IDENTIFICATION,"12341234J");
-		
-		//when(daoHelper.update(clientDao, attrMap,keyMap)).thenThrow(new DuplicateKeyException(""));
-		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT,service.clientUpdate(attrMap,keyMap).getMessage());
+		keyMap.put(ClientDao.ATTR_IDENTIFICATION, "12341234J");
+
+		// when(daoHelper.update(clientDao, attrMap,keyMap)).thenThrow(new
+		// DuplicateKeyException(""));
+		assertEquals(MsgLabels.CLIENT_MAIL_FORMAT, service.clientUpdate(attrMap, keyMap).getMessage());
 	}
-	
-	
+
 	@Test
 	@DisplayName("The Hotel does not exists")
 	void ClientsInDateHotelNotExists() {
@@ -163,10 +173,10 @@ class ClientServiceTest {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
 		result.setMessage(MsgLabels.HOTEL_NOT_EXIST);
-		
-		Map<String,Object> req = new HashMap<String,Object>();
-		
-		Map<String,Object> filter = new HashMap<String,Object>();
+
+		Map<String, Object> req = new HashMap<String, Object>();
+
+		Map<String, Object> filter = new HashMap<String, Object>();
 		filter.put(BookingDao.ATTR_HTL_ID, 1);
 		filter.put("qry_date", "2022-07-01");
 		List<String> columns = new ArrayList<String>();
@@ -180,8 +190,8 @@ class ClientServiceTest {
 		List<String> attrList = new ArrayList<>();
 		attrList.add(HotelDao.ATTR_NAME);
 
-		when(daoHelper.query(hotelDao, keyMapHotel, attrList)).thenReturn(
-				new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_NOT_EXISTS));
+		when(daoHelper.query(hotelDao, keyMapHotel, attrList))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 0, MsgLabels.CLIENT_NOT_EXISTS));
 
 		assertEquals(result.getCode(), service.clientsInDateQuery(req).getCode());
 		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
@@ -194,9 +204,9 @@ class ClientServiceTest {
 		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
 		result.setMessage(MsgLabels.CLIENT_NOT_FOUND);
-		
-		Map<String,Object> req = new HashMap<String,Object>();		
-		Map<String,Object> filter = new HashMap<String,Object>();
+
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
 		List<String> columns = new ArrayList<String>();
 
 		filter.put(BookingDao.ATTR_HTL_ID, 1);
@@ -216,8 +226,8 @@ class ClientServiceTest {
 		resultHotel.addRecord(keyMap);
 
 		when(daoHelper.query(hotelDao, keyMap, attrList)).thenReturn(resultHotel);
-		when(daoHelper.query(isA(ClientDao.class), anyMap(), any(), anyString())).thenReturn(new EntityResultMapImpl(
-				EntityResult.OPERATION_WRONG, 12, MsgLabels.CLIENT_NOT_FOUND));
+		when(daoHelper.query(isA(ClientDao.class), anyMap(), any(), anyString()))
+				.thenReturn(new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.CLIENT_NOT_FOUND));
 
 		assertEquals(result.getCode(), service.clientsInDateQuery(req).getCode());
 		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
@@ -251,65 +261,67 @@ class ClientServiceTest {
 
 		assertEquals(result.getCode(), service.clientsInDateQuery(req).getCode());
 	}
-	
+
 	@Test
 	@DisplayName("MandatoryColumns")
 	void ClientsInDateNoColumns() {
-		
-		EntityResult result = new EntityResultMapImpl();		
+
+		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
 		result.setMessage(MsgLabels.COLUMNS_MANDATORY);
-		
-		Map<String,Object> req = new HashMap<String,Object>();		
-		Map<String,Object> filter = new HashMap<String,Object>();
+
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
 		List<String> columns = new ArrayList<String>();
-		
+
 		filter.put(BookingDao.ATTR_HTL_ID, 1);
 		filter.put("qry_date", "2022-07-18");
-		
+
 		columns.add(BookingDao.ATTR_HTL_ID);
-		
+
 		req.put("filter", filter);
-		//req.put("columns", columns);
-		
+		// req.put("columns", columns);
+
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(HotelDao.ATTR_ID, 1);
 		List<String> attrList = new ArrayList<>();
 		attrList.add(HotelDao.ATTR_NAME);
-				
-		//when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new RuntimeException("Exception"));
-		
-		assertEquals(result.getMessage(),service.clientsInDateQuery(req).getMessage());
+
+		// when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new
+		// RuntimeException("Exception"));
+
+		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
 	}
-	
+
 	@Test
 	@DisplayName("MandatoryFilter")
 	void ClientsInDateNoFilter() {
-		
-		EntityResult result = new EntityResultMapImpl();		
+
+		EntityResult result = new EntityResultMapImpl();
 		result.setCode(EntityResult.OPERATION_WRONG);
 		result.setMessage(MsgLabels.FILTER_MANDATORY);
-		
-		Map<String,Object> req = new HashMap<String,Object>();		
-		Map<String,Object> filter = new HashMap<String,Object>();
+
+		Map<String, Object> req = new HashMap<String, Object>();
+		Map<String, Object> filter = new HashMap<String, Object>();
 		List<String> columns = new ArrayList<String>();
-		
+
 		filter.put(BookingDao.ATTR_HTL_ID, 1);
 		filter.put("qry_date", "2022-07-18");
-		
+
 		columns.add(BookingDao.ATTR_HTL_ID);
-		
-		//req.put("filter", filter);
+
+		// req.put("filter", filter);
 		req.put("columns", columns);
-		
+
 		Map<String, Object> keyMap = new HashMap<>();
 		keyMap.put(HotelDao.ATTR_ID, 1);
 		List<String> attrList = new ArrayList<>();
 		attrList.add(HotelDao.ATTR_NAME);
-				
-		//when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new RuntimeException("Exception"));
-		
-		assertEquals(result.getMessage(),service.clientsInDateQuery(req).getMessage());
+
+		// when(daoHelper.query(hotelDao, keyMap, attrList)).thenThrow(new
+		// RuntimeException("Exception"));
+
+		assertEquals(result.getMessage(), service.clientsInDateQuery(req).getMessage());
 	}
 
 	@Test
@@ -687,11 +699,89 @@ class ClientServiceTest {
 
 		EntityResult er;
 		try (MockedStatic<Utils> mocked = mockStatic(Utils.class)) {
-			mocked.when(() -> Utils.sendMail(anyString(),anyString(),anyString(), anyString(),any())).thenThrow(new AddressException());
+			mocked.when(() -> Utils.sendMail(anyString(), anyString(), anyString(), anyString(), any()))
+					.thenThrow(new AddressException());
 			er = service.sendMailClients(req);
 		}
 
 		assertEquals(EntityResult.OPERATION_WRONG, er.getCode());
 		assertEquals(MsgLabels.ERROR_SENDING_MAIL, er.getMessage());
 	}
+
+	@Test
+	@DisplayName("FailClientUpsertNodata")
+	void clientUpsertNoData() {
+		Map<String, Object> req = new HashMap<String, Object>();
+
+		EntityResult res = service.upsertClient(null);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.DATA_MANDATORY, res.getMessage());
+	}
+
+	@Test
+	@DisplayName("FailClientDataMalformed")
+	void clientUpserDataMalformed() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(ClientDao.ATTR_BIRTHDAY, "2002-68-15");
+		EntityResult res = service.upsertClient(req);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.CLIENT_BIRTHDAY_FORMAT, res.getMessage());
+	}
+
+	@Test
+	@DisplayName("FailClientDataNotValidate")
+	void clientUpserDataNotValidated() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(ClientDao.ATTR_NAME, "Alejandro");
+		req.put(ClientDao.ATTR_SURNAME1, "Torres");
+		req.put(ClientDao.ATTR_SURNAME2, "Martinez");
+		req.put(ClientDao.ATTR_PHONE, "9531651234");
+		req.put(ClientDao.ATTR_BIRTHDAY, "2002-08-15");
+		EntityResult res = service.upsertClient(req);
+		assertEquals(EntityResult.OPERATION_WRONG, res.getCode());
+		assertEquals(MsgLabels.CLIENT_IDENTIFICATION_MANDATORY, res.getMessage());
+	}
+	
+	@Test
+	@DisplayName("FalkeInsertNewClient")
+	void clientUpserFakeInsert() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(ClientDao.ATTR_NAME, "Alejandro");
+		req.put(ClientDao.ATTR_SURNAME1, "Torres");
+		req.put(ClientDao.ATTR_SURNAME2, "Martinez");
+		req.put(ClientDao.ATTR_IDENTIFICATION, "982651621W");
+		req.put(ClientDao.ATTR_PHONE, "9531651234");
+		req.put(ClientDao.ATTR_BIRTHDAY, "2002-08-15");
+		when(daoHelper.query(isA(ClientDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl());
+		when(daoHelper.insert(isA(ClientDao.class), anyMap())).thenReturn(new EntityResultMapImpl() {{put(ClientDao.ATTR_ID,1);}});
+		EntityResult res = service.upsertClient(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+		assertEquals(1, res.get(ClientDao.ATTR_ID));
+	}
+	
+	@Test
+	@DisplayName("FalkeUpdateClient")
+	void clientUpserFakeUpdate() {
+		Map<String, Object> req = new HashMap<String, Object>();
+		req.put(ClientDao.ATTR_NAME, "Alejandro");
+		req.put(ClientDao.ATTR_SURNAME1, "Torres");
+		req.put(ClientDao.ATTR_SURNAME2, "Martinez");
+		req.put(ClientDao.ATTR_IDENTIFICATION, "982651621W");
+		req.put(ClientDao.ATTR_PHONE, "9531651234");
+		req.put(ClientDao.ATTR_BIRTHDAY, "2002-08-15");
+		when(daoHelper.query(isA(ClientDao.class), anyMap(), anyList())).thenReturn(new EntityResultMapImpl() {{
+			addRecord(new HashMap<String, Object>(){{
+				put(ClientDao.ATTR_ID,1);
+			}});
+		}});
+		when(daoHelper.update(isA(ClientDao.class), anyMap(),anyMap())).thenReturn(new EntityResultMapImpl() {{
+			addRecord(new HashMap<String, Object>(){{
+				put(ClientDao.ATTR_ID,1);
+			}});
+		}});
+		EntityResult res = service.upsertClient(req);
+		assertEquals(EntityResult.OPERATION_SUCCESSFUL, res.getCode());
+		assertEquals(1, res.get(ClientDao.ATTR_ID));
+	}
+	
 }

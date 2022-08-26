@@ -11,6 +11,13 @@ public class MsgLabels {
 	public static final String CLIENT_MAIL_FORMAT = "WRONG_CLIENT_MAIL_FORMAT";
 	public static final String CLIENT_MAIL_EXISTS = "CLIENT_MAIL_ALREADY_EXISTS";
 	public static final String CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND";
+	public static final String CLIENT_BIRTHDAY_FORMAT="CLIENT_BIRTHDAY_FORMAT";
+	public static final String CLIENT_BIRTHDATE_TODAY_OR_LATER="CLIENT_BIRTHDATE_TODAY_OR_LATER";
+	public static final String CLIENT_SURNAME1_MANDATORY = "CLIENT_SURNAME1_MANDATORY";
+	public static final String CLIENT_SURNAME2_EMPTY_WHITESPACES = "CLIENT_SURNAME2_EMPTY_WHITESPACES";
+	public static final String CLIENT_PHONE_EMPTY_WHITESPACES = "CLIENT_PHONE_EMPTY_WHITESPACES";
+	public static final String CLIENT_EMAIL_SUBSCRIPTION_FORMAT="CLIENT_EMAIL_SUBSCRIPTION_FORMAT";
+	public static final String CLIENT_EMPTY="CLIENT_EMPTY";
 
 	// EMPLOYEE
 	public static final String EMPLOYEE_NOT_EXIST = "EMPLOYEE_DOES_NOT_EXIST";
@@ -300,6 +307,7 @@ public class MsgLabels {
 	public static final String ROOM_TYPE_NOT_FOUND = "ROOM_TYPE_NOT_FOUND";
 	public static final String BOOKING_SAME_ROOM = "BOOKING_SAME_ROOM";
 	public static final String BOOKING_DIFFERENT_ROOM_TYPE = "BOOKING_DIFFERENT_ROOM_TYPE";
+	public static final String CLIENT_BIRTHDATE_MANDATORY = "CLIENT_BIRTHDATE_MANDATORY";
 	
 
 

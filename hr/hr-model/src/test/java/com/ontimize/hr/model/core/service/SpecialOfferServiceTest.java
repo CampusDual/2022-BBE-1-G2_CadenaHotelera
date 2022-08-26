@@ -122,7 +122,7 @@ class SpecialOfferServiceTest {
 		keyMap.put(SpecialOfferDao.ATTR_ID, 1);
 		when(entityUtils.specialOfferExists(1)).thenReturn(true);
 		UserInformation userInformation = new UserInformation("Mister X", "",
-				(Collection<? extends GrantedAuthority>) new ArrayList<>(), null);
+				(Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>(), null);
 		when(daoHelper.getUser()).thenReturn(userInformation);
 		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
 		when(entityUtils.isOfferFromHotelOnly(anyInt(), anyInt())).thenReturn(false);
@@ -138,7 +138,7 @@ class SpecialOfferServiceTest {
 		keyMap.put(SpecialOfferDao.ATTR_ID, 1);
 		when(entityUtils.specialOfferExists(1)).thenReturn(true);
 		UserInformation userInformation = new UserInformation("Mister X", "",
-				(Collection<? extends GrantedAuthority>) new ArrayList<>(), null);
+				(Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>(), null);
 		when(daoHelper.getUser()).thenReturn(userInformation);
 		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(-1);
 		when(daoHelper.update(isA(SpecialOfferDao.class), anyMap(), anyMap())).thenReturn(new EntityResultMapImpl());
@@ -153,7 +153,7 @@ class SpecialOfferServiceTest {
 		keyMap.put(SpecialOfferDao.ATTR_ID, 1);
 		when(entityUtils.specialOfferExists(1)).thenReturn(true);
 		UserInformation userInformation = new UserInformation("Mister X", "",
-				(Collection<? extends GrantedAuthority>) new ArrayList<>(), null);
+				(Collection<? extends GrantedAuthority>) new ArrayList<GrantedAuthority>(), null);
 		when(daoHelper.getUser()).thenReturn(userInformation);
 		when(credentialUtils.getHotelFromUser(anyString())).thenReturn(1);
 		when(entityUtils.isOfferFromHotelOnly(anyInt(), anyInt())).thenReturn(true);

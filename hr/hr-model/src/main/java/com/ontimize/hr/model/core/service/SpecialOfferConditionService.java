@@ -173,10 +173,10 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 		} catch (BadSqlGrammarException e) {
 			LOG.error(MsgLabels.BAD_DATA, e);
 			return EntityUtils.errorResult(MsgLabels.BAD_DATA);
-		} catch (FetchException |MergeException e) {
+		} catch (FetchException | MergeException e) {
 			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(e.getMessage());
-		}catch (Exception e) {
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return EntityUtils.errorResult(MsgLabels.ERROR);
 		}
@@ -270,8 +270,14 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			LOG.error(MsgLabels.FETCHING_ERROR);
 			throw new FetchException(MsgLabels.FETCHING_ERROR);
 		}
-		if (res.isEmpty())
+		if (res.isEmpty()) {
+			if (entityUtils.specialOfferExists(offerId)) {
+				OfferCondition noconditions =   new OfferCondition();
+				noconditions.setOfferId(offerId);
+				return noconditions;				
+			}
 			return null;
+		}
 
 		for (int i = 0; i < res.calculateRecordNumber(); i++) {
 			boolean conditionChecks = true;
