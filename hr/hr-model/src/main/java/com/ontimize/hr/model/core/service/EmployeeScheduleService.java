@@ -1,7 +1,10 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +19,12 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
 import com.ontimize.hr.api.core.service.IEmployeeScheduleService;
+import com.ontimize.hr.model.core.dao.BookingDao;
 import com.ontimize.hr.model.core.dao.EmployeeDao;
 import com.ontimize.hr.model.core.dao.EmployeeScheduleDao;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.dto.EntityResultMapImpl;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -46,8 +51,19 @@ public class EmployeeScheduleService implements IEmployeeScheduleService {
 	public EntityResult employeeScheduleQuery(Map<String, Object> keyMap, List<String> attrList)
 			throws OntimizeJEERuntimeException {
 		try {
+			Date schDay = null;
+			if(keyMap.containsKey(employeeScheduleDao.ATTR_DAY)) {
+				SimpleDateFormat df = new SimpleDateFormat(Utils.DATE_FORMAT_ISO);
+				df.setLenient(false);
+				schDay = df.parse(keyMap.get(employeeScheduleDao.ATTR_DAY).toString());
+				keyMap.remove(employeeScheduleDao.ATTR_DAY);
+				keyMap.put(employeeScheduleDao.ATTR_DAY, schDay);
+			}
 			return this.daoHelper.query(this.employeeScheduleDao, keyMap, attrList);
 		} catch (BadSqlGrammarException e) {
+			LOG.info(MsgLabels.BAD_DATA);
+			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
+		} catch (ParseException e) {
 			LOG.info(MsgLabels.BAD_DATA);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.BAD_DATA);
 		}
