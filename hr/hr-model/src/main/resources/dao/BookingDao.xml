@@ -28,8 +28,9 @@
 			     LEFT JOIN
 			     	PUBLIC.booking b
 			     on 
-			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id			     	
-			    #WHERE#
+			     	r.rom_number = b.bok_rom_number and r.rom_htl_id=b.bok_htl_id	
+			     WHERE b.bok_status_code = 'A'	
+			    #WHERE_CONCAT#
 			    Order by rom_number 
 			   ]]>
    			</Sentence>
