@@ -1,6 +1,9 @@
 package com.ontimize.hr.model.core.service;
 
+import java.text.SimpleDateFormat;
 import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +30,7 @@ import com.ontimize.hr.model.core.service.exception.ValidationException;
 import com.ontimize.hr.model.core.service.msg.labels.MsgLabels;
 import com.ontimize.hr.model.core.service.utils.CredentialUtils;
 import com.ontimize.hr.model.core.service.utils.EntityUtils;
+import com.ontimize.hr.model.core.service.utils.Utils;
 import com.ontimize.hr.model.core.service.utils.entities.OfferCondition;
 import com.ontimize.jee.common.dto.EntityResult;
 import com.ontimize.jee.common.exceptions.OntimizeJEERuntimeException;
@@ -289,7 +293,9 @@ public class SpecialOfferConditionService implements ISpecialOffersConditionsSer
 			Integer auxDays = (Integer) condition.get(SpecialOfferConditionDao.ATTR_NIGHTS);
 			Integer calculatedDays = null;
 			if (auxBookingStart != null && auxBookingEnd != null) {
-				calculatedDays = (int) ChronoUnit.DAYS.between(auxBookingStart.toInstant(), auxBookingEnd.toInstant());
+				LocalDate auxbookingDateStartL = LocalDate.parse(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(auxBookingStart));
+				LocalDate auxbookingDateEndL =  LocalDate.parse(new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(auxBookingEnd));
+				calculatedDays = (int) ChronoUnit.DAYS.between(auxbookingDateStartL,auxbookingDateEndL);
 			}
 			conditionChecks &= (auxHotelId == null || hotelid.equals(auxHotelId));
 			conditionChecks &= (auxRoomType == null || roomType.equals(auxRoomType));

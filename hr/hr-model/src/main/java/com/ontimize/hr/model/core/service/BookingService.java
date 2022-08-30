@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -679,8 +680,8 @@ public class BookingService implements IBookingService {
 			}
 		}
 
-		if (offerID != null && offerID != -1 && !specialOfferService.isOfferAplicable(offerID, hotelId, roomType,
-				entryDate, departureDate, Calendar.getInstance().getTime())) {
+		if (offerID != null && offerID != -1 &&  !specialOfferService.isOfferAplicable(offerID, hotelId, roomType,
+				entryDate, departureDate, Calendar.getInstance().getTime())){
 			LOG.info(MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.SPECIAL_OFFER_DOES_NOT_APPLY);
 		}
@@ -689,8 +690,7 @@ public class BookingService implements IBookingService {
 
 		Map<String, Object> filterMap = new HashMap<>();
 		filterMap.put(BookingDao.ATTR_ENTRY_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(entryDate));
-		filterMap.put(BookingDao.ATTR_DEPARTURE_DATE,
-				new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(departureDate));
+		filterMap.put(BookingDao.ATTR_DEPARTURE_DATE, new SimpleDateFormat(Utils.DATE_FORMAT_ISO).format(departureDate));
 		filterMap.put(BookingDao.ATTR_HTL_ID, hotelId);
 
 		queryFreeRoomMap.put(Utils.FILTER, filterMap);
@@ -1037,7 +1037,7 @@ public class BookingService implements IBookingService {
 			return new EntityResultMapImpl(EntityResult.OPERATION_WRONG, 12, MsgLabels.ENTRY_DATE_BLANK);
 		}
 
-		LocalDateTime t = LocalDateTime.now();
+		LocalDateTime t = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 		Date today = Timestamp.valueOf(t);
 		if (startDate.before(today)) {
 			LOG.info(MsgLabels.DATE_BEFORE_TODAY);

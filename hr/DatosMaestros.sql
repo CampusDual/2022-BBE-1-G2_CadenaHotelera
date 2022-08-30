@@ -5,7 +5,8 @@
 insert into details_type(det_code, det_description) values ('NIGHT','Price room night');
 insert into details_type(det_code, det_description) values ('LNDRY','Laundry service');
 insert into details_type(det_code, det_description) values ('BRKFS','Breakfast');
-insert into details_type(det_code, det_description) values ('MNBAR','Minibar');        
+insert into details_type(det_code, det_description) values ('MNBAR','Minibar');
+insert into details_type(det_code, det_description) values ('PRKNG','Parking');
 
 
 /**************************************************************************/
@@ -18,14 +19,17 @@ insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(1,1);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(2,1);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(3,1);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(4,1);
+insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(5,1);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(1,2);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(2,2);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(3,2);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(4,2);
+insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(5,2);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(1,3);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(2,3);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(3,3);
 insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(4,3);
+insert into details_type_hotel(dhtl_det_id,dhtl_htl_id)values(5,3);
 
 INSERT INTO room_type(rtyp_name,rtyp_bed_number,rtyp_base_price,rtyp_capacity) VALUES('doble',2,200,4);
 INSERT INTO room_type(rtyp_name,rtyp_bed_number,rtyp_base_price,rtyp_capacity) VALUES('simple',1,120,1);

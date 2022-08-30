@@ -358,8 +358,8 @@ public class SpecialOfferProductService implements ISpecialOffersProductsService
 			return MsgLabels.PRODUCT_PERCENT_DISCOUNT_ZERO_NEGATIVE;
 		if (product.getFlat() != null && product.getFlat().doubleValue() <= 0)
 			return MsgLabels.PRODUCT_FLAT_DISCOUNT_ZERO_NEGATIVE;
-		if (product.getSwap() != null && product.getSwap().doubleValue() <= 0)
-			return MsgLabels.PRODUCT_SWAP_DISCOUNT_ZERO_NEGATIVE;
+		if (product.getSwap() != null && product.getSwap().doubleValue() < 0)
+			return MsgLabels.PRODUCT_SWAP_DISCOUNT_NEGATIVE;
 		return null;
 	}
 

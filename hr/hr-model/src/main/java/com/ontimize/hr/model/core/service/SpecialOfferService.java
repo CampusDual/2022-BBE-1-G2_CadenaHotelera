@@ -635,6 +635,13 @@ public class SpecialOfferService implements ISpecialOffersService {
 	}
 
 	public boolean isOfferActive(Integer offerId, Date bookingDate) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(bookingDate);
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE,0);
+		c.set(Calendar.SECOND,0);
+		c.set(Calendar.MILLISECOND,0);
+		bookingDate=c.getTime();
 		Map<String, Object> keyMap = new HashMap<>();
 		BasicField offer = new BasicField(SpecialOfferDao.ATTR_ID);
 		BasicField start = new BasicField(SpecialOfferDao.ATTR_START);
